@@ -36,15 +36,19 @@ const input = ref('');
       >
         レシピ一覧
       </el-button>
+    </div>
+    <div class="search">
       <el-button
         class="search-button"
         round
       >
         検索
       </el-button>
-      <div class="search-bar">
-        <el-input v-model="input" placeholder="レシピ名・食材で検索" />
-      </div>
+      <el-input
+        class="search-bar"
+        v-model="input"
+        placeholder="レシピ名・食材で検索"
+      />
     </div>
   </div>
 </template>
@@ -62,6 +66,12 @@ const input = ref('');
   color: black;
   font-size: 22px;
 }
+.search {
+  float: right;
+  height: 40px;
+  width: 330px;
+  margin-top: 10px;
+}
 .search-bar {
   float: right;
   width: 230px;
@@ -71,14 +81,12 @@ const input = ref('');
   color: black;
   font-size: 16px;
   height: 100%;
-}
-.el-button {
-  margin-left: 0;
+  margin-left: 5px;
 }
 .menu {
   float: right;
   height: 40px;
-  width: 750px;
+  width: 400px;
   margin-top: 10px;
 }
 .menu-item {
