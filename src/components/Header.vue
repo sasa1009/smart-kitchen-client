@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+// @ts-ignore
+import { useMq } from "vue3-mq";
 const input = ref('');
+const mq = useMq();
 </script>
 
 <template>
@@ -11,6 +14,19 @@ const input = ref('');
     >
       SMART KITCHEN
     </el-button>
+    <div class="search">
+      <el-input
+        class="search-bar"
+        v-model="input"
+        placeholder="レシピ名・食材で検索"
+      />
+      <el-button
+        class="search-button"
+        round
+      >
+        検索
+      </el-button>
+    </div>
     <div class="menu">
       <el-button
         type="text"
@@ -37,19 +53,6 @@ const input = ref('');
         レシピ一覧
       </el-button>
     </div>
-    <div class="search">
-      <el-button
-        class="search-button"
-        round
-      >
-        検索
-      </el-button>
-      <el-input
-        class="search-bar"
-        v-model="input"
-        placeholder="レシピ名・食材で検索"
-      />
-    </div>
   </div>
 </template>
 
@@ -61,23 +64,22 @@ const input = ref('');
   vertical-align: middle;
 }
 .logo {
+  float: left;
   margin-top: 10px;
   padding: 0;
   color: black;
   font-size: 22px;
 }
 .search {
-  float: right;
+  float: left;
   height: 40px;
-  width: 330px;
-  margin-top: 10px;
+  width: 315px;
+  margin: 10px 0 0 20px;
 }
 .search-bar {
-  float: right;
   width: 230px;
 }
 .search-button {
-  float: right;
   color: black;
   font-size: 16px;
   height: 100%;
