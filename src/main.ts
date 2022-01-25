@@ -7,6 +7,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { far } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { Vue3Mq } from "vue3-mq";
 
@@ -19,7 +20,7 @@ app
   .use(Vue3Mq, {
     breakpoints: {
       sm: 0,
-      md: 700,
+      md: 750,
       lg: 960,
     }
   })

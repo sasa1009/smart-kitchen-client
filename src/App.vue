@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import Header from '@/components/header/Index.vue';
+import Top from '@/components/Top.vue';
 </script>
 
 <template>
   <el-container>
     <el-header
-      style="padding: 0"
       class="header"
     >
       <Header />
@@ -13,7 +13,7 @@ import Header from '@/components/header/Index.vue';
     <el-main
       class="main"
     >
-
+      <Top />
     </el-main>
   </el-container>
 </template>
@@ -34,8 +34,10 @@ body {
 <style scoped>
 .header {
   background-color: #EAD00D;
+  padding: 0;
 }
 .main {
   background-color: #FFF4D6;
+  padding: 0;
 }
 </style>
