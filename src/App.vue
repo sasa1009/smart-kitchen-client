@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Header from '@/components/Header.vue';
+import Header from '@/components/header/Index.vue';
 </script>
 
 <template>
@@ -10,6 +10,11 @@ import Header from '@/components/Header.vue';
     >
       <Header />
     </el-header>
+    <el-main
+      class="main"
+    >
+
+    </el-main>
   </el-container>
 </template>
 
@@ -29,5 +34,8 @@ body {
 <style scoped>
 .header {
   background-color: #EAD00D;
+}
+.main {
+  background-color: #FFF4D6;
 }
 </style>
