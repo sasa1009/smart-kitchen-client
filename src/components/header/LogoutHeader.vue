@@ -66,7 +66,7 @@ const isDrawerOpen = ref(false);
       class="menu-md"
     >
       <el-popover
-        placement="bottom-start"
+        placement="bottom-end"
         :width="200"
         trigger="click"
       >
