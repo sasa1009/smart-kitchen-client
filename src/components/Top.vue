@@ -97,47 +97,46 @@ const categories = [
   </div>
   <el-tabs
     type="border-card"
-    class="search-pane"
+    :class="'search-pane-' + mq.current"
   >
     <el-tab-pane
       label="食材から探す"
     >
-      <div class="pane">
-        <div
-          v-for="(ingredient, i) in ingredients"
-          :key="i"
-        >
-          <span class="ingredient-title">{{ ingredient.ingredientCategory }}</span>
-          <el-row class="ingredient-row">
-            <el-col
-              v-for="(item, j) in ingredient.items"
-              :key="j"
-              :span="4"
+      <div
+        v-for="(ingredient, i) in ingredients"
+        :key="i"
+      >
+        <span class="ingredient-title">{{ ingredient.ingredientCategory }}</span>
+        <el-row :class="'ingredient-row-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
+          <el-col
+            v-for="(item, j) in ingredient.items"
+            :key="j"
+            :span="mq.current === 'sm' ? 6 : 4"
+          >
+            <el-link
+              :underline="false"
+              href=""
+              class="search-item"
             >
-              <el-link
-                :underline="false"
-                href=""
-                class="search-item"
-              >
-                <font-awesome-icon
-                  :icon="['fas', 'angle-right']"
-                  class="angle-right"
-                />
-                {{ item }}
-              </el-link>
-            </el-col>
-          </el-row>
-        </div>
+              <font-awesome-icon
+                :icon="['fas', 'angle-right']"
+                class="angle-right"
+              />
+              {{ item }}
+            </el-link>
+          </el-col>
+        </el-row>
       </div>
     </el-tab-pane>
     <el-tab-pane
       label="カテゴリーから探す"
     >
-      <el-row class="ingredient-row pane">
+      <el-row :class="'category-row-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
         <el-col
           v-for="(categorie, index) in categories"
           :key="index"
-          :span="4"
+          :span="mq.current === 'sm' ? 6 : 4"
+          class="category-item"
         >
           <el-link
             :underline="false"
@@ -184,18 +183,37 @@ const categories = [
   width: 375px;
   height: 195px;
 }
-.search-pane {
+.search-pane-lg {
   width: 960px;
   margin: 10px auto 0;
 }
-.pane {
-  width: 710px;
+.search-pane-md {
+  width: 750px;
+  margin: 10px auto 0;
+}
+.search-pane-sm {
+  width: 375px;
+  margin: 10px auto 0;
 }
 .ingredient-title {
   font-weight: bold;
 }
-.ingredient-row {
+.ingredient-row-mdlg {
   margin: 10px 0;
+  width: 710px;
+}
+.ingredient-row-sm {
+  margin: 10px 0;
+  width: 345px;
+}
+.category-row-mdlg {
+  width: 710px;
+}
+.category-row-sm {
+  width: 345px;
+}
+.category-item {
+  margin-bottom: 10px;
 }
 .search-item {
   font-size: 14px;
