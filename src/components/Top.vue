@@ -91,7 +91,7 @@ const recipeCardDataList = reactive([
     imageUrl: '',
     calorie: 350,
     name: '鶏胸肉と小松菜の味噌マヨ炒め',
-    userName: 'ささくら1009',
+    userName: 'innu_oishii',
     userImageUrl: '',
     liked: false,
     likedNumber: 5,
