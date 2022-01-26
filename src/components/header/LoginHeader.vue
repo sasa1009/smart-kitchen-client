@@ -151,7 +151,7 @@ function addNotification() {
         type="text"
         class="menu-item"
       >
-        フードカレンダー
+        フード日誌
       </el-button>
       <el-button
         type="text"
@@ -190,7 +190,7 @@ function addNotification() {
             <span>レシピ一覧</span>
           </el-menu-item>
           <el-menu-item index="2">
-            <span>フードカレンダー</span>
+            <span>フード日誌</span>
           </el-menu-item>
           <el-menu-item index="3">
             <span>レシピ作成</span>
@@ -307,9 +307,9 @@ function addNotification() {
 .header-content {
   height: 60px;
   max-width: 1200px;
+  min-width: 365px;
   margin: 0 auto;
   padding: 0 5px;
-  vertical-align: middle;
 }
 .logo {
   float: left;

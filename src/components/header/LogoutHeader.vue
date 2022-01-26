@@ -134,9 +134,9 @@ const isDrawerOpen = ref(false);
 .header-content {
   height: 60px;
   max-width: 1200px;
+  min-width: 365px;
   margin: 0 auto;
   padding: 0 5px;
-  vertical-align: middle;
 }
 .logo {
   float: left;

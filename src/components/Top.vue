@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+import { reactive } from 'vue';
+import RecipeCard from '@/components/RecipeCard.vue';
+// eslint-disable-next-line
 // @ts-ignore
 import { useMq } from 'vue3-mq';
 const mq = useMq();
@@ -85,6 +86,19 @@ const categories = [
   '餅',
   '中華まん',
 ];
+const recipeCardDataList = reactive([
+  {
+    imageUrl: '',
+    calorie: 350,
+    name: '鶏胸肉と小松菜の味噌マヨ炒め',
+    userName: 'ささくら1009',
+    userImageUrl: '',
+    liked: false,
+    likedNumber: 5,
+    mainIngredient: '鶏肉',
+    category: '肉料理'
+  },
+]);
 </script>
 
 <template>
@@ -153,6 +167,11 @@ const categories = [
       </el-row>
     </el-tab-pane>
   </el-tabs>
+  <RecipeCard
+    :mq-current="mq.current"
+    v-model:recipe-card-data="recipeCardDataList[0]"
+    :is-login="true"
+  />
 </template>
 
 <style scoped>
@@ -175,7 +194,7 @@ const categories = [
   height: 390px;
 }
 .top-image-wrapper-sm {
-  margin: 0 auto;
+  margin: 10px auto 0;
   width: 375px;
   height: 195px;
 }
