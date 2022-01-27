@@ -141,6 +141,7 @@ function updateLike() {
   border-radius: 10px;
   overflow: hidden;
   background-color: white;
+  text-align: left;
 }
 /* カード小 */
 .recipe-card-sm {
@@ -149,6 +150,7 @@ function updateLike() {
   border-radius: 10px;
   overflow: hidden;
   background-color: white;
+  text-align: left;
 }
 /* イメージ大 */
 .recipe-image-wrapper-mdlg {
@@ -242,14 +244,14 @@ function updateLike() {
   color: gold;
 }
 .liked-number-mdlg {
-  padding-left: 10px;
+  padding-left: 11px;
 }
 .category-mdlg {
   font-size: 12px;
 }
 /* レシピ情報小 */
 .recipe-info-sm {
-  width: 200px;
+  width: 160px;
   padding-left: 3px;
 }
 .liked-number-sm {

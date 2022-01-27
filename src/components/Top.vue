@@ -4,6 +4,12 @@ import RecipeCard from '@/components/RecipeCard.vue';
 // eslint-disable-next-line
 // @ts-ignore
 import { useMq } from 'vue3-mq';
+// eslint-disable-next-line
+// @ts-ignore
+import { Carousel, Navigation, Slide } from 'vue3-carousel';
+import 'vue3-carousel/dist/carousel.css';
+import { RecipeCardData } from '@/modules/types';
+
 const mq = useMq();
 
 const ingredients = [
@@ -86,12 +92,81 @@ const categories = [
   '餅',
   '中華まん',
 ];
-const recipeCardDataList = reactive([
+const carouselSetting = {
+  itemsToShow: 2,
+  snapAlign: 'start'
+}
+const breakpointSettings = {
+  750: {
+    itemsToShow: 3,
+    snapAlign: 'center'
+  },
+  960: {
+    itemsToShow: 4,
+    snapAlign: 'start'
+  },
+}
+const recipeCardDataList = reactive<Array<RecipeCardData>>([
   {
-    imageUrl: '',
+    imageUrl: '鶏胸肉と小松菜の味噌マヨ炒め',
     calorie: 350,
-    name: '鶏胸肉と小松菜の味噌マヨ炒め',
-    userName: 'innu_oishii',
+    name: '鶏胸肉と小松菜',
+    userName: 'sasakurasan',
+    userImageUrl: '',
+    liked: false,
+    likedNumber: 5,
+    mainIngredient: '鶏肉',
+    category: '肉料理'
+  },
+  {
+    imageUrl: '鶏胸肉と小松菜の味噌マヨ炒め',
+    calorie: 350,
+    name: '鶏胸肉と小松菜',
+    userName: 'sasakurasan',
+    userImageUrl: '',
+    liked: false,
+    likedNumber: 5,
+    mainIngredient: '鶏肉',
+    category: '肉料理'
+  },
+  {
+    imageUrl: '鶏胸肉と小松菜の味噌マヨ炒め',
+    calorie: 350,
+    name: '鶏胸肉と小松菜',
+    userName: 'sasakurasan',
+    userImageUrl: '',
+    liked: false,
+    likedNumber: 5,
+    mainIngredient: '鶏肉',
+    category: '肉料理'
+  },
+  {
+    imageUrl: '鶏胸肉と小松菜の味噌マヨ炒め',
+    calorie: 350,
+    name: '鶏胸肉と小松菜',
+    userName: 'sasakurasan',
+    userImageUrl: '',
+    liked: false,
+    likedNumber: 5,
+    mainIngredient: '鶏肉',
+    category: '肉料理'
+  },
+  {
+    imageUrl: '鶏胸肉と小松菜の味噌マヨ炒め',
+    calorie: 350,
+    name: '鶏胸肉と小松菜',
+    userName: 'sasakurasan',
+    userImageUrl: '',
+    liked: false,
+    likedNumber: 5,
+    mainIngredient: '鶏肉',
+    category: '肉料理'
+  },
+  {
+    imageUrl: '鶏胸肉と小松菜の味噌マヨ炒め',
+    calorie: 350,
+    name: '鶏胸肉と小松菜',
+    userName: 'sasakurasan',
     userImageUrl: '',
     liked: false,
     likedNumber: 5,
@@ -167,11 +242,57 @@ const recipeCardDataList = reactive([
       </el-row>
     </el-tab-pane>
   </el-tabs>
-  <RecipeCard
-    :mq-current="mq.current"
-    v-model:recipe-card-data="recipeCardDataList[0]"
-    :is-login="true"
-  />
+  <div :class="'carousel-wrapper-' + mq.current">
+    <h3 style="margin: 10px 0 10px 0;">今週の人気レシピランキング</h3>
+    <Carousel
+      :settings="carouselSetting"
+      :breakpoints="breakpointSettings"
+    >
+      <Slide
+        v-for="(recipeCardData, index) in recipeCardDataList"
+        :key="index"
+      >
+        <div>
+          <span style="font-size: 18px; font-weight: bold;">
+            {{ index + 1 }}
+          </span>
+          <RecipeCard
+            :mq-current="mq.current"
+            v-model:recipe-card-data="recipeCardDataList[index]"
+            :is-login="true"
+          />
+        </div>
+      </Slide>
+
+      <template #addons>
+        <Navigation />
+      </template>
+    </Carousel>
+  </div>
+  <div :class="'carousel-wrapper-' + mq.current">
+    <h3 style="margin: 10px 0 10px 0;">フォロー中のユーザーの新着レシピ</h3>
+    <Carousel
+      :settings="carouselSetting"
+      :breakpoints="breakpointSettings"
+    >
+      <Slide
+        v-for="(recipeCardData, index) in recipeCardDataList"
+        :key="index"
+      >
+        <div>
+          <RecipeCard
+            :mq-current="mq.current"
+            v-model:recipe-card-data="recipeCardDataList[index]"
+            :is-login="true"
+          />
+        </div>
+      </Slide>
+
+      <template #addons>
+        <Navigation />
+      </template>
+    </Carousel>
+  </div>
 </template>
 
 <style scoped>
@@ -240,5 +361,19 @@ const recipeCardDataList = reactive([
 .angle-right {
   font-size: 16px;
   color: silver;
+}
+/* カルーセル */
+
+.carousel-wrapper-lg {
+  width: 940px;
+  margin: 0 auto;
+}
+.carousel-wrapper-md {
+  width: 730px;
+  margin: 0 auto;
+}
+.carousel-wrapper-sm {
+  width: 350px;
+  margin: 0 auto;
 }
 </style>
