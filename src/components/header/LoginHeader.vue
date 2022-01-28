@@ -40,6 +40,7 @@ function addNotification() {
     <el-button
       type="text"
       class="logo"
+      @click="$router.push({ name: 'Home' })"
     >
       SMART KITCHEN
     </el-button>
@@ -162,6 +163,7 @@ function addNotification() {
       <el-button
         type="text"
         class="menu-item"
+        @click="$router.push({ name: 'Recipes' })"
       >
         レシピ一覧
       </el-button>
