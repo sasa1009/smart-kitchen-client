@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Header from '@/components/header/Index.vue';
-import Top from '@/components/Top.vue';
+// import Home from '@/views/Home.vue';
 </script>
 
 <template>
@@ -13,7 +13,7 @@ import Top from '@/components/Top.vue';
     <el-main
       class="main"
     >
-      <Top />
+      <router-view />
     </el-main>
     <el-footer
       class="footer"
