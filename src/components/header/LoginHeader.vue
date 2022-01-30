@@ -344,7 +344,7 @@ function addNotification() {
 .menu-md {
   float: right;
   height: 40px;
-  width: 170px;
+  width: 165px;
   margin-top: 10px;
 }
 .menu-item {
