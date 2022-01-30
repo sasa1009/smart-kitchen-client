@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
 import RecipeCard from '@/components/RecipeCard.vue';
 // eslint-disable-next-line
 // @ts-ignore
