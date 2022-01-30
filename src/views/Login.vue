@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
 import type { ElForm } from 'element-plus'
+import axios from 'axios';
 
 const formRef = ref<InstanceType<typeof ElForm>>()
 const rules = reactive({
@@ -38,7 +39,20 @@ const submitForm = (formEl: InstanceType<typeof ElForm> | undefined) => {
   if (!formEl) return
   formEl.validate((valid) => {
     if (valid) {
-      console.log('submit!')
+      axios({
+        method: 'post',
+        headers: {
+          'content-type': 'application/json'
+        },
+        url:'http://localhost:3000/api/v1/auth/sign_in',
+        data: formData,
+      })
+        .then(function (response) {
+          console.log(response);
+        })
+        .catch(function (error) {
+          console.log(error);
+        })
     } else {
       console.log('error submit!')
       return false
