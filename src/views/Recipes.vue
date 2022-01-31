@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, computed } from 'vue';
+import { computed } from 'vue';
 // eslint-disable-next-line
 // @ts-ignore
 import { useMq } from 'vue3-mq';

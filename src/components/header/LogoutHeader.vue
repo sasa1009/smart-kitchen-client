@@ -13,6 +13,7 @@ const isDrawerOpen = ref(false);
     <el-button
       type="text"
       class="logo"
+      @click="$router.push({ name: 'Home' })"
     >
       SMART KITCHEN
     </el-button>
@@ -39,6 +40,7 @@ const isDrawerOpen = ref(false);
       <el-button
         type="text"
         class="menu-item"
+        @click="$router.push({ name: 'Login' })"
       >
         ログイン
       </el-button>
@@ -51,12 +53,14 @@ const isDrawerOpen = ref(false);
       <el-button
         type="text"
         class="menu-item"
+        @click="$router.push({ name: 'Signup' })"
       >
         ユーザー登録
       </el-button>
       <el-button
         type="text"
         class="menu-item"
+        @click="$router.push({ name: 'Recipes' })"
       >
         レシピ一覧
       </el-button>
@@ -81,16 +85,25 @@ const isDrawerOpen = ref(false);
           </el-button>
         </template>
         <el-menu text-color="#000000">
-          <el-menu-item index="1">
+          <el-menu-item
+            index="1"
+            @click="$router.push({ name: 'Recipes' })"
+          >
             <span>レシピ一覧</span>
           </el-menu-item>
-          <el-menu-item index="2">
+          <el-menu-item
+            index="2"
+            @click="$router.push({ name: 'Signup' })"
+          >
             <span>ユーザー登録</span>
           </el-menu-item>
           <el-menu-item index="3">
             <span>ゲストログイン</span>
           </el-menu-item>
-          <el-menu-item index="4">
+          <el-menu-item
+            index="4"
+            @click="$router.push({ name: 'Login' })"
+          >
             <span>ログイン</span>
           </el-menu-item>
         </el-menu>

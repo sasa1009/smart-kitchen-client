@@ -9,3 +9,10 @@ export interface RecipeCardData {
   mainIngredient: string;
   category: string;
 }
+
+export interface AuthData {
+  uid: string;
+  accessToken: string;
+  client: string;
+  expiry: string;
+}
