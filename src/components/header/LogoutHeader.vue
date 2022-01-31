@@ -53,6 +53,7 @@ const isDrawerOpen = ref(false);
       <el-button
         type="text"
         class="menu-item"
+        @click="$router.push({ name: 'Signup' })"
       >
         ユーザー登録
       </el-button>
@@ -90,7 +91,10 @@ const isDrawerOpen = ref(false);
           >
             <span>レシピ一覧</span>
           </el-menu-item>
-          <el-menu-item index="2">
+          <el-menu-item
+            index="2"
+            @click="$router.push({ name: 'Signup' })"
+          >
             <span>ユーザー登録</span>
           </el-menu-item>
           <el-menu-item index="3">
