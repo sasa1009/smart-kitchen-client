@@ -2,6 +2,11 @@
 import { reactive, ref } from 'vue';
 import type { ElForm } from 'element-plus'
 import axios from 'axios';
+import { authData } from '@/modules/auth';
+import { useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus';
+
+const router = useRouter();
 
 const formRef = ref<InstanceType<typeof ElForm>>()
 const rules = reactive({
@@ -35,8 +40,8 @@ const formData = reactive({
   email: '',
   password: ''
 });
-const submitForm = (formEl: InstanceType<typeof ElForm> | undefined) => {
-  if (!formEl) return
+function login(formEl: InstanceType<typeof ElForm> | undefined) {
+  if (!formEl) return;
   formEl.validate((valid) => {
     if (valid) {
       axios({
@@ -49,12 +54,27 @@ const submitForm = (formEl: InstanceType<typeof ElForm> | undefined) => {
       })
         .then(function (response) {
           console.log(response);
+          authData.value.uid = response.headers.uid;
+          authData.value.accessToken = response.headers['access-token'];
+          authData.value.client = response.headers.client;
+          authData.value.expiry = response.headers.expiry;
+          ElMessage({
+            showClose: true,
+            message: 'ログインしました。',
+            type: 'success'
+          })
+          router.push({ name: 'Home' });
         })
         .catch(function (error) {
+          ElMessage({
+            showClose: true,
+            message: 'ログインに失敗しました。',
+            type: 'error'
+          })
           console.log(error);
-        })
+        });
     } else {
-      console.log('error submit!')
+      console.log('error submit!');
       return false
     }
   })
@@ -87,7 +107,7 @@ const submitForm = (formEl: InstanceType<typeof ElForm> | undefined) => {
       <el-form-item>
         <el-button
           type="primary"
-          @click="submitForm(formRef)"
+          @click="login(formRef)"
         >
           ログイン
         </el-button>

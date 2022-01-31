@@ -4,7 +4,12 @@ import { ref, reactive } from 'vue';
 // @ts-ignore
 import { useMq } from 'vue3-mq';
 import dayjs from 'dayjs';
+import axios from 'axios';
+import { authData } from '@/modules/auth';
+import { useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus';
 
+const router = useRouter();
 const input = ref('');
 const mq = useMq();
 const isDrawerOpen = ref(false);
@@ -33,6 +38,38 @@ const notifications = reactive([
 function addNotification() {
   notifications.push(...notifications);
 }
+function logout() {
+  axios({
+    method: 'delete',
+    headers: {
+      uid: authData.value.uid,
+      'access-token': authData.value.accessToken,
+      client: authData.value.client
+    },
+    url:'http://localhost:3000/api/v1/auth/sign_out',
+  })
+    .then(function (response) {
+      console.log(response);
+      authData.value.uid = '';
+      authData.value.accessToken = '';
+      authData.value.client = '';
+      authData.value.expiry = '';
+      ElMessage({
+        showClose: true,
+        message: 'ログアウトしました。',
+      })
+      router.push({ name: 'Home' });
+    })
+    .catch(function (error) {
+      console.log(error);
+      ElMessage({
+        showClose: true,
+        message: 'ログインに失敗しました。',
+        type: 'error'
+      })
+    });
+}
+
 </script>
 
 <template>
@@ -86,7 +123,10 @@ function addNotification() {
           <el-menu-item index="2">
             <span>ユーザー情報</span>
           </el-menu-item>
-          <el-menu-item index="3">
+          <el-menu-item
+            index="3"
+            @click="logout"
+          >
             <span>ログアウト</span>
           </el-menu-item>
         </el-menu>
@@ -188,7 +228,10 @@ function addNotification() {
           </el-button>
         </template>
         <el-menu text-color="#000000">
-          <el-menu-item index="1">
+          <el-menu-item
+            index="1"
+            @click="$router.push({ name: 'Recipes' })"
+          >
             <span>レシピ一覧</span>
           </el-menu-item>
           <el-menu-item index="2">
@@ -200,7 +243,10 @@ function addNotification() {
           <el-menu-item index="4">
             <span>ユーザー情報</span>
           </el-menu-item>
-          <el-menu-item index="5">
+          <el-menu-item
+            index="5"
+            @click='logout'
+          >
             <span>ログアウト</span>
           </el-menu-item>
         </el-menu>
