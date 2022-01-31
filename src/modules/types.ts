@@ -14,5 +14,5 @@ export interface AuthData {
   uid: string;
   accessToken: string;
   client: string;
-  expiry: string;
+  expirationDateTime: string;
 }

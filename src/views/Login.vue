@@ -5,6 +5,7 @@ import axios from 'axios';
 import { authData } from '@/modules/auth';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
+import dayjs from 'dayjs';
 
 const router = useRouter();
 
@@ -57,7 +58,7 @@ function login(formEl: InstanceType<typeof ElForm> | undefined) {
           authData.value.uid = response.headers.uid;
           authData.value.accessToken = response.headers['access-token'];
           authData.value.client = response.headers.client;
-          authData.value.expiry = response.headers.expiry;
+          authData.value.expirationDateTime = dayjs().add(1, 'week').format();
           ElMessage({
             showClose: true,
             message: 'ログインしました。',
