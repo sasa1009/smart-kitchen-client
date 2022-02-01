@@ -3,11 +3,12 @@ import { reactive, ref } from 'vue';
 import type { ElForm } from 'element-plus'
 import axios from 'axios';
 import { authData } from '@/modules/auth';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import dayjs from 'dayjs';
 
 const router = useRouter();
+const route = useRoute();
 
 const formRef = ref<InstanceType<typeof ElForm>>()
 const rules = reactive({
@@ -64,15 +65,19 @@ function login(formEl: InstanceType<typeof ElForm> | undefined) {
             message: 'ログインしました。',
             type: 'success'
           })
-          router.push({ name: 'Home' });
+          if (route.query.redirect) {
+            router.push(route.query.redirect as string);
+          } else {
+            router.push({ name: 'Home' });
+          }
         })
         .catch(function (error) {
+          console.error(error);
           ElMessage({
             showClose: true,
             message: 'ログインに失敗しました。',
             type: 'error'
           })
-          console.log(error);
         });
     } else {
       console.log('error submit!');
