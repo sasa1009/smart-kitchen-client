@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import Header from '@/components/header/Index.vue';
-// import Home from '@/views/Home.vue';
+// eslint-disable-next-line
+// @ts-ignore
+import { useMq } from 'vue3-mq';
+const mq = useMq();
 </script>
 
 <template>
@@ -13,7 +16,9 @@ import Header from '@/components/header/Index.vue';
     <el-main
       class="main"
     >
-      <router-view />
+      <router-view
+        :mq-current="mq.current"
+      />
     </el-main>
     <el-footer
       class="footer"

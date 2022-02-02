@@ -1,8 +1,14 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, defineProps } from 'vue';
 import { authData } from '@/modules/auth';
 import { CurrentUserApi, Configuration, CurrentUserResponseUser } from '@/api';
 
+const props = defineProps({
+  mqCurrent: {
+    type: String,
+    default: 'lg'
+  },
+});
 const userData = reactive<CurrentUserResponseUser>({
   id: 0,
   name: '',
@@ -22,8 +28,8 @@ const userData = reactive<CurrentUserResponseUser>({
 </script>
 
 <template>
-  <div class="user-data-wrapper">
-    <div class="user-data">
+  <div :class="'user-data-wrapper-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">
+    <div :class="'user-data-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">
       <div
         v-if="userData.image_url"
         :class="'user-image-wrapper'"
@@ -43,10 +49,10 @@ const userData = reactive<CurrentUserResponseUser>({
           class="user-icon"
         />
       </div>
-      <div class="user-name">
+      <div :class="'user-name-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">
         <div class="name">{{ userData.name }}</div>
       </div>
-      <div class="edit">
+      <div :class="'edit-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">
         <el-button
           type="text"
           @click="$router.push({ name: '' })"
@@ -57,7 +63,7 @@ const userData = reactive<CurrentUserResponseUser>({
     </div>
     <div
       v-if="userData.comment"
-      class="comment"
+      :class="'comment-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
     >
       <h3>一言コメント</h3>
       <div>
@@ -68,16 +74,32 @@ const userData = reactive<CurrentUserResponseUser>({
 </template>
 
 <style scoped>
-.user-data-wrapper {
+/* ユーザーデータラッパー大 */
+.user-data-wrapper-mdlg {
   width: 750px;
   height: 600px;
   background-color: white;
   margin: 10px auto 0 auto;
 }
-.user-data {
+/* ユーザーデータラッパー小 */
+.user-data-wrapper-sm {
+  width: 375px;
+  height: 600px;
+  background-color: white;
+  margin: 10px auto 0 auto;
+}
+/* ユーザーデータ大 */
+.user-data-mdlg {
   width: 375px;
   height: 400px;
   float: left;
+}
+/* ユーザーデータ小 */
+.user-data-sm {
+  width: 375px;
+  height: 400px;
+  padding: 10px;
+  box-sizing: border-box;
 }
 .user-image-wrapper {
   width: 150px;
@@ -98,24 +120,41 @@ const userData = reactive<CurrentUserResponseUser>({
 .user-icon {
   font-size: 150px;
 }
-.user-name {
+/* ユーザーネームを含むユーザー情報大 */
+.user-name-mdlg {
   width: 100%;
   height: 180px;
   margin-top: 30px;
   padding-left: 10px;
   box-sizing: border-box;
 }
+/* ユーザーネームを含むユーザー情報小 */
+.user-name-sm {
+  width: 100%;
+  height: 180px;
+  margin-top: 30px;
+}
 .name {
   font-size: 25px;
   font-weight: bold;
 }
-.edit {
+.edit-mdlg {
   padding-left: 10px;
   box-sizing: border-box;
 }
-.comment {
+/* コメント大 */
+.comment-mdlg {
   width: 375px;
   height: 400px;
   float: left;
+  font-size: 14px;
+}
+/* コメント小 */
+.comment-sm {
+  width: 375px;
+  height: 200px;
+  font-size: 14px;
+  padding: 10px;
+  box-sizing: border-box;
 }
 </style>
