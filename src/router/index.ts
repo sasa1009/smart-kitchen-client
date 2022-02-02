@@ -1,7 +1,8 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from '../views/Home.vue';
 import Recipes from '../views/Recipes.vue';
-import CurrentUser from '../views/CurrentUser.vue';
+import CurrentUser from '../views/CurrentUser/CurrentUser.vue';
+import CurrentUserEdit from '../views/CurrentUser/CurrentUserEdit.vue';
 import Signup from '../views/Signup.vue';
 import Login from '../views/Login.vue';
 
@@ -22,6 +23,12 @@ const routes: Array<RouteRecordRaw> = [
     path: '/current-user',
     name: 'CurrentUser',
     component: CurrentUser,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/current-user/edit',
+    name: 'CurrentUserEdit',
+    component: CurrentUserEdit,
     meta: { requiresAuth: true },
   },
   {
