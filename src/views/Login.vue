@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import type { ElForm } from 'element-plus'
+import type { ElForm } from 'element-plus';
+import { ElMessage } from 'element-plus';
 import axios from 'axios';
 import { authData } from '@/modules/auth';
 import { useRouter, useRoute } from 'vue-router';
-import { ElMessage } from 'element-plus';
 import dayjs from 'dayjs';
 
 const router = useRouter();
@@ -21,7 +21,7 @@ const rules = reactive({
     {
       type: 'email',
       message: 'メールアドレス形式で入力してください。',
-      trigger: ['blur'],
+      trigger: 'blur',
     },
   ],
   password: [
@@ -34,7 +34,7 @@ const rules = reactive({
       min: 8,
       max: 20,
       message: '8文字以上20文字以下で入力して下さい。',
-      trigger: ['blur'],
+      trigger: 'blur',
     },
   ]
 });

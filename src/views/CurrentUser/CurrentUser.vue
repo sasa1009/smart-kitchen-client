@@ -55,7 +55,7 @@ const userData = reactive<CurrentUserResponseUser>({
       <div :class="'edit-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">
         <el-button
           type="text"
-          @click="$router.push({ name: '' })"
+          @click="$router.push({ name: 'CurrentUserEdit' })"
         >
           ユーザー情報を編集する
         </el-button>
