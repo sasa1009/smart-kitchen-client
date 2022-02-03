@@ -3,9 +3,13 @@ import { ref, reactive, defineProps } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import type { ElForm } from 'element-plus';
-import type { UploadFile } from 'element-plus/lib/el-upload/src/upload.type';
 import { authData } from '@/modules/auth';
 import { CurrentUserApi, Configuration, CurrentUserResponseUser } from '@/api';
+
+interface ImageData {
+  imageDataUrl: string | ArrayBuffer | null;
+  name: string | null;
+}
 
 const props = defineProps({
   mqCurrent: {
@@ -42,14 +46,65 @@ const rules = reactive({
     },
   ],
 });
+
 const formData = reactive<CurrentUserResponseUser>({
   id: 0,
   name: '',
   comment: '',
   image_url: ''
 });
+const imageData: ImageData = reactive({
+  imageDataUrl: null,
+  name: ''
+});
 
+/**
+ * アップロードされた画像ファイルのバリデーションとBASE64形式への変換を行う
+ */
+function handleFile(event: any) {
+  const file = event.target.files[0];
+  console.log(file);
 
+  // ファイルのサイズは5MBまで
+  if (file.size > 5000000) {
+    ElMessage({
+      showClose: true,
+      message: '5MB以下のサイズの画像を指定してください。',
+      type: 'error',
+    })
+    return;
+  }
+
+  // ファイルの形式はJPEGまたはPNGのみ
+  if (file.type != 'image/jpeg' && file.type != 'image/png') {
+    ElMessage({
+      showClose: true,
+      message: 'JPEGまたはPNG形式のファイルを指定してください。',
+      type: 'error',
+    })
+    return;
+  }
+
+  // imageDataオブジェクトに画像データを格納
+  const reader = new FileReader();
+  reader.onload = e => {
+    imageData.imageDataUrl = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  imageData.name = file.name;
+}
+
+/**
+ * アップロードされた画像ファイルを削除する
+ */
+function deleteFile() {
+  imageData.imageDataUrl = null;
+  imageData.name = '';
+}
+
+/**
+ * ログイン中のユーザー情報を取得する
+ */
 (async function init() {
   const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
   try {
@@ -74,12 +129,12 @@ const formData = reactive<CurrentUserResponseUser>({
     >
       <div :class="'user-data-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">
         <div
-          v-if="formData.image_url"
+          v-if="!!formData.image_url || !!imageData.imageDataUrl"
           :class="'user-image-wrapper'"
         >
           <el-image
             :class="'user-image'"
-            :src="formData.image_url"
+            :src="imageData.imageDataUrl ? imageData.imageDataUrl : formData.image_url"
             fit="cover"
           ></el-image>
         </div>
@@ -91,6 +146,32 @@ const formData = reactive<CurrentUserResponseUser>({
             :icon="['far', 'user-circle']"
             class="user-icon"
           />
+        </div>
+        <div class="upload-wrapper">
+          <label class="upload">
+            画像を変更
+            <input
+              type="file"
+              @change="handleFile"
+              />
+          </label>
+          <span class="upload-tips">5MB以下で、JPEGまたはPNG形式の画像を指定してください。</span>
+          <div
+            class="image-name-wrapper"
+            v-if="imageData.imageDataUrl"
+          >
+            <div class="image-name">
+              {{ imageData.name }}
+            </div>
+            <span
+              class="delete-button"
+              @click="deleteFile"
+            >
+              <font-awesome-icon
+                :icon="['far', 'times-circle']"
+              />
+            </span>
+          </div>
         </div>
         <el-form-item
           label="ユーザー名"
@@ -160,5 +241,59 @@ const formData = reactive<CurrentUserResponseUser>({
   height: 400px;
   padding: 10px;
   box-sizing: border-box;
+}
+/* 画像アップローダー */
+.upload-wrapper {
+  margin: 10px 0;
+}
+.upload {
+  background-color: #409eff;
+  color: white;
+  font-size: 14px;
+  display: block;
+  width: 140px;
+  height: 25px;
+  text-align: center;
+  padding-top: 3px;
+  box-sizing: border-box;
+  cursor: pointer;
+  border-radius: 5px;
+}
+.upload:hover {
+  opacity: 0.8;
+}
+.upload > input {
+  display: none;
+}
+.upload-tips {
+  font-size: 12px;
+  color: #606266;
+}
+/* アップロードされた画像の名前 */
+.image-name-wrapper {
+  height: 27px;
+}
+.image-name-wrapper::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+.image-name {
+  font-size: 14px;
+  font-weight: bold;
+  text-decoration: underline;
+  width: 200px;
+  margin-top: 3px;
+  float: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.delete-button {
+  font-size: 20px;
+}
+.delete-button:hover {
+  color: #409eff;
+  cursor: pointer;
 }
 </style>
