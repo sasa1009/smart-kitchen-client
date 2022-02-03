@@ -70,10 +70,11 @@ router.beforeEach((to, from, next) => {
   if (isLogin.value) {
     // 認証情報が期限切れの場合
     if (isExpired.value) {
+      authData.value.userId = null;
       authData.value.uid = '';
       authData.value.accessToken = '';
       authData.value.client = '';
-      authData.value.expirationDateTime = '';
+      authData.value.expiry = '';
       next({ name: 'Login', query: { redirect: to.fullPath } });
     // 認証情報が期限内の場合
     } else {

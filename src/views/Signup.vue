@@ -69,10 +69,11 @@ function signUp(formEl: InstanceType<typeof ElForm> | undefined) {
       })
         .then(function (response) {
           console.log(response);
+          authData.value.userId = response.data.data.id;
           authData.value.uid = response.headers.uid;
           authData.value.accessToken = response.headers['access-token'];
           authData.value.client = response.headers.client;
-          authData.value.expirationDateTime = dayjs().add(1, 'week').format();
+          authData.value.expiry = dayjs.unix(Number(response.headers.expiry)).format();
           ElMessage({
             showClose: true,
             message: 'ユーザー登録が完了しました。',

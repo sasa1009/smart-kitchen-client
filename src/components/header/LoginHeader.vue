@@ -50,10 +50,11 @@ function logout() {
   })
     .then(function (response) {
       console.log(response);
+      authData.value.userId = null;
       authData.value.uid = '';
       authData.value.accessToken = '';
       authData.value.client = '';
-      authData.value.expirationDateTime = '';
+      authData.value.expiry = '';
       ElMessage({
         showClose: true,
         message: 'ログアウトしました。',
@@ -64,7 +65,7 @@ function logout() {
       console.log(error);
       ElMessage({
         showClose: true,
-        message: 'ログインに失敗しました。',
+        message: 'ログアウトに失敗しました。',
         type: 'error'
       })
     });
