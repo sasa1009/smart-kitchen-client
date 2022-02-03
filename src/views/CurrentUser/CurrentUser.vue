@@ -2,13 +2,12 @@
 import { reactive, defineProps } from 'vue';
 import { authData } from '@/modules/auth';
 import { CurrentUserApi, Configuration, CurrentUserResponseUser } from '@/api';
+// eslint-disable-next-line
+// @ts-ignore
+import { useMq } from 'vue3-mq';
 
-const props = defineProps({
-  mqCurrent: {
-    type: String,
-    default: 'lg'
-  },
-});
+const mq = useMq();
+
 const userData = reactive<CurrentUserResponseUser>({
   id: 0,
   name: '',
@@ -28,8 +27,8 @@ const userData = reactive<CurrentUserResponseUser>({
 </script>
 
 <template>
-  <div :class="'user-data-wrapper-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">
-    <div :class="'user-data-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">
+  <div :class="'user-data-wrapper-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
+    <div :class="'user-data-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
       <div
         v-if="userData.image_url"
         :class="'user-image-wrapper'"
@@ -49,10 +48,10 @@ const userData = reactive<CurrentUserResponseUser>({
           class="user-icon"
         />
       </div>
-      <div :class="'user-name-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">
+      <div :class="'user-name-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
         <div class="name">{{ userData.name }}</div>
       </div>
-      <div :class="'edit-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">
+      <div :class="'edit-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
         <el-button
           type="text"
           @click="$router.push({ name: 'CurrentUserEdit' })"
@@ -63,7 +62,7 @@ const userData = reactive<CurrentUserResponseUser>({
     </div>
     <div
       v-if="userData.comment"
-      :class="'comment-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
+      :class="'comment-' + (mq.current === 'sm' ? 'sm' : 'mdlg')"
     >
       <h3>一言コメント</h3>
       <div>

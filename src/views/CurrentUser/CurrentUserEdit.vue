@@ -5,18 +5,16 @@ import { ElMessage } from 'element-plus';
 import type { ElForm } from 'element-plus';
 import { authData } from '@/modules/auth';
 import { CurrentUserApi, Configuration, CurrentUserResponseUser } from '@/api';
+// eslint-disable-next-line
+// @ts-ignore
+import { useMq } from 'vue3-mq';
 
 interface ImageData {
   imageDataUrl: string | ArrayBuffer | null;
   name: string | null;
 }
 
-const props = defineProps({
-  mqCurrent: {
-    type: String,
-    default: 'lg'
-  },
-});
+const mq = useMq();
 
 const router = useRouter();
 const route = useRoute();
@@ -53,7 +51,7 @@ const formData = reactive<CurrentUserResponseUser>({
   comment: '',
   image_url: ''
 });
-const imageData: ImageData = reactive({
+const imageData = reactive<ImageData>({
   imageDataUrl: null,
   name: ''
 });
@@ -63,7 +61,6 @@ const imageData: ImageData = reactive({
  */
 function handleFile(event: any) {
   const file = event.target.files[0];
-  console.log(file);
 
   // ファイルのサイズは5MBまで
   if (file.size > 5000000) {
@@ -118,7 +115,7 @@ function deleteFile() {
 </script>
 
 <template>
-  <div :class="'user-data-wrapper-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">
+  <div :class="'user-data-wrapper-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
     <el-form
       ref="formRef"
       label-position="top"
@@ -127,7 +124,7 @@ function deleteFile() {
       :rules="rules"
       class="login-form"
     >
-      <div :class="'user-data-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">
+      <div :class="'user-data-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
         <div
           v-if="!!formData.image_url || !!imageData.imageDataUrl"
           :class="'user-image-wrapper'"
@@ -291,9 +288,10 @@ function deleteFile() {
 }
 .delete-button {
   font-size: 20px;
+  color: #F56C6C;
+  cursor: pointer;
 }
 .delete-button:hover {
-  color: #409eff;
-  cursor: pointer;
+  opacity: 0.8;
 }
 </style>
