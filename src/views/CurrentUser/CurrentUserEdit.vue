@@ -153,9 +153,7 @@ function updateUser(formEl: InstanceType<typeof ElForm>) {
         // 画像が投稿されている場合はS3にアップロード
         if (imageData.file) {
           const imageMetaData = await uploadImageFileToS3(imageData.file);
-          console.log(imageMetaData);
           Object.assign(updateParams, imageMetaData);
-          console.log(updateParams);
         }
 
         // ユーザー情報を更新
