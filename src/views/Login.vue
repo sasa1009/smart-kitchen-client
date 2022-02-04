@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import type { ElForm } from 'element-plus'
+import type { ElForm } from 'element-plus';
+import { ElMessage } from 'element-plus';
 import axios from 'axios';
 import { authData } from '@/modules/auth';
-import { useRouter } from 'vue-router';
-import { ElMessage } from 'element-plus';
+import { useRouter, useRoute } from 'vue-router';
+import dayjs from 'dayjs';
 
 const router = useRouter();
+const route = useRoute();
 
 const formRef = ref<InstanceType<typeof ElForm>>()
 const rules = reactive({
@@ -19,7 +21,7 @@ const rules = reactive({
     {
       type: 'email',
       message: 'メールアドレス形式で入力してください。',
-      trigger: ['blur'],
+      trigger: 'blur',
     },
   ],
   password: [
@@ -32,7 +34,7 @@ const rules = reactive({
       min: 8,
       max: 20,
       message: '8文字以上20文字以下で入力して下さい。',
-      trigger: ['blur'],
+      trigger: 'blur',
     },
   ]
 });
@@ -54,24 +56,29 @@ function login(formEl: InstanceType<typeof ElForm> | undefined) {
       })
         .then(function (response) {
           console.log(response);
+          authData.value.userId = response.data.data.id;
           authData.value.uid = response.headers.uid;
           authData.value.accessToken = response.headers['access-token'];
           authData.value.client = response.headers.client;
-          authData.value.expiry = response.headers.expiry;
+          authData.value.expiry = dayjs.unix(Number(response.headers.expiry)).format();
           ElMessage({
             showClose: true,
             message: 'ログインしました。',
             type: 'success'
           })
-          router.push({ name: 'Home' });
+          if (route.query.redirect) {
+            router.push(route.query.redirect as string);
+          } else {
+            router.push({ name: 'Home' });
+          }
         })
         .catch(function (error) {
+          console.error(error);
           ElMessage({
             showClose: true,
             message: 'ログインに失敗しました。',
             type: 'error'
           })
-          console.log(error);
         });
     } else {
       console.log('error submit!');

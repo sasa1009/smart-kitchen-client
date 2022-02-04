@@ -50,6 +50,7 @@ function logout() {
   })
     .then(function (response) {
       console.log(response);
+      authData.value.userId = null;
       authData.value.uid = '';
       authData.value.accessToken = '';
       authData.value.client = '';
@@ -64,7 +65,7 @@ function logout() {
       console.log(error);
       ElMessage({
         showClose: true,
-        message: 'ログインに失敗しました。',
+        message: 'ログアウトに失敗しました。',
         type: 'error'
       })
     });
@@ -120,7 +121,10 @@ function logout() {
           <el-menu-item index="1">
             <span>レシピ作成</span>
           </el-menu-item>
-          <el-menu-item index="2">
+          <el-menu-item
+            index="2"
+            @click="$router.push({ name: 'CurrentUser' })"
+          >
             <span>ユーザー情報</span>
           </el-menu-item>
           <el-menu-item
@@ -240,7 +244,10 @@ function logout() {
           <el-menu-item index="3">
             <span>レシピ作成</span>
           </el-menu-item>
-          <el-menu-item index="4">
+          <el-menu-item
+            index="4"
+            @click="$router.push({ name: 'CurrentUser' })"
+          >
             <span>ユーザー情報</span>
           </el-menu-item>
           <el-menu-item

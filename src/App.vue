@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import Header from '@/components/header/Index.vue';
-// import Home from '@/views/Home.vue';
 </script>
 
 <template>
