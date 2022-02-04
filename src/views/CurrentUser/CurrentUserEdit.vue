@@ -1,17 +1,19 @@
 <script setup lang="ts">
-import { ref, reactive, defineProps } from 'vue';
+import { ref, reactive } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import type { ElForm } from 'element-plus';
 import { authData } from '@/modules/auth';
+import { getPresignedUrl } from '@/modules/presignedUrl';
 import { CurrentUserApi, Configuration, CurrentUserResponseUser } from '@/api';
+import axios from 'axios';
 // eslint-disable-next-line
 // @ts-ignore
 import { useMq } from 'vue3-mq';
 
 interface ImageData {
   imageDataUrl: string | ArrayBuffer | null;
-  name: string | null;
+  file: File | null;
 }
 
 const mq = useMq();
@@ -53,42 +55,57 @@ const formData = reactive<CurrentUserResponseUser>({
 });
 const imageData = reactive<ImageData>({
   imageDataUrl: null,
-  name: ''
+  file: null
 });
 
 /**
- * アップロードされた画像ファイルのバリデーションとBASE64形式への変換を行う
+ * アップロードされた画像ファイルに対して以下の処理を行う
+ * ・画像ファイルのバリデーション処理
+ * ・BASE64形式への変換
+ * ・各情報のimageDataオブジェクトへの格納
  */
 function handleFile(event: any) {
-  const file = event.target.files[0];
+  try {
+    const file = event.target.files[0] as unknown as File;
+    if (!file) return;
 
-  // ファイルのサイズは5MBまで
-  if (file.size > 5000000) {
+    // ファイルのバリデーションを行う
+    // ファイルのサイズは5MBまで
+    if (file.size > 5000000) {
+      ElMessage({
+        showClose: true,
+        message: '5MB以下のサイズの画像を指定してください。',
+        type: 'error',
+      })
+      return;
+    }
+
+    // ファイルの形式はJPEGまたはPNGのみ
+    if (file.type != 'image/jpeg' && file.type != 'image/png') {
+      ElMessage({
+        showClose: true,
+        message: 'JPEGまたはPNG形式のファイルを指定してください。',
+        type: 'error',
+      })
+      return;
+    }
+
+    // imageDataオブジェクトに画像データを格納
+    const reader = new FileReader();
+    reader.onload = e => {
+      imageData.imageDataUrl = e.target.result;
+    };
+    reader.readAsDataURL(file);
+    imageData.file = file;
+  } catch (error) {
+    console.error(error);
     ElMessage({
       showClose: true,
-      message: '5MB以下のサイズの画像を指定してください。',
+      message: 'ファイルの取り込みに失敗しました。',
       type: 'error',
     })
-    return;
+    throw new Error();
   }
-
-  // ファイルの形式はJPEGまたはPNGのみ
-  if (file.type != 'image/jpeg' && file.type != 'image/png') {
-    ElMessage({
-      showClose: true,
-      message: 'JPEGまたはPNG形式のファイルを指定してください。',
-      type: 'error',
-    })
-    return;
-  }
-
-  // imageDataオブジェクトに画像データを格納
-  const reader = new FileReader();
-  reader.onload = e => {
-    imageData.imageDataUrl = e.target.result;
-  };
-  reader.readAsDataURL(file);
-  imageData.name = file.name;
 }
 
 /**
@@ -96,7 +113,28 @@ function handleFile(event: any) {
  */
 function deleteFile() {
   imageData.imageDataUrl = null;
-  imageData.name = '';
+  imageData.file = null;
+}
+
+/**
+ * 画像ファイルをS3にアップロードする
+ */
+async function uploadImageFileToS3(file: File) {
+  // ファイルの署名付きURLを取得する
+  const presignedUrl = await getPresignedUrl(file.name);
+  if (!presignedUrl) throw new Error('署名付きURLの取得に失敗しました。');
+
+  // S3にファイルをアップロード
+  const updateResponse = await axios.put(presignedUrl.url, file);
+
+  if (updateResponse.status === 200) {
+    return {
+      imageUrl: presignedUrl.url.split('?')[0],
+      key: presignedUrl.key
+    };
+  } else {
+    throw new Error('ファイルのアップロードに失敗しました。');
+  }
 }
 
 /**
@@ -133,7 +171,7 @@ function deleteFile() {
             :class="'user-image'"
             :src="imageData.imageDataUrl ? imageData.imageDataUrl : formData.image_url"
             fit="cover"
-          ></el-image>
+          />
         </div>
         <div
           v-else
@@ -158,7 +196,7 @@ function deleteFile() {
             v-if="imageData.imageDataUrl"
           >
             <div class="image-name">
-              {{ imageData.name }}
+              {{ imageData.file?.name }}
             </div>
             <span
               class="delete-button"

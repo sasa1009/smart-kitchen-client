@@ -65,6 +65,25 @@ export interface CurrentUserResponseUser {
      */
     'image_url': string | null;
 }
+/**
+ * 署名付きURL情報
+ * @export
+ * @interface GetPresignedUrlResponse
+ */
+export interface GetPresignedUrlResponse {
+    /**
+     * ファイルのアップロードに使用する署名付きURL
+     * @type {string}
+     * @memberof GetPresignedUrlResponse
+     */
+    'url': string;
+    /**
+     * ファイルのバケットのルートからのパス
+     * @type {string}
+     * @memberof GetPresignedUrlResponse
+     */
+    'key': string;
+}
 
 /**
  * CurrentUserApi - axios parameter creator
@@ -73,8 +92,8 @@ export interface CurrentUserResponseUser {
 export const CurrentUserApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * ログイン中のユーザーの情報を取得
-         * @summary ログインユーザー情報取得
+         * ログイン中のユーザー情報を取得する
+         * @summary ログイン中のユーザー情報を取得する
          * @param {string} uid devise-token-auth用のuid
          * @param {string} accessToken devise-token-auth用のaccess-token
          * @param {string} client devise-token-auth用のclient
@@ -134,8 +153,8 @@ export const CurrentUserApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = CurrentUserApiAxiosParamCreator(configuration)
     return {
         /**
-         * ログイン中のユーザーの情報を取得
-         * @summary ログインユーザー情報取得
+         * ログイン中のユーザー情報を取得する
+         * @summary ログイン中のユーザー情報を取得する
          * @param {string} uid devise-token-auth用のuid
          * @param {string} accessToken devise-token-auth用のaccess-token
          * @param {string} client devise-token-auth用のclient
@@ -157,8 +176,8 @@ export const CurrentUserApiFactory = function (configuration?: Configuration, ba
     const localVarFp = CurrentUserApiFp(configuration)
     return {
         /**
-         * ログイン中のユーザーの情報を取得
-         * @summary ログインユーザー情報取得
+         * ログイン中のユーザー情報を取得する
+         * @summary ログイン中のユーザー情報を取得する
          * @param {string} uid devise-token-auth用のuid
          * @param {string} accessToken devise-token-auth用のaccess-token
          * @param {string} client devise-token-auth用のclient
@@ -179,8 +198,8 @@ export const CurrentUserApiFactory = function (configuration?: Configuration, ba
  */
 export class CurrentUserApi extends BaseAPI {
     /**
-     * ログイン中のユーザーの情報を取得
-     * @summary ログインユーザー情報取得
+     * ログイン中のユーザー情報を取得する
+     * @summary ログイン中のユーザー情報を取得する
      * @param {string} uid devise-token-auth用のuid
      * @param {string} accessToken devise-token-auth用のaccess-token
      * @param {string} client devise-token-auth用のclient
@@ -190,6 +209,154 @@ export class CurrentUserApi extends BaseAPI {
      */
     public getCurrentUser(uid: string, accessToken: string, client: string, options?: AxiosRequestConfig) {
         return CurrentUserApiFp(this.configuration).getCurrentUser(uid, accessToken, client, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * PresignedUrlApi - axios parameter creator
+ * @export
+ */
+export const PresignedUrlApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * S3の署名付きURLを取得する
+         * @summary S3の署名付きURLを取得する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} userId ログイン中のユーザーのID
+         * @param {string} fileName S3にアップロードする予定のファイルの名前
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPresignedUrl: async (uid: string, accessToken: string, client: string, userId: number, fileName: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uid' is not null or undefined
+            assertParamExists('getPresignedUrl', 'uid', uid)
+            // verify required parameter 'accessToken' is not null or undefined
+            assertParamExists('getPresignedUrl', 'accessToken', accessToken)
+            // verify required parameter 'client' is not null or undefined
+            assertParamExists('getPresignedUrl', 'client', client)
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('getPresignedUrl', 'userId', userId)
+            // verify required parameter 'fileName' is not null or undefined
+            assertParamExists('getPresignedUrl', 'fileName', fileName)
+            const localVarPath = `/presigned-url`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (userId !== undefined) {
+                localVarQueryParameter['userId'] = userId;
+            }
+
+            if (fileName !== undefined) {
+                localVarQueryParameter['fileName'] = fileName;
+            }
+
+            if (uid !== undefined && uid !== null) {
+                localVarHeaderParameter['uid'] = String(uid);
+            }
+
+            if (accessToken !== undefined && accessToken !== null) {
+                localVarHeaderParameter['access-token'] = String(accessToken);
+            }
+
+            if (client !== undefined && client !== null) {
+                localVarHeaderParameter['client'] = String(client);
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * PresignedUrlApi - functional programming interface
+ * @export
+ */
+export const PresignedUrlApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = PresignedUrlApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * S3の署名付きURLを取得する
+         * @summary S3の署名付きURLを取得する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} userId ログイン中のユーザーのID
+         * @param {string} fileName S3にアップロードする予定のファイルの名前
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getPresignedUrl(uid: string, accessToken: string, client: string, userId: number, fileName: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetPresignedUrlResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getPresignedUrl(uid, accessToken, client, userId, fileName, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * PresignedUrlApi - factory interface
+ * @export
+ */
+export const PresignedUrlApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = PresignedUrlApiFp(configuration)
+    return {
+        /**
+         * S3の署名付きURLを取得する
+         * @summary S3の署名付きURLを取得する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} userId ログイン中のユーザーのID
+         * @param {string} fileName S3にアップロードする予定のファイルの名前
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPresignedUrl(uid: string, accessToken: string, client: string, userId: number, fileName: string, options?: any): AxiosPromise<GetPresignedUrlResponse> {
+            return localVarFp.getPresignedUrl(uid, accessToken, client, userId, fileName, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * PresignedUrlApi - object-oriented interface
+ * @export
+ * @class PresignedUrlApi
+ * @extends {BaseAPI}
+ */
+export class PresignedUrlApi extends BaseAPI {
+    /**
+     * S3の署名付きURLを取得する
+     * @summary S3の署名付きURLを取得する
+     * @param {string} uid devise-token-auth用のuid
+     * @param {string} accessToken devise-token-auth用のaccess-token
+     * @param {string} client devise-token-auth用のclient
+     * @param {number} userId ログイン中のユーザーのID
+     * @param {string} fileName S3にアップロードする予定のファイルの名前
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PresignedUrlApi
+     */
+    public getPresignedUrl(uid: string, accessToken: string, client: string, userId: number, fileName: string, options?: AxiosRequestConfig) {
+        return PresignedUrlApiFp(this.configuration).getPresignedUrl(uid, accessToken, client, userId, fileName, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
