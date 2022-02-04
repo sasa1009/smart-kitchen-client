@@ -47,7 +47,7 @@ export interface CurrentUserResponseUser {
      */
     'id': number;
     /**
-     * ユーザーネーム
+     * ユーザー名
      * @type {string}
      * @memberof CurrentUserResponseUser
      */
@@ -83,6 +83,37 @@ export interface GetPresignedUrlResponse {
      * @memberof GetPresignedUrlResponse
      */
     'key': string;
+}
+/**
+ * 更新するユーザー情報
+ * @export
+ * @interface UpdateCurrentUserRequest
+ */
+export interface UpdateCurrentUserRequest {
+    /**
+     * ユーザー名
+     * @type {string}
+     * @memberof UpdateCurrentUserRequest
+     */
+    'name'?: string;
+    /**
+     * 一言コメント
+     * @type {string}
+     * @memberof UpdateCurrentUserRequest
+     */
+    'comment'?: string;
+    /**
+     * ユーザーの画像のURL
+     * @type {string}
+     * @memberof UpdateCurrentUserRequest
+     */
+    'image_url'?: string;
+    /**
+     * ユーザーの画像のkey
+     * @type {string}
+     * @memberof UpdateCurrentUserRequest
+     */
+    'image_key'?: string;
 }
 
 /**
@@ -142,6 +173,67 @@ export const CurrentUserApiAxiosParamCreator = function (configuration?: Configu
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * ログイン中のユーザー情報を更新する
+         * @summary ログイン中のユーザー情報を更新する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} userId ログイン中のユーザーのID
+         * @param {UpdateCurrentUserRequest} updateCurrentUserRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateCurrentUser: async (uid: string, accessToken: string, client: string, userId: number, updateCurrentUserRequest: UpdateCurrentUserRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uid' is not null or undefined
+            assertParamExists('updateCurrentUser', 'uid', uid)
+            // verify required parameter 'accessToken' is not null or undefined
+            assertParamExists('updateCurrentUser', 'accessToken', accessToken)
+            // verify required parameter 'client' is not null or undefined
+            assertParamExists('updateCurrentUser', 'client', client)
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('updateCurrentUser', 'userId', userId)
+            // verify required parameter 'updateCurrentUserRequest' is not null or undefined
+            assertParamExists('updateCurrentUser', 'updateCurrentUserRequest', updateCurrentUserRequest)
+            const localVarPath = `/users/{userId}`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (uid !== undefined && uid !== null) {
+                localVarHeaderParameter['uid'] = String(uid);
+            }
+
+            if (accessToken !== undefined && accessToken !== null) {
+                localVarHeaderParameter['access-token'] = String(accessToken);
+            }
+
+            if (client !== undefined && client !== null) {
+                localVarHeaderParameter['client'] = String(client);
+            }
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateCurrentUserRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -163,6 +255,21 @@ export const CurrentUserApiFp = function(configuration?: Configuration) {
          */
         async getCurrentUser(uid: string, accessToken: string, client: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CurrentUserResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getCurrentUser(uid, accessToken, client, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * ログイン中のユーザー情報を更新する
+         * @summary ログイン中のユーザー情報を更新する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} userId ログイン中のユーザーのID
+         * @param {UpdateCurrentUserRequest} updateCurrentUserRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateCurrentUser(uid: string, accessToken: string, client: string, userId: number, updateCurrentUserRequest: UpdateCurrentUserRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CurrentUserResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateCurrentUser(uid, accessToken, client, userId, updateCurrentUserRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -187,6 +294,20 @@ export const CurrentUserApiFactory = function (configuration?: Configuration, ba
         getCurrentUser(uid: string, accessToken: string, client: string, options?: any): AxiosPromise<CurrentUserResponse> {
             return localVarFp.getCurrentUser(uid, accessToken, client, options).then((request) => request(axios, basePath));
         },
+        /**
+         * ログイン中のユーザー情報を更新する
+         * @summary ログイン中のユーザー情報を更新する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} userId ログイン中のユーザーのID
+         * @param {UpdateCurrentUserRequest} updateCurrentUserRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateCurrentUser(uid: string, accessToken: string, client: string, userId: number, updateCurrentUserRequest: UpdateCurrentUserRequest, options?: any): AxiosPromise<CurrentUserResponse> {
+            return localVarFp.updateCurrentUser(uid, accessToken, client, userId, updateCurrentUserRequest, options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -209,6 +330,22 @@ export class CurrentUserApi extends BaseAPI {
      */
     public getCurrentUser(uid: string, accessToken: string, client: string, options?: AxiosRequestConfig) {
         return CurrentUserApiFp(this.configuration).getCurrentUser(uid, accessToken, client, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ログイン中のユーザー情報を更新する
+     * @summary ログイン中のユーザー情報を更新する
+     * @param {string} uid devise-token-auth用のuid
+     * @param {string} accessToken devise-token-auth用のaccess-token
+     * @param {string} client devise-token-auth用のclient
+     * @param {number} userId ログイン中のユーザーのID
+     * @param {UpdateCurrentUserRequest} updateCurrentUserRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CurrentUserApi
+     */
+    public updateCurrentUser(uid: string, accessToken: string, client: string, userId: number, updateCurrentUserRequest: UpdateCurrentUserRequest, options?: AxiosRequestConfig) {
+        return CurrentUserApiFp(this.configuration).updateCurrentUser(uid, accessToken, client, userId, updateCurrentUserRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

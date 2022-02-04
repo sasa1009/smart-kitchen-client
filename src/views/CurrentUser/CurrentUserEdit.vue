@@ -5,7 +5,7 @@ import { ElMessage } from 'element-plus';
 import type { ElForm } from 'element-plus';
 import { authData } from '@/modules/auth';
 import { getPresignedUrl } from '@/modules/presignedUrl';
-import { CurrentUserApi, Configuration, CurrentUserResponseUser } from '@/api';
+import { CurrentUserApi, Configuration, CurrentUserResponseUser, UpdateCurrentUserRequest } from '@/api';
 import axios from 'axios';
 // eslint-disable-next-line
 // @ts-ignore
@@ -40,8 +40,8 @@ const rules = reactive({
   comment: [
     {
       min: 1,
-      max: 100,
-      message: '100文字以下で入力して下さい。',
+      max: 200,
+      message: '200文字以下で入力して下さい。',
       trigger: ['blur'],
     },
   ],
@@ -129,12 +129,61 @@ async function uploadImageFileToS3(file: File) {
 
   if (updateResponse.status === 200) {
     return {
-      imageUrl: presignedUrl.url.split('?')[0],
-      key: presignedUrl.key
+      image_url: presignedUrl.url.split('?')[0],
+      image_key: presignedUrl.key
     };
   } else {
     throw new Error('ファイルのアップロードに失敗しました。');
   }
+}
+
+/**
+ * ユーザー情報を更新する
+ */
+function updateUser(formEl: InstanceType<typeof ElForm>) {
+  formEl.validate(async (valid) => {
+    if (valid) {
+      try {
+        if (!authData.value.userId) throw new Error('未ログインです。');
+        const updateParams: UpdateCurrentUserRequest = {
+          name: formData.name,
+          comment: formData.comment ? formData.comment : undefined,
+        };
+
+        // 画像が投稿されている場合はS3にアップロード
+        if (imageData.file) {
+          const imageMetaData = await uploadImageFileToS3(imageData.file);
+          console.log(imageMetaData);
+          Object.assign(updateParams, imageMetaData);
+          console.log(updateParams);
+        }
+
+        // ユーザー情報を更新
+        const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
+        const response = await new CurrentUserApi(configuration).updateCurrentUser(authData.value.uid, authData.value.accessToken, authData.value.client, authData.value.userId, updateParams)
+        if (response.status === 200) {
+          ElMessage({
+            showClose: true,
+            message: 'ユーザー情報を更新しました。',
+            type: 'success',
+          })
+          router.push({ name: 'CurrentUser' })
+        } else {
+          throw new Error('ユーザー情報更新失敗。');
+        }
+      } catch (error) {
+        console.error(error);
+        ElMessage({
+          showClose: true,
+          message: 'ユーザー情報の更新に失敗しました。',
+          type: 'error',
+        })
+      }
+    } else {
+      console.log('error submit!');
+      return false
+    }
+  });
 }
 
 /**
@@ -221,7 +270,12 @@ async function uploadImageFileToS3(file: File) {
           <el-input
             v-model="formData.comment"
             type="textarea"
+            :maxlength="200"
+            :show-word-limit="true"
           />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="updateUser(formRef)">更新</el-button>
         </el-form-item>
       </div>
     </el-form>
