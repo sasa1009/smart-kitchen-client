@@ -5,6 +5,7 @@ import CurrentUser from '../views/CurrentUser/CurrentUser.vue';
 import CurrentUserEdit from '../views/CurrentUser/CurrentUserEdit.vue';
 import Signup from '../views/Signup.vue';
 import Login from '../views/Login.vue';
+import PostRecipe from '../views/PostRecipe.vue';
 
 import { authData, isLogin, isExpired } from '@/modules/auth';
 
@@ -40,6 +41,12 @@ const routes: Array<RouteRecordRaw> = [
     path: '/login',
     name: 'Login',
     component: Login
+  },
+  {
+    path: '/recipe/post',
+    name: 'PostRecipe',
+    component: PostRecipe,
+    meta: { requiresAuth: true },
   },
   // {
   //   path: '/about',
