@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, defineProps } from 'vue';
+import { reactive } from 'vue';
 import { authData } from '@/modules/auth';
 import { CurrentUserApi, Configuration, CurrentUserResponseUser } from '@/api';
 // eslint-disable-next-line
@@ -65,9 +65,7 @@ const userData = reactive<CurrentUserResponseUser>({
       :class="'comment-' + (mq.current === 'sm' ? 'sm' : 'mdlg')"
     >
       <h3>一言コメント</h3>
-      <div>
-        {{ userData.comment }}
-      </div>
+      <div v-html="userData.comment.replace(/\n/g, '<br>')" />
     </div>
   </div>
 </template>

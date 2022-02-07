@@ -5,11 +5,11 @@ import { ElMessage } from 'element-plus';
 import type { ElForm } from 'element-plus';
 import { authData } from '@/modules/auth';
 import { ingredientsForForm, categories } from '@/modules/data';
-import { getPresignedUrl } from '@/modules/presignedUrl';
-import axios from 'axios';
+import { uploadImageFileToS3 } from '@/modules/presignedUrl';
 // eslint-disable-next-line
 // @ts-ignore
 import { useMq } from 'vue3-mq';
+import { RecipesApi, Configuration, CreateRecipeRequest } from '@/api';
 
 interface ImageData {
   imageDataUrl: string | ArrayBuffer | null;
@@ -29,7 +29,7 @@ const rules = reactive({
       trigger: 'blur',
     }
   ],
-  mainIngredient: [
+  main_ingredient: [
     {
       required: true,
       message: 'メイン食材を選択してください。',
@@ -46,55 +46,50 @@ const rules = reactive({
 });
 
 // フォームで使用するデータを格納する
-const formData = reactive({
+const recipeData = reactive({
   title: '',
   comment: '',
   amount: 1,
-  calorie: 1,
-  mainIngredient: '',
+  calorie: 0,
+  main_ingredient: '',
   category: '',
-  ingredients: [
-    {
-      name: '',
-      amount: '',
-      showErrorMessage: false
-    },
-    {
-      name: '',
-      amount: '',
-      showErrorMessage: false
-    },
-    {
-      name: '',
-      amount: '',
-      showErrorMessage: false
-    },
-  ],
-  procedures: [
-    {
-      description: '',
-      imageDataUrl: null,
-      file: null,
-      showErrorMessage: false
-    },
-    {
-      description: '',
-      imageDataUrl: null,
-      file: null,
-      showErrorMessage: false
-    },
-  ],
   tips: ''
 });
-
-// ユーザーが選択した食材カテゴリーを格納する
-const ingredientCategory = ref('');
+const ingredientData = reactive([
+  {
+    name: '',
+    amount: '',
+    showErrorMessage: false
+  },
+  {
+    name: '',
+    amount: '',
+    showErrorMessage: false
+  },
+])
+const procedureData = reactive([
+  {
+    description: '',
+    imageDataUrl: null,
+    file: null,
+    showErrorMessage: false
+  },
+  {
+    description: '',
+    imageDataUrl: null,
+    file: null,
+    showErrorMessage: false
+  },
+])
 
 // レシピのメイン画像データを格納する
 const mainImageData = reactive<ImageData>({
   imageDataUrl: null,
   file: null
 });
+
+// ユーザーが選択した食材カテゴリーを格納する
+const ingredientCategory = ref('');
 
 /**
  * アップロードされた画像ファイルに対して以下の処理を行う
@@ -134,14 +129,14 @@ function handleFile(event: any, index: number) {
       if (index === -1) {
         mainImageData.imageDataUrl = e.target.result;
       } else {
-        formData.procedures[index].imageDataUrl = e.target.result;
+        procedureData[index].imageDataUrl = e.target.result;
       }
     };
     reader.readAsDataURL(file);
     if (index === -1) {
       mainImageData.file = file;
     } else {
-      formData.procedures[index].file = file;
+      procedureData[index].file = file;
     }
   } catch (error) {
     console.error(error);
@@ -162,8 +157,8 @@ function deleteFile(index: number) {
     mainImageData.imageDataUrl = null;
     mainImageData.file = null;
   } else {
-    formData.procedures[index].imageDataUrl = null;
-    formData.procedures[index].file = null;
+    procedureData[index].imageDataUrl = null;
+    procedureData[index].file = null;
   }
 }
 
@@ -171,16 +166,16 @@ function deleteFile(index: number) {
  * 食材を削除する
  */
 function deleteIngredient(index: number) {
-  if (formData.ingredients.length >= 2) {
-    formData.ingredients.splice(index, 1);
+  if (ingredientData.length >= 2) {
+    ingredientData.splice(index, 1);
   }
 }
 
 /**
- * 食材を削除する
+ * 食材を追加する
  */
 function addIngredient() {
-  formData.ingredients.push({
+  ingredientData.push({
     name: '',
     amount: '',
     showErrorMessage: false
@@ -188,19 +183,19 @@ function addIngredient() {
 }
 
 /**
- * 食材を削除する
+ * 手順を削除する
  */
 function deleteProcedure(index: number) {
-  if (formData.procedures.length >= 2) {
-    formData.procedures.splice(index, 1);
+  if (procedureData.length >= 2) {
+    procedureData.splice(index, 1);
   }
 }
 
 /**
- * 食材を削除する
+ * 手順を追加する
  */
 function addProcedure() {
-  formData.procedures.push({
+  procedureData.push({
     description: '',
     imageDataUrl: null,
     file: null,
@@ -209,69 +204,105 @@ function addProcedure() {
 }
 
 /**
- * 画像ファイルをS3にアップロードする
- */
-async function uploadImageFileToS3(file: File) {
-  // ファイルの署名付きURLを取得する
-  const presignedUrl = await getPresignedUrl(file.name);
-  if (!presignedUrl) throw new Error('署名付きURLの取得に失敗しました。');
-
-  // S3にファイルをアップロード
-  const updateResponse = await axios.put(presignedUrl.url, file);
-
-  if (updateResponse.status === 200) {
-    return {
-      image_url: presignedUrl.url.split('?')[0],
-      image_key: presignedUrl.key
-    };
-  } else {
-    throw new Error('ファイルのアップロードに失敗しました。');
-  }
-}
-
-/**
  * ユーザー情報を更新する
  */
-function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
+function createRecipe(formEl: InstanceType<typeof ElForm> | undefined) {
   if (!formEl) return;
   formEl.validate(async (valid) => {
     if (valid) {
       try {
         // if (!authData.value.userId) throw new Error('未ログインです。');
-        // const updateParams: UpdateCurrentUserRequest = {
-        //   name: formData.name,
-        //   comment: formData.comment ? formData.comment : undefined,
-        // };
 
-        // // 画像が投稿されている場合はS3にアップロード
-        // if (imageData.file) {
-        //   const imageMetaData = await uploadImageFileToS3(imageData.file);
-        //   Object.assign(updateParams, imageMetaData);
-        // }
+        // 食材と作り方の項目をバリデーション
+        let isError = false;
+        for (const ingredient of ingredientData) {
+          // 未入力の項目があればエラーメッセージを表示
+          if (!ingredient.name || !ingredient.amount) {
+            ingredient.showErrorMessage = true;
+            isError = true;
+          }
+          // 入力済みであればエラーメッセージを非表示
+          if (!!ingredient.name && !!ingredient.amount) {
+            ingredient.showErrorMessage = false;
+          }
+        }
+        for (const procedure of procedureData) {
+          // 未入力の項目があればエラーメッセージを表示
+          if (!procedure.description) {
+            procedure.showErrorMessage = true;
+            isError = true;
+          }
+          // 入力済みであればエラーメッセージを非表示
+          if (procedure.description) {
+            procedure.showErrorMessage = false;
+          }
+        }
+        if (isError) {
+          ElMessage({
+            showClose: true,
+            message: '未入力の項目があります。',
+            type: 'error',
+          });
+          return;
+        }
 
-        // // ユーザー情報を更新
-        // const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
-        // const response = await new CurrentUserApi(configuration).updateCurrentUser(authData.value.uid, authData.value.accessToken, authData.value.client, authData.value.userId, updateParams)
-        // if (response.status === 200) {
-        //   ElMessage({
-        //     showClose: true,
-        //     message: 'ユーザー情報を更新しました。',
-        //     type: 'success',
-        //   })
-        //   router.push({ name: 'CurrentUser' })
-        // } else {
-        //   throw new Error('ユーザー情報更新失敗。');
-        // }
+        // メイン画像が投稿されている場合はS3にアップロード
+        if (mainImageData.file) {
+          const imageMetaData = await uploadImageFileToS3(mainImageData.file);
+          Object.assign(recipeData, imageMetaData);
+        }
+
+        // 手順の画像が投稿されている場合はS3にアップロード
+        for (const procedure of procedureData) {
+          if (procedure.file) {
+            const imageMetaData = await uploadImageFileToS3(procedure.file);
+            Object.assign(procedure, imageMetaData);
+          }
+        }
+
+        const createParams: CreateRecipeRequest = {
+          ...recipeData,
+          ingredients: ingredientData.map((ingredient, index) => ({
+            index,
+            name: ingredient.name,
+            amount: ingredient.amount
+          })),
+          procedures: procedureData.map((procedure, index) => ({
+            index,
+            description: procedure.description,
+            image_url: procedure?.image_url,
+            image_key: procedure?.image_key
+          }))
+        };
+
+        // // レシピ情報を登録
+        const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
+        const response = await new RecipesApi(configuration).createRecipe(authData.value.uid, authData.value.accessToken, authData.value.client, createParams);
+        if (response.status === 201) {
+          ElMessage({
+            showClose: true,
+            message: 'レシピを登録しました。',
+            type: 'success',
+          })
+          router.push({ name: 'Home' })
+        } else {
+          throw new Error('レシピ登録失敗。');
+        }
       } catch (error) {
         console.error(error);
         ElMessage({
           showClose: true,
-          message: 'ユーザー情報の更新に失敗しました。',
+          message: 'レシピの登録に失敗しました。',
           type: 'error',
-        })
+        });
       }
     } else {
       console.log('error submit!');
+      ElMessage({
+        showClose: true,
+        message: '未入力の項目があります。',
+        type: 'error',
+      })
       return false
     }
   });
@@ -284,7 +315,7 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
       ref="formRef"
       label-position="top"
       label-width="100px"
-      :model="formData"
+      :model="recipeData"
       :rules="rules"
       :hide-required-asterisk="true"
       class="login-form"
@@ -334,7 +365,7 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
           prop="title"
         >
           <el-input
-            v-model="formData.title"
+            v-model="recipeData.title"
             :maxlength="30"
             :show-word-limit="true"
           />
@@ -344,7 +375,7 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
           prop="comment"
         >
           <el-input
-            v-model="formData.comment"
+            v-model="recipeData.comment"
             type="textarea"
             :maxlength="200"
             :show-word-limit="true"
@@ -355,7 +386,7 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
           prop="amount"
         >
           <el-input-number
-            v-model="formData.amount"
+            v-model="recipeData.amount"
             :min="1"
             :max="100"
             class="amount"
@@ -367,8 +398,8 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
           prop="amount"
         >
           <el-input-number
-            v-model="formData.calorie"
-            :min="1"
+            v-model="recipeData.calorie"
+            :min="0"
             :max="100000"
             class="amount"
           />
@@ -376,7 +407,7 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
         </el-form-item>
         <el-form-item
           label="メイン食材"
-          prop="mainIngredient"
+          prop="main_ingredient"
         >
           <el-select
             v-model="ingredientCategory"
@@ -392,7 +423,7 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
           </el-select>
           <el-select
             v-if="ingredientCategory"
-            v-model="formData.mainIngredient"
+            v-model="recipeData.main_ingredient"
             placeholder="メイン食材"
             class="main-ingredient-selector"
           >
@@ -409,7 +440,7 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
           prop="category"
         >
           <el-select
-            v-model="formData.category"
+            v-model="recipeData.category"
             placeholder="食材カテゴリー"
             class="category-selector"
           >
@@ -438,7 +469,7 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
             </el-col>
           </el-row>
           <el-row
-            v-for="(ingredient, index) in formData.ingredients"
+            v-for="(ingredient, index) in ingredientData"
             :key="index"
             class="ingredient"
           >
@@ -447,14 +478,14 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
               class="ingredient-name"
             >
               <el-input
-                v-model="formData.ingredients[index].name"
+                v-model="ingredientData[index].name"
                 :maxlength="20"
                 :show-word-limit="true"
               />
             </el-col>
             <el-col :span="8">
               <el-input
-                v-model="formData.ingredients[index].amount"
+                v-model="ingredientData[index].amount"
                 :maxlength="20"
                 :show-word-limit="true"
               />
@@ -464,7 +495,7 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
               class="ingredient-delete-section"
             >
               <span
-                v-if="formData.ingredients.length >= 2"
+                v-if="ingredientData.length >= 2"
                 class="ingredient-delete-button"
                 @click="deleteIngredient(index)"
               >
@@ -474,7 +505,7 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
               </span>
             </el-col>
             <span
-              v-if="formData.ingredients[index].showErrorMessage"
+              v-if="ingredientData[index].showErrorMessage"
               class="ingredient-error-message"
             >
               食材名と分量を入力してください。
@@ -502,7 +533,7 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
             </el-col>
           </el-row>
           <el-row
-            v-for="(ingredient, index) in formData.procedures"
+            v-for="(ingredient, index) in procedureData"
             :key="index"
             class="procedure"
           >
@@ -517,13 +548,13 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
               class="procedure-description"
             >
               <el-input
-                v-model="formData.procedures[index].description"
+                v-model="procedureData[index].description"
                 type="textarea"
                 :maxlength="100"
                 :show-word-limit="true"
               />
               <span
-                v-if="formData.procedures[index].showErrorMessage"
+                v-if="procedureData[index].showErrorMessage"
                 class="procedure-error-message"
               >
               手順を入力してください。
@@ -534,7 +565,7 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
               class="ingredient-delete-section"
             >
               <span
-                v-if="formData.procedures.length >= 2"
+                v-if="procedureData.length >= 2"
                 class="ingredient-delete-button"
                 @click="deleteProcedure(index)"
               >
@@ -554,10 +585,10 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
                 </label>
                 <div
                   class="procedure-image-name-wrapper"
-                  v-if="formData.procedures[index].file"
+                  v-if="procedureData[index].file"
                 >
                   <div class="procedure-image-name">
-                    {{ formData.procedures[index].file?.name }}
+                    {{ procedureData[index].file?.name }}
                   </div>
                   <span
                     class="delete-button"
@@ -573,9 +604,9 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
                 
               >
                 <el-image
-                  v-if="formData.procedures[index].imageDataUrl"
+                  v-if="procedureData[index].imageDataUrl"
                   class="procedure-image"
-                  :src="formData.procedures[index].imageDataUrl"
+                  :src="procedureData[index].imageDataUrl"
                   fit="cover"
                 />
               </div>
@@ -592,14 +623,14 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
           prop="tips"
         >
           <el-input
-            v-model="formData.tips"
+            v-model="recipeData.tips"
             type="textarea"
             :maxlength="200"
             :show-word-limit="true"
           />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="updateUser(formRef)">登録</el-button>
+          <el-button type="primary" @click="createRecipe(formRef)">登録</el-button>
         </el-form-item>
       </div>
     </el-form>

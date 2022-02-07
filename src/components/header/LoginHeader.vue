@@ -118,7 +118,10 @@ function logout() {
           </el-button>
         </template>
         <el-menu text-color="#000000">
-          <el-menu-item index="1">
+          <el-menu-item
+            index="1"
+            @click="$router.push({ name: 'PostRecipe' })"
+          >
             <span>レシピ作成</span>
           </el-menu-item>
           <el-menu-item
@@ -241,7 +244,10 @@ function logout() {
           <el-menu-item index="2">
             <span>フード日誌</span>
           </el-menu-item>
-          <el-menu-item index="3">
+          <el-menu-item
+            index="3"
+            @click="$router.push({ name: 'PostRecipe' })"
+          >
             <span>レシピ作成</span>
           </el-menu-item>
           <el-menu-item
