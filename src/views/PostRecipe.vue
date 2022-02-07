@@ -204,7 +204,7 @@ function addProcedure() {
 }
 
 /**
- * ユーザー情報を更新する
+ * レシピ情報を登録する
  */
 function createRecipe(formEl: InstanceType<typeof ElForm> | undefined) {
   if (!formEl) return;
