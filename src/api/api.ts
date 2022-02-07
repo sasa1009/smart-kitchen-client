@@ -22,6 +22,148 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
 
 /**
+ * 新規登録するレシピ情報
+ * @export
+ * @interface CreateRecipeRequest
+ */
+export interface CreateRecipeRequest {
+    /**
+     * レシピのタイトル
+     * @type {string}
+     * @memberof CreateRecipeRequest
+     */
+    'title': string;
+    /**
+     * コメント
+     * @type {string}
+     * @memberof CreateRecipeRequest
+     */
+    'comment': string;
+    /**
+     * レシピの分量
+     * @type {number}
+     * @memberof CreateRecipeRequest
+     */
+    'amount': number;
+    /**
+     * レシピの一人分のカロリー
+     * @type {number}
+     * @memberof CreateRecipeRequest
+     */
+    'calorie': number;
+    /**
+     * メインの食材
+     * @type {string}
+     * @memberof CreateRecipeRequest
+     */
+    'main_ingredient': string;
+    /**
+     * カテゴリー
+     * @type {string}
+     * @memberof CreateRecipeRequest
+     */
+    'category': string;
+    /**
+     * コツ・ポイント
+     * @type {string}
+     * @memberof CreateRecipeRequest
+     */
+    'tips': string;
+    /**
+     * メイン画像のURL
+     * @type {string}
+     * @memberof CreateRecipeRequest
+     */
+    'image_url'?: string;
+    /**
+     * メイン画像のkey
+     * @type {string}
+     * @memberof CreateRecipeRequest
+     */
+    'image_key'?: string;
+    /**
+     * レシピで使用する材料
+     * @type {Array<CreateRecipeRequestIngredients>}
+     * @memberof CreateRecipeRequest
+     */
+    'ingredients': Array<CreateRecipeRequestIngredients>;
+    /**
+     * 手順
+     * @type {Array<CreateRecipeRequestProcedures>}
+     * @memberof CreateRecipeRequest
+     */
+    'procedures': Array<CreateRecipeRequestProcedures>;
+}
+/**
+ * 
+ * @export
+ * @interface CreateRecipeRequestIngredients
+ */
+export interface CreateRecipeRequestIngredients {
+    /**
+     * 食材の並び順
+     * @type {number}
+     * @memberof CreateRecipeRequestIngredients
+     */
+    'index': number;
+    /**
+     * 材料名
+     * @type {string}
+     * @memberof CreateRecipeRequestIngredients
+     */
+    'name': string;
+    /**
+     * 分量
+     * @type {string}
+     * @memberof CreateRecipeRequestIngredients
+     */
+    'amount': string;
+}
+/**
+ * 
+ * @export
+ * @interface CreateRecipeRequestProcedures
+ */
+export interface CreateRecipeRequestProcedures {
+    /**
+     * 手順の並び順
+     * @type {number}
+     * @memberof CreateRecipeRequestProcedures
+     */
+    'index': number;
+    /**
+     * 手順の詳細
+     * @type {string}
+     * @memberof CreateRecipeRequestProcedures
+     */
+    'description': string;
+    /**
+     * 手順の画像のURL
+     * @type {string}
+     * @memberof CreateRecipeRequestProcedures
+     */
+    'image_url'?: string;
+    /**
+     * 手順の画像のkey
+     * @type {string}
+     * @memberof CreateRecipeRequestProcedures
+     */
+    'image_key'?: string;
+}
+/**
+ * 登録が成功した場合のレスポンス
+ * @export
+ * @interface CreateResponse
+ */
+export interface CreateResponse {
+    /**
+     * 登録が成功した場合のメッセージ
+     * @type {string}
+     * @memberof CreateResponse
+     */
+    'message': string;
+}
+/**
  * ログイン中のユーザー情報のルートプロパティ
  * @export
  * @interface CurrentUserResponse
@@ -494,6 +636,143 @@ export class PresignedUrlApi extends BaseAPI {
      */
     public getPresignedUrl(uid: string, accessToken: string, client: string, userId: number, fileName: string, options?: AxiosRequestConfig) {
         return PresignedUrlApiFp(this.configuration).getPresignedUrl(uid, accessToken, client, userId, fileName, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * RecipesApi - axios parameter creator
+ * @export
+ */
+export const RecipesApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * レシピ情報を登録する
+         * @summary レシピ情報を登録する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {CreateRecipeRequest} createRecipeRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createRecipe: async (uid: string, accessToken: string, client: string, createRecipeRequest: CreateRecipeRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uid' is not null or undefined
+            assertParamExists('createRecipe', 'uid', uid)
+            // verify required parameter 'accessToken' is not null or undefined
+            assertParamExists('createRecipe', 'accessToken', accessToken)
+            // verify required parameter 'client' is not null or undefined
+            assertParamExists('createRecipe', 'client', client)
+            // verify required parameter 'createRecipeRequest' is not null or undefined
+            assertParamExists('createRecipe', 'createRecipeRequest', createRecipeRequest)
+            const localVarPath = `/recipes`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (uid !== undefined && uid !== null) {
+                localVarHeaderParameter['uid'] = String(uid);
+            }
+
+            if (accessToken !== undefined && accessToken !== null) {
+                localVarHeaderParameter['access-token'] = String(accessToken);
+            }
+
+            if (client !== undefined && client !== null) {
+                localVarHeaderParameter['client'] = String(client);
+            }
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createRecipeRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * RecipesApi - functional programming interface
+ * @export
+ */
+export const RecipesApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = RecipesApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * レシピ情報を登録する
+         * @summary レシピ情報を登録する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {CreateRecipeRequest} createRecipeRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createRecipe(uid: string, accessToken: string, client: string, createRecipeRequest: CreateRecipeRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createRecipe(uid, accessToken, client, createRecipeRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * RecipesApi - factory interface
+ * @export
+ */
+export const RecipesApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = RecipesApiFp(configuration)
+    return {
+        /**
+         * レシピ情報を登録する
+         * @summary レシピ情報を登録する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {CreateRecipeRequest} createRecipeRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createRecipe(uid: string, accessToken: string, client: string, createRecipeRequest: CreateRecipeRequest, options?: any): AxiosPromise<CreateResponse> {
+            return localVarFp.createRecipe(uid, accessToken, client, createRecipeRequest, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * RecipesApi - object-oriented interface
+ * @export
+ * @class RecipesApi
+ * @extends {BaseAPI}
+ */
+export class RecipesApi extends BaseAPI {
+    /**
+     * レシピ情報を登録する
+     * @summary レシピ情報を登録する
+     * @param {string} uid devise-token-auth用のuid
+     * @param {string} accessToken devise-token-auth用のaccess-token
+     * @param {string} client devise-token-auth用のclient
+     * @param {CreateRecipeRequest} createRecipeRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RecipesApi
+     */
+    public createRecipe(uid: string, accessToken: string, client: string, createRecipeRequest: CreateRecipeRequest, options?: AxiosRequestConfig) {
+        return RecipesApiFp(this.configuration).createRecipe(uid, accessToken, client, createRecipeRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

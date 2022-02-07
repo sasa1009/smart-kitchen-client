@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import type { ElForm } from 'element-plus';
 import { authData } from '@/modules/auth';
@@ -19,7 +19,6 @@ interface ImageData {
 const mq = useMq();
 
 const router = useRouter();
-const route = useRoute();
 
 const formRef = ref<InstanceType<typeof ElForm>>()
 
@@ -81,7 +80,7 @@ function handleFile(event: any) {
     }
 
     // ファイルの形式はJPEGまたはPNGのみ
-    if (file.type != 'image/jpeg' && file.type != 'image/png') {
+    if (file.type !== 'image/jpeg' && file.type !== 'image/png') {
       ElMessage({
         showClose: true,
         message: 'JPEGまたはPNG形式のファイルを指定してください。',
@@ -140,7 +139,8 @@ async function uploadImageFileToS3(file: File) {
 /**
  * ユーザー情報を更新する
  */
-function updateUser(formEl: InstanceType<typeof ElForm>) {
+function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
+  if (!formEl) return;
   formEl.validate(async (valid) => {
     if (valid) {
       try {
