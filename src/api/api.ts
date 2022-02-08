@@ -157,11 +157,11 @@ export interface CreateRecipeRequestProcedures {
  */
 export interface CreateResponse {
     /**
-     * 登録が成功した場合のメッセージ
-     * @type {string}
+     * 登録したリソースのID
+     * @type {number}
      * @memberof CreateResponse
      */
-    'message': string;
+    'id': number;
 }
 /**
  * ログイン中のユーザー情報のルートプロパティ
@@ -225,6 +225,154 @@ export interface GetPresignedUrlResponse {
      * @memberof GetPresignedUrlResponse
      */
     'key': string;
+}
+/**
+ * 単一のレシピ情報のルートプロパティ
+ * @export
+ * @interface GetRecipeResponse
+ */
+export interface GetRecipeResponse {
+    /**
+     * 
+     * @type {GetRecipeResponseRecipe}
+     * @memberof GetRecipeResponse
+     */
+    'recipe': GetRecipeResponseRecipe;
+}
+/**
+ * 単一のレシピ情報
+ * @export
+ * @interface GetRecipeResponseRecipe
+ */
+export interface GetRecipeResponseRecipe {
+    /**
+     * レシピのID
+     * @type {number}
+     * @memberof GetRecipeResponseRecipe
+     */
+    'id': number;
+    /**
+     * レシピのタイトル
+     * @type {string}
+     * @memberof GetRecipeResponseRecipe
+     */
+    'title': string;
+    /**
+     * コメント
+     * @type {string}
+     * @memberof GetRecipeResponseRecipe
+     */
+    'comment': string;
+    /**
+     * レシピの分量
+     * @type {number}
+     * @memberof GetRecipeResponseRecipe
+     */
+    'amount': number;
+    /**
+     * レシピの一人分のカロリー
+     * @type {number}
+     * @memberof GetRecipeResponseRecipe
+     */
+    'calorie': number;
+    /**
+     * メインの食材
+     * @type {string}
+     * @memberof GetRecipeResponseRecipe
+     */
+    'main_ingredient': string;
+    /**
+     * カテゴリー
+     * @type {string}
+     * @memberof GetRecipeResponseRecipe
+     */
+    'category': string;
+    /**
+     * コツ・ポイント
+     * @type {string}
+     * @memberof GetRecipeResponseRecipe
+     */
+    'tips': string;
+    /**
+     * メイン画像のURL
+     * @type {string}
+     * @memberof GetRecipeResponseRecipe
+     */
+    'image_url': string | null;
+    /**
+     * 
+     * @type {GetRecipeResponseRecipeUser}
+     * @memberof GetRecipeResponseRecipe
+     */
+    'user': GetRecipeResponseRecipeUser;
+    /**
+     * レシピで使用する材料
+     * @type {Array<CreateRecipeRequestIngredients>}
+     * @memberof GetRecipeResponseRecipe
+     */
+    'ingredients': Array<CreateRecipeRequestIngredients>;
+    /**
+     * 手順
+     * @type {Array<GetRecipeResponseRecipeProcedures>}
+     * @memberof GetRecipeResponseRecipe
+     */
+    'procedures': Array<GetRecipeResponseRecipeProcedures>;
+}
+/**
+ * 
+ * @export
+ * @interface GetRecipeResponseRecipeProcedures
+ */
+export interface GetRecipeResponseRecipeProcedures {
+    /**
+     * 手順の並び順
+     * @type {number}
+     * @memberof GetRecipeResponseRecipeProcedures
+     */
+    'index': number;
+    /**
+     * 手順の詳細
+     * @type {string}
+     * @memberof GetRecipeResponseRecipeProcedures
+     */
+    'description': string;
+    /**
+     * 手順の画像のURL
+     * @type {string}
+     * @memberof GetRecipeResponseRecipeProcedures
+     */
+    'image_url': string | null;
+}
+/**
+ * レシピを作成したユーザー情報
+ * @export
+ * @interface GetRecipeResponseRecipeUser
+ */
+export interface GetRecipeResponseRecipeUser {
+    /**
+     * ユーザーのID
+     * @type {number}
+     * @memberof GetRecipeResponseRecipeUser
+     */
+    'id': number;
+    /**
+     * ユーザー名
+     * @type {string}
+     * @memberof GetRecipeResponseRecipeUser
+     */
+    'name': string;
+    /**
+     * 一言コメント
+     * @type {string}
+     * @memberof GetRecipeResponseRecipeUser
+     */
+    'comment': string;
+    /**
+     * ユーザーの画像のURL
+     * @type {string}
+     * @memberof GetRecipeResponseRecipeUser
+     */
+    'image_url': string | null;
 }
 /**
  * 更新するユーザー情報
@@ -703,6 +851,40 @@ export const RecipesApiAxiosParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 単一のレシピ情報を取得する
+         * @summary 単一のレシピ情報を取得する
+         * @param {number} recipeId レシピのID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRecipe: async (recipeId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'recipeId' is not null or undefined
+            assertParamExists('getRecipe', 'recipeId', recipeId)
+            const localVarPath = `/recipes/{recipeId}`
+                .replace(`{${"recipeId"}}`, encodeURIComponent(String(recipeId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -725,6 +907,17 @@ export const RecipesApiFp = function(configuration?: Configuration) {
          */
         async createRecipe(uid: string, accessToken: string, client: string, createRecipeRequest: CreateRecipeRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createRecipe(uid, accessToken, client, createRecipeRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 単一のレシピ情報を取得する
+         * @summary 単一のレシピ情報を取得する
+         * @param {number} recipeId レシピのID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getRecipe(recipeId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetRecipeResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getRecipe(recipeId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -750,6 +943,16 @@ export const RecipesApiFactory = function (configuration?: Configuration, basePa
         createRecipe(uid: string, accessToken: string, client: string, createRecipeRequest: CreateRecipeRequest, options?: any): AxiosPromise<CreateResponse> {
             return localVarFp.createRecipe(uid, accessToken, client, createRecipeRequest, options).then((request) => request(axios, basePath));
         },
+        /**
+         * 単一のレシピ情報を取得する
+         * @summary 単一のレシピ情報を取得する
+         * @param {number} recipeId レシピのID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRecipe(recipeId: number, options?: any): AxiosPromise<GetRecipeResponse> {
+            return localVarFp.getRecipe(recipeId, options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -773,6 +976,18 @@ export class RecipesApi extends BaseAPI {
      */
     public createRecipe(uid: string, accessToken: string, client: string, createRecipeRequest: CreateRecipeRequest, options?: AxiosRequestConfig) {
         return RecipesApiFp(this.configuration).createRecipe(uid, accessToken, client, createRecipeRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 単一のレシピ情報を取得する
+     * @summary 単一のレシピ情報を取得する
+     * @param {number} recipeId レシピのID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RecipesApi
+     */
+    public getRecipe(recipeId: number, options?: AxiosRequestConfig) {
+        return RecipesApiFp(this.configuration).getRecipe(recipeId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

@@ -441,7 +441,7 @@ function createRecipe(formEl: InstanceType<typeof ElForm> | undefined) {
         >
           <el-select
             v-model="recipeData.category"
-            placeholder="食材カテゴリー"
+            placeholder="カテゴリー"
             class="category-selector"
           >
             <el-option
