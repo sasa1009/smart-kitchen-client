@@ -53,7 +53,9 @@ const recipeData = reactive({
   calorie: 0,
   main_ingredient: '',
   category: '',
-  tips: ''
+  tips: '',
+  image_url: null,
+  image_key: null
 });
 const ingredientData = reactive([
   {
@@ -72,13 +74,17 @@ const procedureData = reactive([
     description: '',
     imageDataUrl: null,
     file: null,
-    showErrorMessage: false
+    showErrorMessage: false,
+    image_url: null,
+    image_key: null
   },
   {
     description: '',
     imageDataUrl: null,
     file: null,
-    showErrorMessage: false
+    showErrorMessage: false,
+    image_url: null,
+    image_key: null
   },
 ])
 
@@ -199,7 +205,9 @@ function addProcedure() {
     description: '',
     imageDataUrl: null,
     file: null,
-    showErrorMessage: false
+    showErrorMessage: false,
+    image_url: null,
+    image_key: null
   });
 }
 
@@ -260,7 +268,7 @@ function createRecipe(formEl: InstanceType<typeof ElForm> | undefined) {
           }
         }
 
-        const createParams: CreateRecipeRequest = {
+        const params: CreateRecipeRequest = {
           ...recipeData,
           ingredients: ingredientData.map((ingredient, index) => ({
             index,
@@ -275,16 +283,16 @@ function createRecipe(formEl: InstanceType<typeof ElForm> | undefined) {
           }))
         };
 
-        // // レシピ情報を登録
+        // レシピ情報を登録
         const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
-        const response = await new RecipesApi(configuration).createRecipe(authData.value.uid, authData.value.accessToken, authData.value.client, createParams);
+        const response = await new RecipesApi(configuration).createRecipe(authData.value.uid, authData.value.accessToken, authData.value.client, params);
         if (response.status === 201) {
           ElMessage({
             showClose: true,
             message: 'レシピを登録しました。',
             type: 'success',
           })
-          router.push({ name: 'Home' })
+          router.push(`/recipe/${response.data.id}`)
         } else {
           throw new Error('レシピ登録失敗。');
         }
@@ -600,9 +608,7 @@ function createRecipe(formEl: InstanceType<typeof ElForm> | undefined) {
                   </span>
                 </div>
               </div>
-              <div
-                
-              >
+              <div>
                 <el-image
                   v-if="procedureData[index].imageDataUrl"
                   class="procedure-image"

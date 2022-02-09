@@ -74,13 +74,13 @@ export interface CreateRecipeRequest {
      * @type {string}
      * @memberof CreateRecipeRequest
      */
-    'image_url'?: string;
+    'image_url': string | null;
     /**
      * メイン画像のkey
      * @type {string}
      * @memberof CreateRecipeRequest
      */
-    'image_key'?: string;
+    'image_key': string | null;
     /**
      * レシピで使用する材料
      * @type {Array<CreateRecipeRequestIngredients>}
@@ -142,13 +142,13 @@ export interface CreateRecipeRequestProcedures {
      * @type {string}
      * @memberof CreateRecipeRequestProcedures
      */
-    'image_url'?: string;
+    'image_url': string | null;
     /**
      * 手順の画像のkey
      * @type {string}
      * @memberof CreateRecipeRequestProcedures
      */
-    'image_key'?: string;
+    'image_key': string | null;
 }
 /**
  * 登録が成功した場合のレスポンス
