@@ -5,7 +5,8 @@ import CurrentUser from '../views/CurrentUser/CurrentUser.vue';
 import CurrentUserEdit from '../views/CurrentUser/CurrentUserEdit.vue';
 import Signup from '../views/Signup.vue';
 import Login from '../views/Login.vue';
-import PostRecipe from '../views/PostRecipe.vue';
+import PostRecipe from '../views/Recipe/PostRecipe.vue';
+import Recipe from '../views/Recipe/Recipe.vue';
 
 import { authData, isLogin, isExpired } from '@/modules/auth';
 
@@ -41,6 +42,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/login',
     name: 'Login',
     component: Login
+  },
+  {
+    path: '/recipe/:id',
+    name: 'Recipe',
+    component: Recipe,
   },
   {
     path: '/recipe/post',
