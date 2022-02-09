@@ -2,7 +2,11 @@
 import { reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { RecipesApi, Configuration, GetRecipeResponseRecipe } from '@/api';
+// eslint-disable-next-line
+// @ts-ignore
+import { useMq } from 'vue3-mq';
 
+const mq = useMq();
 const route = useRoute();
 
 // レシピ情報
@@ -56,12 +60,12 @@ const toggle = ref(true);
 </script>
 
 <template>
-  <div class="recipe-data-wrapper-mdlg">
-    <div class="upper-mdlg clearfix">
-      <div class="upper-left-mdlg">
+  <div :class="'recipe-data-wrapper-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
+    <div :class="'clearfix upper-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
+      <div :class="'upper-left-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
         <h3 class="title">{{ recipeData.title }}</h3>
         <el-image
-          class="main-image-mdlg"
+          :class="'main-image-' + (mq.current === 'sm' ? 'sm' : 'mdlg')"
           :src="recipeData.image_url ? recipeData.image_url : require('@/assets/noimage.png')"
           fit="cover"
         />
@@ -162,7 +166,7 @@ const toggle = ref(true);
           </div>
         </div>
       </div>
-      <div class="upper-right-mdlg">
+      <div :class="'upper-right-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
         <h3 class="title">コメント</h3>
         <div
           v-html="recipeData.comment.replace(/\n/g, '<br>')"
@@ -206,13 +210,13 @@ const toggle = ref(true);
         </div>
       </div>
     </div>
-    <div class="middle-mdlg">
+    <div :class="'middle-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
       <h3 class="title">作り方</h3>
       <el-row>
         <el-col
           v-for="(procedure, index) in recipeData.procedures"
           :key="index"
-          :span="6"
+          :span="mq.current === 'sm' ? 12 : 6"
           class="procedure-wrapper-mdlg"
         >
           <div class="procedure-index">{{ index + 1 }}</div>
@@ -247,10 +251,24 @@ const toggle = ref(true);
   padding-bottom: 10px;
   box-sizing: border-box;
 }
+/* レシピデータラッパー小 */
+.recipe-data-wrapper-sm {
+  width: 375px;
+  background-color: white;
+  margin: 10px auto 0 auto;
+  padding-bottom: 10px;
+  box-sizing: border-box;
+}
 /* レシピ画面上部大 */
 .upper-mdlg {
   width: 750px;
   padding: 20px 20px 0 20px;
+  box-sizing: border-box;
+}
+/* レシピ画面上部小 */
+.upper-sm {
+  width: 375px;
+  padding: 10px 10px 0 10px;
   box-sizing: border-box;
 }
 /* クリアフィックス */
@@ -259,11 +277,18 @@ const toggle = ref(true);
    display: block;
    clear: both;
 }
-/* レシピ画面上部左側 */
+/* レシピ画面上部左側大 */
 .upper-left-mdlg {
   width: 355px;
   height: 600px;
   padding: 5px;
+  box-sizing: border-box;
+  float: left;
+}
+/* レシピ画面上部左側小 */
+.upper-left-sm {
+  width: 355px;
+  height: 600px;
   box-sizing: border-box;
   float: left;
 }
@@ -275,6 +300,11 @@ const toggle = ref(true);
 .main-image-mdlg {
   width: 345px;
   height: 345px;
+}
+/* メイン画像小 */
+.main-image-sm {
+  width: 355px;
+  height: 355px;
 }
 /* カロリー */
 .calorie {
@@ -351,12 +381,20 @@ const toggle = ref(true);
 .edit-recipe {
   font-size: 14px;
 }
-/* レシピ画面上部右側 */
+/* レシピ画面上部右側大 */
 .upper-right-mdlg {
   width: 355px;
   min-height: 600px;
   padding: 5px 0 5px 15px;
   box-sizing: border-box;
+  float: left;
+}
+/* レシピ画面上部右側小 */
+.upper-right-sm {
+  width: 355px;
+  min-height: 600px;
+  padding: 0;
+  margin-top: 20px;
   float: left;
 }
 /* コメント */
@@ -383,6 +421,13 @@ const toggle = ref(true);
   width: 750px;
   margin-top: 30px;
   padding: 0 20px 0 25px;
+  box-sizing: border-box;
+}
+/* レシピ画面中央部小 */
+.middle-sm {
+  width: 375px;
+  margin-top: 30px;
+  padding: 0 10px;
   box-sizing: border-box;
 }
 /* 作り方 */
