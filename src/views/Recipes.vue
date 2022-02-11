@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { reactive, computed, watch } from 'vue';
+import { ElMessage } from 'element-plus';
 // eslint-disable-next-line
 // @ts-ignore
 import { useMq } from 'vue3-mq';
 import RecipeCard from '@/components/RecipeCard.vue';
-import { recipeCardDataList } from '@/modules/data';
+import { RecipesApi, Configuration, GetRecipesResponseRecipes } from '@/api';
 
 const mq = useMq();
+
+/**
+ * 現在のページの幅に応じて数値を返す
+ */
 const currentSpan = computed(() => {
   switch (mq.current) {
     case 'lg':
@@ -19,20 +24,81 @@ const currentSpan = computed(() => {
       return 6;
   }
 });
+
+// レシピ情報の配列
+const recipeDataList = reactive<Array<GetRecipesResponseRecipes>>([
+  {
+    id: 0,
+    title: '',
+    calorie: 0,
+    main_ingredient: '',
+    category: '',
+    image_url: '',
+    user: {
+      id: 0,
+      name: '',
+      comment: '',
+      image_url: ''
+    }
+  },
+]);
+
+/**
+ * ページングに使用するデータ
+ */
+const pageData = reactive({
+  limit: 12,
+  current: 1,
+  total: 0,
+});
+
+// レシピ情報の一覧を取得してrecipeDataListに格納する
+async function getRecipes() {
+  try {
+    const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
+    const response = await new RecipesApi(configuration).getRecipes(pageData.limit, pageData.limit * (pageData.current - 1));
+    if (response.status !== 200) {
+      ElMessage({
+        showClose: true,
+        message: 'レシピ情報の取得に失敗しました。',
+        type: 'error',
+      });
+      throw new Error('レシピ情報の取得に失敗しました。')
+    }
+    recipeDataList.splice(0);
+    Object.assign(recipeDataList, response.data.recipes);
+    pageData.total = response.data.meta.total;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+/**
+ * ページネーションのページ番号がクリックされた時に新たなレシピ情報の一覧を取得してrecipeDataListに格納する
+ */
+watch(
+  () => pageData.current,
+  async () => {
+    await getRecipes();
+  }
+);
+
+// コンポーネント作成時にレシピ情報を取得する
+getRecipes();
 </script>
 
 <template>
   <el-row :class="'row row-' + mq.current">
     <el-col
       :span="currentSpan"
-      v-for="(recipeCardData, index) in recipeCardDataList"
+      v-for="(recipeCardData, index) in recipeDataList"
       :key="index"
       class="col"
     >
       <div :class="'recipe-card-wrapper-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
         <RecipeCard
           :mq-current="mq.current"
-          v-model:recipe-card-data="recipeCardDataList[index]"
+          :recipe-card-data="recipeDataList[index]"
           :is-login="true"
         />
       </div>
@@ -41,7 +107,9 @@ const currentSpan = computed(() => {
   <div class="pagination">
     <el-pagination
       layout="prev, pager, next"
-      :total="1000"
+      v-model:currentPage="pageData.current"
+      :total="pageData.total"
+      :page-size="pageData.limit"
       :pager-count="5"
       style="--el-pagination-background-color: #FFF4D6;
             --el-pagination-button-disabled-background-color: #FFF4D6;

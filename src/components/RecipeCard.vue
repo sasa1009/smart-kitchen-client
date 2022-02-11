@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, PropType } from 'vue';
-import { RecipeCardData } from '@/modules/types';
+import { defineProps, PropType, reactive } from 'vue';
+import { GetRecipesResponseRecipes } from '@/api';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const props = defineProps({
   mqCurrent: {
@@ -8,7 +11,7 @@ const props = defineProps({
     default: 'lg'
   },
   recipeCardData: {
-    type: Object as PropType<RecipeCardData>,
+    type: Object as PropType<GetRecipesResponseRecipes>,
     default: () => ({})
   },
   isLogin: {
@@ -16,17 +19,19 @@ const props = defineProps({
     default: false
   }
 });
-const emits = defineEmits(['update:recipeCardData']);
+
+const like = reactive({
+  likedNumber: 5,
+  liked: false
+});
+
 function updateLike() {
-  const recipeCardData = props.recipeCardData;
-  if (recipeCardData.liked) {
-    recipeCardData.liked = !recipeCardData.liked;
-    recipeCardData.likedNumber--;
-    emits('update:recipeCardData', recipeCardData);
+  if (like.liked) {
+    like.liked = !like.liked;
+    like.likedNumber--;
   } else {
-    recipeCardData.liked = !recipeCardData.liked;
-    recipeCardData.likedNumber++;
-    emits('update:recipeCardData', recipeCardData);
+    like.liked = !like.liked;
+    like.likedNumber++;
   }
 }
 </script>
@@ -36,7 +41,7 @@ function updateLike() {
     <div :class="'recipe-image-wrapper-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">
       <el-image
         :class="'recipe-image-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
-        :src="require('@/assets/butaumadon.jpeg')"
+        :src="props.recipeCardData.image_url ? props.recipeCardData.image_url : require('@/assets/noimage.png')"
         fit="cover"
       />
       <span :class="'calorie-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">{{ props.recipeCardData.calorie }}kcal</span>
@@ -45,8 +50,9 @@ function updateLike() {
       :underline="false"
       href=""
       :class="'recipe-name-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
+      @click="router.push({ path: `/recipe/${props.recipeCardData.id}` })"
     >
-      {{ props.recipeCardData.name }}
+      {{ props.recipeCardData.title }}
     </el-link>
     <el-row
       :class="'user-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
@@ -63,7 +69,7 @@ function updateLike() {
           href=""
           :class="'user-name-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
         >
-          {{ props.recipeCardData.userName }}
+          {{ props.recipeCardData.user.name }}
         </el-link>
       </el-col>
     </el-row>
@@ -74,7 +80,7 @@ function updateLike() {
         <div>
           <el-button
             type="text"
-            v-if="props.recipeCardData.liked"
+            v-if="like.liked"
             @click="updateLike"
             style="padding: 0;"
             href=""
@@ -98,7 +104,7 @@ function updateLike() {
           </el-button>
         </div>
         <div :class="'liked-number-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">
-          {{ props.recipeCardData.likedNumber }}
+          {{ like.likedNumber }}
         </div>
       </el-col>
       <el-col :span="5">
@@ -120,7 +126,7 @@ function updateLike() {
           href=""
           :class="'category-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
         >
-          {{ props.recipeCardData.mainIngredient }}
+          {{ props.recipeCardData.main_ingredient }}
         </el-link><br>
         <el-link
           href=""

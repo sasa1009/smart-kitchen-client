@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
+import { ElMessage } from 'element-plus';
 import { RecipesApi, Configuration, GetRecipeResponseRecipe } from '@/api';
 // eslint-disable-next-line
 // @ts-ignore
@@ -51,7 +52,14 @@ const toggle = ref(true);
   const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
   try {
     const response = await new RecipesApi(configuration).getRecipe(Number(route.params.id));
-    if (response.status !== 200) throw new Error('ユーザー情報の取得に失敗しました。');
+    if (response.status !== 200) {
+      ElMessage({
+        showClose: true,
+        message: 'レシピ情報の取得に失敗しました。',
+        type: 'error',
+      });
+      throw new Error('レシピ情報の取得に失敗しました。')
+    }
     Object.assign(recipeData, response.data.recipe)
   } catch (error) {
     console.error(error);
@@ -67,7 +75,7 @@ const toggle = ref(true);
         <el-image
           :class="'main-image-' + (mq.current === 'sm' ? 'sm' : 'mdlg')"
           :src="recipeData.image_url ? recipeData.image_url : require('@/assets/noimage.png')"
-          fit="cover"
+          fit="contain"
         />
         <div class="calorie">
           一人分のカロリー<span class="calorie-number">{{ recipeData.calorie }}</span>kcal
@@ -170,9 +178,8 @@ const toggle = ref(true);
         <h3 class="title">コメント</h3>
         <div
           v-html="recipeData.comment.replace(/\n/g, '<br>')"
-          class="comment"
         />
-        <h3 class="title">材料（{{ recipeData.amount }}人分）</h3>
+        <h3 class="title ingredient-title">材料（{{ recipeData.amount }}人分）</h3>
         <el-row
           v-for="(ingredient, index) in recipeData.ingredients"
           :key="index"
@@ -224,7 +231,7 @@ const toggle = ref(true);
             v-if="procedure.image_url"
             class="procedure-image-mdlg"
             :src="procedure.image_url"
-            fit="cover"
+            fit="contain"
           />
           <div
             class="procedure"
@@ -397,11 +404,10 @@ const toggle = ref(true);
   margin-top: 20px;
   float: left;
 }
-/* コメント */
-.comment {
-  min-height: 100px;
-}
 /* 材料 */
+.ingredient-title {
+  margin-top: 20px;
+}
 .ingredient-row {
   border-bottom: solid 0.5px #c0c0c0;
   margin-bottom: 5px;
@@ -411,7 +417,7 @@ const toggle = ref(true);
 }
 /* メイン食材 */
 .main-ingredient {
-  margin-top: 30px;
+  margin-top: 20px;
 }
 .category-link {
   text-decoration: underline;

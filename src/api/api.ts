@@ -301,10 +301,10 @@ export interface GetRecipeResponseRecipe {
     'image_url': string | null;
     /**
      * 
-     * @type {GetRecipeResponseRecipeUser}
+     * @type {GetRecipesResponseUser}
      * @memberof GetRecipeResponseRecipe
      */
-    'user': GetRecipeResponseRecipeUser;
+    'user': GetRecipesResponseUser;
     /**
      * レシピで使用する材料
      * @type {Array<CreateRecipeRequestIngredients>}
@@ -344,33 +344,114 @@ export interface GetRecipeResponseRecipeProcedures {
     'image_url': string | null;
 }
 /**
+ * レシピ情報一覧のルートプロパティ
+ * @export
+ * @interface GetRecipesResponse
+ */
+export interface GetRecipesResponse {
+    /**
+     * レシピ情報の一覧
+     * @type {Array<GetRecipesResponseRecipes>}
+     * @memberof GetRecipesResponse
+     */
+    'recipes': Array<GetRecipesResponseRecipes>;
+    /**
+     * 
+     * @type {GetRecipesResponseMeta}
+     * @memberof GetRecipesResponse
+     */
+    'meta': GetRecipesResponseMeta;
+}
+/**
+ * 追加情報
+ * @export
+ * @interface GetRecipesResponseMeta
+ */
+export interface GetRecipesResponseMeta {
+    /**
+     * レシピ情報の総数
+     * @type {number}
+     * @memberof GetRecipesResponseMeta
+     */
+    'total': number;
+}
+/**
+ * 
+ * @export
+ * @interface GetRecipesResponseRecipes
+ */
+export interface GetRecipesResponseRecipes {
+    /**
+     * レシピのID
+     * @type {number}
+     * @memberof GetRecipesResponseRecipes
+     */
+    'id': number;
+    /**
+     * レシピのタイトル
+     * @type {string}
+     * @memberof GetRecipesResponseRecipes
+     */
+    'title': string;
+    /**
+     * レシピの一人分のカロリー
+     * @type {number}
+     * @memberof GetRecipesResponseRecipes
+     */
+    'calorie': number;
+    /**
+     * メインの食材
+     * @type {string}
+     * @memberof GetRecipesResponseRecipes
+     */
+    'main_ingredient': string;
+    /**
+     * カテゴリー
+     * @type {string}
+     * @memberof GetRecipesResponseRecipes
+     */
+    'category': string;
+    /**
+     * メイン画像のURL
+     * @type {string}
+     * @memberof GetRecipesResponseRecipes
+     */
+    'image_url': string | null;
+    /**
+     * 
+     * @type {GetRecipesResponseUser}
+     * @memberof GetRecipesResponseRecipes
+     */
+    'user': GetRecipesResponseUser;
+}
+/**
  * レシピを作成したユーザー情報
  * @export
- * @interface GetRecipeResponseRecipeUser
+ * @interface GetRecipesResponseUser
  */
-export interface GetRecipeResponseRecipeUser {
+export interface GetRecipesResponseUser {
     /**
      * ユーザーのID
      * @type {number}
-     * @memberof GetRecipeResponseRecipeUser
+     * @memberof GetRecipesResponseUser
      */
     'id': number;
     /**
      * ユーザー名
      * @type {string}
-     * @memberof GetRecipeResponseRecipeUser
+     * @memberof GetRecipesResponseUser
      */
     'name': string;
     /**
      * 一言コメント
      * @type {string}
-     * @memberof GetRecipeResponseRecipeUser
+     * @memberof GetRecipesResponseUser
      */
     'comment': string;
     /**
      * ユーザーの画像のURL
      * @type {string}
-     * @memberof GetRecipeResponseRecipeUser
+     * @memberof GetRecipesResponseUser
      */
     'image_url': string | null;
 }
@@ -885,6 +966,50 @@ export const RecipesApiAxiosParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * レシピ情報を一覧取得する
+         * @summary レシピ情報を一覧取得する
+         * @param {number} limit 取得するレシピ情報の件数
+         * @param {number} offset 取得をスキップするレシピ情報の件数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRecipes: async (limit: number, offset: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'limit' is not null or undefined
+            assertParamExists('getRecipes', 'limit', limit)
+            // verify required parameter 'offset' is not null or undefined
+            assertParamExists('getRecipes', 'offset', offset)
+            const localVarPath = `/recipes`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -920,6 +1045,18 @@ export const RecipesApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getRecipe(recipeId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+        /**
+         * レシピ情報を一覧取得する
+         * @summary レシピ情報を一覧取得する
+         * @param {number} limit 取得するレシピ情報の件数
+         * @param {number} offset 取得をスキップするレシピ情報の件数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getRecipes(limit: number, offset: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetRecipesResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getRecipes(limit, offset, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
     }
 };
 
@@ -952,6 +1089,17 @@ export const RecipesApiFactory = function (configuration?: Configuration, basePa
          */
         getRecipe(recipeId: number, options?: any): AxiosPromise<GetRecipeResponse> {
             return localVarFp.getRecipe(recipeId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * レシピ情報を一覧取得する
+         * @summary レシピ情報を一覧取得する
+         * @param {number} limit 取得するレシピ情報の件数
+         * @param {number} offset 取得をスキップするレシピ情報の件数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRecipes(limit: number, offset: number, options?: any): AxiosPromise<GetRecipesResponse> {
+            return localVarFp.getRecipes(limit, offset, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -988,6 +1136,19 @@ export class RecipesApi extends BaseAPI {
      */
     public getRecipe(recipeId: number, options?: AxiosRequestConfig) {
         return RecipesApiFp(this.configuration).getRecipe(recipeId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * レシピ情報を一覧取得する
+     * @summary レシピ情報を一覧取得する
+     * @param {number} limit 取得するレシピ情報の件数
+     * @param {number} offset 取得をスキップするレシピ情報の件数
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RecipesApi
+     */
+    public getRecipes(limit: number, offset: number, options?: AxiosRequestConfig) {
+        return RecipesApiFp(this.configuration).getRecipes(limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
