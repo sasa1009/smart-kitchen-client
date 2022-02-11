@@ -456,6 +456,50 @@ export interface GetRecipesResponseUser {
     'image_url': string | null;
 }
 /**
+ * 単一のユーザー情報のルートプロパティ
+ * @export
+ * @interface GetUserResponse
+ */
+export interface GetUserResponse {
+    /**
+     * 
+     * @type {GetUserResponseUser}
+     * @memberof GetUserResponse
+     */
+    'user': GetUserResponseUser;
+}
+/**
+ * 単一のユーザー情報
+ * @export
+ * @interface GetUserResponseUser
+ */
+export interface GetUserResponseUser {
+    /**
+     * ユーザーID
+     * @type {number}
+     * @memberof GetUserResponseUser
+     */
+    'id': number;
+    /**
+     * ユーザー名
+     * @type {string}
+     * @memberof GetUserResponseUser
+     */
+    'name': string;
+    /**
+     * 一言コメント
+     * @type {string}
+     * @memberof GetUserResponseUser
+     */
+    'comment': string | null;
+    /**
+     * ユーザーの画像のURL
+     * @type {string}
+     * @memberof GetUserResponseUser
+     */
+    'image_url': string | null;
+}
+/**
  * 更新するユーザー情報
  * @export
  * @interface UpdateCurrentUserRequest
@@ -1149,6 +1193,111 @@ export class RecipesApi extends BaseAPI {
      */
     public getRecipes(limit: number, offset: number, options?: AxiosRequestConfig) {
         return RecipesApiFp(this.configuration).getRecipes(limit, offset, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * UsersApi - axios parameter creator
+ * @export
+ */
+export const UsersApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 単一のユーザー情報を取得する
+         * @summary 単一のユーザー情報を取得する
+         * @param {number} userId ユーザーのID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUser: async (userId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('getUser', 'userId', userId)
+            const localVarPath = `/users/{userId}`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * UsersApi - functional programming interface
+ * @export
+ */
+export const UsersApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = UsersApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 単一のユーザー情報を取得する
+         * @summary 単一のユーザー情報を取得する
+         * @param {number} userId ユーザーのID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getUser(userId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetUserResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getUser(userId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * UsersApi - factory interface
+ * @export
+ */
+export const UsersApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = UsersApiFp(configuration)
+    return {
+        /**
+         * 単一のユーザー情報を取得する
+         * @summary 単一のユーザー情報を取得する
+         * @param {number} userId ユーザーのID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUser(userId: number, options?: any): AxiosPromise<GetUserResponse> {
+            return localVarFp.getUser(userId, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * UsersApi - object-oriented interface
+ * @export
+ * @class UsersApi
+ * @extends {BaseAPI}
+ */
+export class UsersApi extends BaseAPI {
+    /**
+     * 単一のユーザー情報を取得する
+     * @summary 単一のユーザー情報を取得する
+     * @param {number} userId ユーザーのID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsersApi
+     */
+    public getUser(userId: number, options?: AxiosRequestConfig) {
+        return UsersApiFp(this.configuration).getUser(userId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

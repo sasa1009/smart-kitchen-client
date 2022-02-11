@@ -38,7 +38,10 @@ function updateLike() {
 
 <template>
   <div :class="'recipe-card-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">
-    <div :class="'recipe-image-wrapper-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">
+    <div
+      :class="'recipe-image-wrapper-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
+      @click="router.push({ path: `/recipe/${props.recipeCardData.id}` })"
+    >
       <el-image
         :class="'recipe-image-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
         :src="props.recipeCardData.image_url ? props.recipeCardData.image_url : require('@/assets/noimage.png')"
@@ -58,9 +61,22 @@ function updateLike() {
       :class="'user-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
     >
       <el-col :span="4">
+        <div
+          v-if="props.recipeCardData.user.image_url"
+          :class="'user-image-wrapper-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
+          @click="router.push({ path: `/user/${props.recipeCardData.user.id}` })"
+        >
+          <el-image
+            :src="props.recipeCardData.user.image_url"
+            :class="'user-image-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
+            fit="cover"
+          />
+        </div>
         <font-awesome-icon
+          v-else
           :icon="['far', 'user-circle']"
           :class="'icon-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
+          @click="router.push({ path: `/user/${props.recipeCardData.user.id}` })"
         />
       </el-col>
       <el-col :span="20">
@@ -68,6 +84,7 @@ function updateLike() {
           :underline="false"
           href=""
           :class="'user-name-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
+          @click="router.push({ path: `/user/${props.recipeCardData.user.id}` })"
         >
           {{ props.recipeCardData.user.name }}
         </el-link>
@@ -163,6 +180,10 @@ function updateLike() {
   position: relative;
   height: 115px;
 }
+.recipe-image-wrapper-mdlg:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
 .recipe-image-mdlg {
   width: 100%;
   height: 115px;
@@ -172,6 +193,10 @@ function updateLike() {
 .recipe-image-wrapper-sm {
   position: relative;
   height: 92px;
+}
+.recipe-image-wrapper-sm:hover {
+  opacity: 0.8;
+  cursor: pointer;
 }
 .recipe-image-sm {
   width: 100%;
@@ -233,13 +258,51 @@ function updateLike() {
   font-size: 11px;
   margin-left: 2px;
 }
+/* ユーザー画像大 */
+.user-image-wrapper-mdlg {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.user-image-wrapper-mdlg:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
+.user-image-mdlg {
+  width: 25px;
+  height: 25px;
+}
+/* ユーザー画像小 */
+.user-image-wrapper-sm {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.user-image-wrapper-sm:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
+.user-image-sm {
+  width: 22px;
+  height: 22px;
+}
 /* アイコン大 */
 .icon-mdlg {
   font-size: 25px;
 }
+.icon-mdlg:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
 /* アイコン小 */
 .icon-sm {
   font-size: 22px;
+}
+.icon-sm:hover {
+  opacity: 0.8;
+  cursor: pointer;
 }
 /* レシピ情報大 */
 .recipe-info-mdlg {

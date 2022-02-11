@@ -5,6 +5,7 @@ import CurrentUser from '../views/CurrentUser/CurrentUser.vue';
 import CurrentUserEdit from '../views/CurrentUser/CurrentUserEdit.vue';
 import Signup from '../views/Signup.vue';
 import Login from '../views/Login.vue';
+import User from '../views/User.vue';
 import PostRecipe from '../views/Recipe/PostRecipe.vue';
 import Recipe from '../views/Recipe/Recipe.vue';
 
@@ -42,6 +43,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/login',
     name: 'Login',
     component: Login
+  },
+  {
+    path: '/user/:id',
+    name: 'User',
+    component: User
   },
   {
     path: '/recipe/:id',
