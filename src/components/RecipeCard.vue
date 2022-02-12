@@ -49,14 +49,12 @@ function updateLike() {
       />
       <span :class="'calorie-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">{{ props.recipeCardData.calorie }}kcal</span>
     </div>
-    <el-link
-      :underline="false"
-      href=""
-      :class="'recipe-name-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
+    <span
+      :class="'recipe-name recipe-name-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
       @click="router.push({ path: `/recipe/${props.recipeCardData.id}` })"
     >
       {{ props.recipeCardData.title }}
-    </el-link>
+    </span>
     <el-row
       :class="'user-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
     >
@@ -80,14 +78,12 @@ function updateLike() {
         />
       </el-col>
       <el-col :span="20">
-        <el-link
-          :underline="false"
-          href=""
-          :class="'user-name-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
+        <span
+          :class="'user-name user-name-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
           @click="router.push({ path: `/user/${props.recipeCardData.user.id}` })"
         >
           {{ props.recipeCardData.user.name }}
-        </el-link>
+        </span>
       </el-col>
     </el-row>
     <el-row
@@ -139,18 +135,19 @@ function updateLike() {
       <el-col
         :span="14"
       >
-        <el-link
-          href=""
-          :class="'category-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
+        <span
+          :class="'category category-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
+          @click="router.push({ name: 'Recipes', params: { main_ingredient: props.recipeCardData.main_ingredient } })"
         >
           {{ props.recipeCardData.main_ingredient }}
-        </el-link><br>
-        <el-link
+        </span><br>
+        <span
           href=""
-          :class="'category-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
+          :class="'category category-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
+          @click="router.push({ name: 'Recipes', params: { category: props.recipeCardData.category } })"
         >
           {{ props.recipeCardData.category }}
-        </el-link>
+        </span>
       </el-col>
     </el-row>
   </div>
@@ -230,6 +227,12 @@ function updateLike() {
   font-size: 14px;
   font-weight: bold;
 }
+/* レシピ名共通 */
+.recipe-name:hover {
+  opacity: 0.8;
+  cursor: pointer;
+  text-decoration: underline;
+}
 /* レシピ名大 */
 .recipe-name-mdlg {
   font-weight: bold;
@@ -239,6 +242,12 @@ function updateLike() {
 .recipe-name-sm {
   font-weight: bold;
   font-size: 11px;
+}
+/* ユーザー名共通 */
+.user-name:hover {
+  opacity: 0.8;
+  cursor: pointer;
+  text-decoration: underline;
 }
 /* ユーザー情報大 */
 .user-mdlg {
@@ -314,6 +323,11 @@ function updateLike() {
 }
 .liked-number-mdlg {
   padding-left: 11px;
+}
+.category:hover {
+  opacity: 0.8;
+  cursor: pointer;
+  text-decoration: underline;
 }
 .category-mdlg {
   font-size: 12px;

@@ -1,5 +1,5 @@
 import { reactive } from 'vue';
-import { RecipeCardData } from '@/modules/types';
+import { GetRecipesResponseRecipes } from '@/api'
 
 // メイン食材
 export const ingredients = [
@@ -133,3 +133,21 @@ export const ingredientsForForm = {
     'こんにゃく',
   ]
 };
+
+// レシピ情報の配列
+export const recipeDataList = reactive<Array<GetRecipesResponseRecipes>>([
+  {
+    id: 0,
+    title: '',
+    calorie: 0,
+    main_ingredient: '',
+    category: '',
+    image_url: '',
+    user: {
+      id: 0,
+      name: '',
+      comment: '',
+      image_url: ''
+    }
+  },
+]);

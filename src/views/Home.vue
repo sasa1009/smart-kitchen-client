@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { reactive } from 'vue';
+import { ElMessage } from 'element-plus';
 import RecipeCard from '@/components/RecipeCard.vue';
 // eslint-disable-next-line
 // @ts-ignore
@@ -7,7 +9,8 @@ import { useMq } from 'vue3-mq';
 // @ts-ignore
 import { Carousel, Navigation, Slide } from 'vue3-carousel';
 import 'vue3-carousel/dist/carousel.css';
-import { ingredients, categories, recipeCardDataList } from '@/modules/data';
+import { Configuration, RecipesApi } from '@/api'
+import { ingredients, categories, recipeDataList } from '@/modules/data';
 
 const mq = useMq();
 
@@ -25,6 +28,36 @@ const breakpointSettings = {
     snapAlign: 'start'
   },
 }
+
+/**
+ * ページングに使用するデータ
+ */
+const pageData = reactive({
+  limit: 12,
+  current: 1,
+  total: 0,
+});
+
+// レシピ情報の一覧を取得してrecipeDataListに格納する
+(async function init() {
+  try {
+    const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
+    const response = await new RecipesApi(configuration).getRecipes(pageData.limit, pageData.limit * (pageData.current - 1), '', '');
+    if (response.status !== 200) {
+      ElMessage({
+        showClose: true,
+        message: 'レシピ情報の取得に失敗しました。',
+        type: 'error',
+      });
+      throw new Error('レシピ情報の取得に失敗しました。')
+    }
+    recipeDataList.splice(0);
+    Object.assign(recipeDataList, response.data.recipes);
+    pageData.total = response.data.meta.total;
+  } catch (error) {
+    console.error(error);
+  }
+})();
 </script>
 
 <template>
@@ -53,17 +86,16 @@ const breakpointSettings = {
             :key="j"
             :span="mq.current === 'sm' ? 6 : 4"
           >
-            <el-link
-              :underline="false"
-              href=""
+            <span
               class="search-item"
+              @click="$router.push({ name: 'Recipes', params: { main_ingredient: item } })"
             >
               <font-awesome-icon
                 :icon="['fas', 'angle-right']"
                 class="angle-right"
               />
               {{ item }}
-            </el-link>
+            </span>
           </el-col>
         </el-row>
       </div>
@@ -73,22 +105,21 @@ const breakpointSettings = {
     >
       <el-row :class="'category-row-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
         <el-col
-          v-for="(categorie, index) in categories"
+          v-for="(category, index) in categories"
           :key="index"
           :span="mq.current === 'sm' ? 6 : 4"
           class="category-item"
         >
-          <el-link
-            :underline="false"
-            href=""
+          <span
             class="search-item"
+            @click="$router.push({ name: 'Recipes', params: { category: category } })"
           >
             <font-awesome-icon
               :icon="['fas', 'angle-right']"
               class="angle-right"
             />
-            {{ categorie }}
-          </el-link>
+            {{ category }}
+          </span>
         </el-col>
       </el-row>
     </el-tab-pane>
@@ -100,7 +131,7 @@ const breakpointSettings = {
       :breakpoints="breakpointSettings"
     >
       <Slide
-        v-for="(recipeCardData, index) in recipeCardDataList"
+        v-for="(recipeCardData, index) in recipeDataList"
         :key="index"
       >
         <div>
@@ -109,7 +140,7 @@ const breakpointSettings = {
           </span>
           <RecipeCard
             :mq-current="mq.current"
-            v-model:recipe-card-data="recipeCardDataList[index]"
+            v-model:recipe-card-data="recipeDataList[index]"
             :is-login="true"
           />
         </div>
@@ -127,13 +158,13 @@ const breakpointSettings = {
       :breakpoints="breakpointSettings"
     >
       <Slide
-        v-for="(recipeCardData, index) in recipeCardDataList"
+        v-for="(recipeCardData, index) in recipeDataList"
         :key="index"
       >
         <div>
           <RecipeCard
             :mq-current="mq.current"
-            v-model:recipe-card-data="recipeCardDataList[index]"
+            v-model:recipe-card-data="recipeDataList[index]"
             :is-login="true"
           />
         </div>
@@ -208,6 +239,11 @@ const breakpointSettings = {
 }
 .search-item {
   font-size: 14px;
+}
+.search-item:hover {
+  opacity: 0.8;
+  cursor: pointer;
+  text-decoration: underline;
 }
 .angle-right {
   font-size: 16px;

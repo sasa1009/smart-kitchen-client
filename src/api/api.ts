@@ -1015,14 +1015,20 @@ export const RecipesApiAxiosParamCreator = function (configuration?: Configurati
          * @summary レシピ情報を一覧取得する
          * @param {number} limit 取得するレシピ情報の件数
          * @param {number} offset 取得をスキップするレシピ情報の件数
+         * @param {string} category 絞り込みを行うカテゴリー
+         * @param {string} mainIngredient 絞り込みを行うメイン食材
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getRecipes: async (limit: number, offset: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getRecipes: async (limit: number, offset: number, category: string, mainIngredient: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'limit' is not null or undefined
             assertParamExists('getRecipes', 'limit', limit)
             // verify required parameter 'offset' is not null or undefined
             assertParamExists('getRecipes', 'offset', offset)
+            // verify required parameter 'category' is not null or undefined
+            assertParamExists('getRecipes', 'category', category)
+            // verify required parameter 'mainIngredient' is not null or undefined
+            assertParamExists('getRecipes', 'mainIngredient', mainIngredient)
             const localVarPath = `/recipes`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1041,6 +1047,14 @@ export const RecipesApiAxiosParamCreator = function (configuration?: Configurati
 
             if (offset !== undefined) {
                 localVarQueryParameter['offset'] = offset;
+            }
+
+            if (category !== undefined) {
+                localVarQueryParameter['category'] = category;
+            }
+
+            if (mainIngredient !== undefined) {
+                localVarQueryParameter['main_ingredient'] = mainIngredient;
             }
 
 
@@ -1094,11 +1108,13 @@ export const RecipesApiFp = function(configuration?: Configuration) {
          * @summary レシピ情報を一覧取得する
          * @param {number} limit 取得するレシピ情報の件数
          * @param {number} offset 取得をスキップするレシピ情報の件数
+         * @param {string} category 絞り込みを行うカテゴリー
+         * @param {string} mainIngredient 絞り込みを行うメイン食材
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getRecipes(limit: number, offset: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetRecipesResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getRecipes(limit, offset, options);
+        async getRecipes(limit: number, offset: number, category: string, mainIngredient: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetRecipesResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getRecipes(limit, offset, category, mainIngredient, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -1139,11 +1155,13 @@ export const RecipesApiFactory = function (configuration?: Configuration, basePa
          * @summary レシピ情報を一覧取得する
          * @param {number} limit 取得するレシピ情報の件数
          * @param {number} offset 取得をスキップするレシピ情報の件数
+         * @param {string} category 絞り込みを行うカテゴリー
+         * @param {string} mainIngredient 絞り込みを行うメイン食材
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getRecipes(limit: number, offset: number, options?: any): AxiosPromise<GetRecipesResponse> {
-            return localVarFp.getRecipes(limit, offset, options).then((request) => request(axios, basePath));
+        getRecipes(limit: number, offset: number, category: string, mainIngredient: string, options?: any): AxiosPromise<GetRecipesResponse> {
+            return localVarFp.getRecipes(limit, offset, category, mainIngredient, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -1187,12 +1205,14 @@ export class RecipesApi extends BaseAPI {
      * @summary レシピ情報を一覧取得する
      * @param {number} limit 取得するレシピ情報の件数
      * @param {number} offset 取得をスキップするレシピ情報の件数
+     * @param {string} category 絞り込みを行うカテゴリー
+     * @param {string} mainIngredient 絞り込みを行うメイン食材
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RecipesApi
      */
-    public getRecipes(limit: number, offset: number, options?: AxiosRequestConfig) {
-        return RecipesApiFp(this.configuration).getRecipes(limit, offset, options).then((request) => request(this.axios, this.basePath));
+    public getRecipes(limit: number, offset: number, category: string, mainIngredient: string, options?: AxiosRequestConfig) {
+        return RecipesApiFp(this.configuration).getRecipes(limit, offset, category, mainIngredient, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

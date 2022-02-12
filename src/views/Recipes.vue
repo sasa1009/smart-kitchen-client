@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { reactive, computed, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { ElMessage } from 'element-plus';
 // eslint-disable-next-line
 // @ts-ignore
 import { useMq } from 'vue3-mq';
 import RecipeCard from '@/components/RecipeCard.vue';
-import { RecipesApi, Configuration, GetRecipesResponseRecipes } from '@/api';
+import { RecipesApi, Configuration } from '@/api';
+import { recipeDataList } from '@/modules/data';
 
+const route = useRoute();
 const mq = useMq();
 
 /**
@@ -25,24 +28,6 @@ const currentSpan = computed(() => {
   }
 });
 
-// レシピ情報の配列
-const recipeDataList = reactive<Array<GetRecipesResponseRecipes>>([
-  {
-    id: 0,
-    title: '',
-    calorie: 0,
-    main_ingredient: '',
-    category: '',
-    image_url: '',
-    user: {
-      id: 0,
-      name: '',
-      comment: '',
-      image_url: ''
-    }
-  },
-]);
-
 /**
  * ページングに使用するデータ
  */
@@ -56,7 +41,7 @@ const pageData = reactive({
 async function getRecipes() {
   try {
     const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
-    const response = await new RecipesApi(configuration).getRecipes(pageData.limit, pageData.limit * (pageData.current - 1));
+    const response = await new RecipesApi(configuration).getRecipes(pageData.limit, pageData.limit * (pageData.current - 1), route.params.category ? route.params.category : '', route.params.main_ingredient ? route.params.main_ingredient : '');
     if (response.status !== 200) {
       ElMessage({
         showClose: true,
@@ -72,6 +57,12 @@ async function getRecipes() {
     console.error(error);
   }
 }
+
+watch(
+  () => route.params,
+  async () => {
+  await getRecipes();
+});
 
 /**
  * ページネーションのページ番号がクリックされた時に新たなレシピ情報の一覧を取得してrecipeDataListに格納する

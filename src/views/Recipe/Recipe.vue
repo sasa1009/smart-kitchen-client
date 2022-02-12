@@ -95,13 +95,12 @@ const toggle = ref(true);
             />
           </div>
           <div class="user-name">
-            <el-link
-              :underline="false"
+            <span
               class="user-name-link"
-              href=""
+              @click="$router.push({ path: `/user/${recipeData.user.id}` })"
             >
               {{ recipeData.user.name }}
-            </el-link>
+            </span>
           </div>
         </div>
         <div class="buttons">
@@ -198,22 +197,20 @@ const toggle = ref(true);
           </el-col>
         </el-row>
         <div class="main-ingredient">
-          <el-link
-            :underline="false"
+          <span
             class="category-link"
-            href=""
+            @click="$router.push({ name: 'Recipes', params: { main_ingredient: recipeData.main_ingredient } })"
           >
             {{ recipeData.main_ingredient }}
-          </el-link>
+          </span>
         </div>
         <div>
-          <el-link
-            :underline="false"
+          <span
             class="category-link"
-            href=""
+            @click="$router.push({ name: 'Recipes', params: { category: recipeData.category } })"
           >
             {{ recipeData.category }}
-          </el-link>
+          </span>
         </div>
       </div>
     </div>
@@ -234,10 +231,9 @@ const toggle = ref(true);
             fit="contain"
           />
           <div
+            v-html="procedure.description.replace(/\n/g, '<br>')"
             class="procedure"
-          >
-            {{ procedure.description }}
-          </div>
+          />
         </el-col>
       </el-row>
       <h3 class="title tips-title">コツ・ポイント</h3>
@@ -355,6 +351,11 @@ const toggle = ref(true);
 .user-name-link {
   font-size: 16px;
 }
+.user-name-link:hover {
+  opacity: 0.8;
+  cursor: pointer;
+  text-decoration: underline;
+}
 /* ボタン群 */
 .buttons {
   width: 345px;
@@ -420,6 +421,11 @@ const toggle = ref(true);
   margin-top: 20px;
 }
 .category-link {
+  font-size: 14px;
+}
+.category-link:hover {
+  opacity: 0.8;
+  cursor: pointer;
   text-decoration: underline;
 }
 /* レシピ画面中央部大 */
