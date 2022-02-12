@@ -1,5 +1,5 @@
 import { reactive } from 'vue';
-import { RecipeCardData } from '@/modules/types';
+import { GetRecipesResponseRecipes } from '@/api'
 
 // メイン食材
 export const ingredients = [
@@ -62,11 +62,15 @@ export const ingredients = [
 export const categories = [
   'お菓子',
   'スープ・汁物・シチュー',
+  'カレー',
   '卵料理',
   'ごはんもの',
   'サラダ',
   '肉料理',
   '麺類',
+  '炒め物',
+  '煮物',
+  '揚げ物',
   '野菜料理',
   'パン',
   '鍋料理',
@@ -74,6 +78,7 @@ export const categories = [
   '魚介料理',
   '飲み物',
   'パイ・キッシュ',
+  'パスタ',
   'グラタン・ドリア・ラザニア',
   '餃子・焼売・春巻き',
   '漬物',
@@ -129,137 +134,20 @@ export const ingredientsForForm = {
   ]
 };
 
-export const recipeCardDataList = reactive<Array<RecipeCardData>>([
+// レシピ情報の配列
+export const recipeDataList = reactive<Array<GetRecipesResponseRecipes>>([
   {
-    imageUrl: '鶏胸肉と小松菜の味噌マヨ炒め',
-    calorie: 350,
-    name: '鶏胸肉と小松菜',
-    userName: 'sasakurasan',
-    userImageUrl: '',
-    liked: false,
-    likedNumber: 5,
-    mainIngredient: '鶏肉',
-    category: '肉料理'
-  },
-  {
-    imageUrl: '鶏胸肉と小松菜の味噌マヨ炒め',
-    calorie: 350,
-    name: '鶏胸肉と小松菜',
-    userName: 'sasakurasan',
-    userImageUrl: '',
-    liked: false,
-    likedNumber: 5,
-    mainIngredient: '鶏肉',
-    category: '肉料理'
-  },
-  {
-    imageUrl: '鶏胸肉と小松菜の味噌マヨ炒め',
-    calorie: 350,
-    name: '鶏胸肉と小松菜',
-    userName: 'sasakurasan',
-    userImageUrl: '',
-    liked: false,
-    likedNumber: 5,
-    mainIngredient: '鶏肉',
-    category: '肉料理'
-  },
-  {
-    imageUrl: '鶏胸肉と小松菜の味噌マヨ炒め',
-    calorie: 350,
-    name: '鶏胸肉と小松菜',
-    userName: 'sasakurasan',
-    userImageUrl: '',
-    liked: false,
-    likedNumber: 5,
-    mainIngredient: '鶏肉',
-    category: '肉料理'
-  },
-  {
-    imageUrl: '鶏胸肉と小松菜の味噌マヨ炒め',
-    calorie: 350,
-    name: '鶏胸肉と小松菜',
-    userName: 'sasakurasan',
-    userImageUrl: '',
-    liked: false,
-    likedNumber: 5,
-    mainIngredient: '鶏肉',
-    category: '肉料理'
-  },
-  {
-    imageUrl: '鶏胸肉と小松菜の味噌マヨ炒め',
-    calorie: 350,
-    name: '鶏胸肉と小松菜',
-    userName: 'sasakurasan',
-    userImageUrl: '',
-    liked: false,
-    likedNumber: 5,
-    mainIngredient: '鶏肉',
-    category: '肉料理'
-  },
-  {
-    imageUrl: '鶏胸肉と小松菜の味噌マヨ炒め',
-    calorie: 350,
-    name: '鶏胸肉と小松菜',
-    userName: 'sasakurasan',
-    userImageUrl: '',
-    liked: false,
-    likedNumber: 5,
-    mainIngredient: '鶏肉',
-    category: '肉料理'
-  },
-  {
-    imageUrl: '鶏胸肉と小松菜の味噌マヨ炒め',
-    calorie: 350,
-    name: '鶏胸肉と小松菜',
-    userName: 'sasakurasan',
-    userImageUrl: '',
-    liked: false,
-    likedNumber: 5,
-    mainIngredient: '鶏肉',
-    category: '肉料理'
-  },
-  {
-    imageUrl: '鶏胸肉と小松菜の味噌マヨ炒め',
-    calorie: 350,
-    name: '鶏胸肉と小松菜',
-    userName: 'sasakurasan',
-    userImageUrl: '',
-    liked: false,
-    likedNumber: 5,
-    mainIngredient: '鶏肉',
-    category: '肉料理'
-  },
-  {
-    imageUrl: '鶏胸肉と小松菜の味噌マヨ炒め',
-    calorie: 350,
-    name: '鶏胸肉と小松菜',
-    userName: 'sasakurasan',
-    userImageUrl: '',
-    liked: false,
-    likedNumber: 5,
-    mainIngredient: '鶏肉',
-    category: '肉料理'
-  },
-  {
-    imageUrl: '鶏胸肉と小松菜の味噌マヨ炒め',
-    calorie: 350,
-    name: '鶏胸肉と小松菜',
-    userName: 'sasakurasan',
-    userImageUrl: '',
-    liked: false,
-    likedNumber: 5,
-    mainIngredient: '鶏肉',
-    category: '肉料理'
-  },
-  {
-    imageUrl: '鶏胸肉と小松菜の味噌マヨ炒め',
-    calorie: 350,
-    name: '鶏胸肉と小松菜',
-    userName: 'sasakurasan',
-    userImageUrl: '',
-    liked: false,
-    likedNumber: 5,
-    mainIngredient: '鶏肉',
-    category: '肉料理'
+    id: 0,
+    title: '',
+    calorie: 0,
+    main_ingredient: '',
+    category: '',
+    image_url: '',
+    user: {
+      id: 0,
+      name: '',
+      comment: '',
+      image_url: ''
+    }
   },
 ]);

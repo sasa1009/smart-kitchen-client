@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, PropType } from 'vue';
-import { RecipeCardData } from '@/modules/types';
+import { defineProps, PropType, reactive } from 'vue';
+import { GetRecipesResponseRecipes } from '@/api';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const props = defineProps({
   mqCurrent: {
@@ -8,7 +11,7 @@ const props = defineProps({
     default: 'lg'
   },
   recipeCardData: {
-    type: Object as PropType<RecipeCardData>,
+    type: Object as PropType<GetRecipesResponseRecipes>,
     default: () => ({})
   },
   isLogin: {
@@ -16,55 +19,71 @@ const props = defineProps({
     default: false
   }
 });
-const emits = defineEmits(['update:recipeCardData']);
+
+const like = reactive({
+  likedNumber: 5,
+  liked: false
+});
+
 function updateLike() {
-  const recipeCardData = props.recipeCardData;
-  if (recipeCardData.liked) {
-    recipeCardData.liked = !recipeCardData.liked;
-    recipeCardData.likedNumber--;
-    emits('update:recipeCardData', recipeCardData);
+  if (like.liked) {
+    like.liked = !like.liked;
+    like.likedNumber--;
   } else {
-    recipeCardData.liked = !recipeCardData.liked;
-    recipeCardData.likedNumber++;
-    emits('update:recipeCardData', recipeCardData);
+    like.liked = !like.liked;
+    like.likedNumber++;
   }
 }
 </script>
 
 <template>
   <div :class="'recipe-card-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">
-    <div :class="'recipe-image-wrapper-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">
+    <div
+      :class="'recipe-image-wrapper-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
+      @click="router.push({ path: `/recipe/${props.recipeCardData.id}` })"
+    >
       <el-image
         :class="'recipe-image-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
-        :src="require('@/assets/butaumadon.jpeg')"
+        :src="props.recipeCardData.image_url ? props.recipeCardData.image_url : require('@/assets/noimage.png')"
         fit="cover"
       />
       <span :class="'calorie-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">{{ props.recipeCardData.calorie }}kcal</span>
     </div>
-    <el-link
-      :underline="false"
-      href=""
-      :class="'recipe-name-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
+    <span
+      :class="'recipe-name recipe-name-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
+      @click="router.push({ path: `/recipe/${props.recipeCardData.id}` })"
     >
-      {{ props.recipeCardData.name }}
-    </el-link>
+      {{ props.recipeCardData.title }}
+    </span>
     <el-row
       :class="'user-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
     >
       <el-col :span="4">
+        <div
+          v-if="props.recipeCardData.user.image_url"
+          :class="'user-image-wrapper-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
+          @click="router.push({ path: `/user/${props.recipeCardData.user.id}` })"
+        >
+          <el-image
+            :src="props.recipeCardData.user.image_url"
+            :class="'user-image-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
+            fit="cover"
+          />
+        </div>
         <font-awesome-icon
+          v-else
           :icon="['far', 'user-circle']"
           :class="'icon-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
+          @click="router.push({ path: `/user/${props.recipeCardData.user.id}` })"
         />
       </el-col>
       <el-col :span="20">
-        <el-link
-          :underline="false"
-          href=""
-          :class="'user-name-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
+        <span
+          :class="'user-name user-name-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
+          @click="router.push({ path: `/user/${props.recipeCardData.user.id}` })"
         >
-          {{ props.recipeCardData.userName }}
-        </el-link>
+          {{ props.recipeCardData.user.name }}
+        </span>
       </el-col>
     </el-row>
     <el-row
@@ -74,7 +93,7 @@ function updateLike() {
         <div>
           <el-button
             type="text"
-            v-if="props.recipeCardData.liked"
+            v-if="like.liked"
             @click="updateLike"
             style="padding: 0;"
             href=""
@@ -98,7 +117,7 @@ function updateLike() {
           </el-button>
         </div>
         <div :class="'liked-number-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">
-          {{ props.recipeCardData.likedNumber }}
+          {{ like.likedNumber }}
         </div>
       </el-col>
       <el-col :span="5">
@@ -116,18 +135,19 @@ function updateLike() {
       <el-col
         :span="14"
       >
-        <el-link
-          href=""
-          :class="'category-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
+        <span
+          :class="'category category-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
+          @click="router.push({ name: 'Recipes', params: { main_ingredient: props.recipeCardData.main_ingredient } })"
         >
-          {{ props.recipeCardData.mainIngredient }}
-        </el-link><br>
-        <el-link
+          {{ props.recipeCardData.main_ingredient }}
+        </span><br>
+        <span
           href=""
-          :class="'category-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
+          :class="'category category-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
+          @click="router.push({ name: 'Recipes', params: { category: props.recipeCardData.category } })"
         >
           {{ props.recipeCardData.category }}
-        </el-link>
+        </span>
       </el-col>
     </el-row>
   </div>
@@ -157,6 +177,10 @@ function updateLike() {
   position: relative;
   height: 115px;
 }
+.recipe-image-wrapper-mdlg:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
 .recipe-image-mdlg {
   width: 100%;
   height: 115px;
@@ -166,6 +190,10 @@ function updateLike() {
 .recipe-image-wrapper-sm {
   position: relative;
   height: 92px;
+}
+.recipe-image-wrapper-sm:hover {
+  opacity: 0.8;
+  cursor: pointer;
 }
 .recipe-image-sm {
   width: 100%;
@@ -199,6 +227,12 @@ function updateLike() {
   font-size: 14px;
   font-weight: bold;
 }
+/* レシピ名共通 */
+.recipe-name:hover {
+  opacity: 0.8;
+  cursor: pointer;
+  text-decoration: underline;
+}
 /* レシピ名大 */
 .recipe-name-mdlg {
   font-weight: bold;
@@ -208,6 +242,12 @@ function updateLike() {
 .recipe-name-sm {
   font-weight: bold;
   font-size: 11px;
+}
+/* ユーザー名共通 */
+.user-name:hover {
+  opacity: 0.8;
+  cursor: pointer;
+  text-decoration: underline;
 }
 /* ユーザー情報大 */
 .user-mdlg {
@@ -227,13 +267,51 @@ function updateLike() {
   font-size: 11px;
   margin-left: 2px;
 }
+/* ユーザー画像大 */
+.user-image-wrapper-mdlg {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.user-image-wrapper-mdlg:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
+.user-image-mdlg {
+  width: 25px;
+  height: 25px;
+}
+/* ユーザー画像小 */
+.user-image-wrapper-sm {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.user-image-wrapper-sm:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
+.user-image-sm {
+  width: 22px;
+  height: 22px;
+}
 /* アイコン大 */
 .icon-mdlg {
   font-size: 25px;
 }
+.icon-mdlg:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
 /* アイコン小 */
 .icon-sm {
   font-size: 22px;
+}
+.icon-sm:hover {
+  opacity: 0.8;
+  cursor: pointer;
 }
 /* レシピ情報大 */
 .recipe-info-mdlg {
@@ -245,6 +323,11 @@ function updateLike() {
 }
 .liked-number-mdlg {
   padding-left: 11px;
+}
+.category:hover {
+  opacity: 0.8;
+  cursor: pointer;
+  text-decoration: underline;
 }
 .category-mdlg {
   font-size: 12px;
