@@ -418,6 +418,18 @@ export interface GetRecipesResponseRecipes {
      */
     'image_url': string | null;
     /**
+     * お気に入り登録済みか
+     * @type {boolean}
+     * @memberof GetRecipesResponseRecipes
+     */
+    'is_favorited': boolean;
+    /**
+     * お気に入りの登録数
+     * @type {number}
+     * @memberof GetRecipesResponseRecipes
+     */
+    'favorited_count': number;
+    /**
      * 
      * @type {GetRecipesResponseUser}
      * @memberof GetRecipesResponseRecipes
@@ -766,6 +778,244 @@ export class CurrentUserApi extends BaseAPI {
 
 
 /**
+ * FavoritesApi - axios parameter creator
+ * @export
+ */
+export const FavoritesApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * お気に入り情報を登録する
+         * @summary お気に入り情報を登録する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} recipeId お気に入りに登録するレシピのID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createFavorite: async (uid: string, accessToken: string, client: string, recipeId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uid' is not null or undefined
+            assertParamExists('createFavorite', 'uid', uid)
+            // verify required parameter 'accessToken' is not null or undefined
+            assertParamExists('createFavorite', 'accessToken', accessToken)
+            // verify required parameter 'client' is not null or undefined
+            assertParamExists('createFavorite', 'client', client)
+            // verify required parameter 'recipeId' is not null or undefined
+            assertParamExists('createFavorite', 'recipeId', recipeId)
+            const localVarPath = `/favorites`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (recipeId !== undefined) {
+                localVarQueryParameter['recipe_id'] = recipeId;
+            }
+
+            if (uid !== undefined && uid !== null) {
+                localVarHeaderParameter['uid'] = String(uid);
+            }
+
+            if (accessToken !== undefined && accessToken !== null) {
+                localVarHeaderParameter['access-token'] = String(accessToken);
+            }
+
+            if (client !== undefined && client !== null) {
+                localVarHeaderParameter['client'] = String(client);
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * お気に入り情報を削除する
+         * @summary お気に入り情報を削除する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} recipeId お気に入りを削除するレシピのID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteFavorite: async (uid: string, accessToken: string, client: string, recipeId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uid' is not null or undefined
+            assertParamExists('deleteFavorite', 'uid', uid)
+            // verify required parameter 'accessToken' is not null or undefined
+            assertParamExists('deleteFavorite', 'accessToken', accessToken)
+            // verify required parameter 'client' is not null or undefined
+            assertParamExists('deleteFavorite', 'client', client)
+            // verify required parameter 'recipeId' is not null or undefined
+            assertParamExists('deleteFavorite', 'recipeId', recipeId)
+            const localVarPath = `/favorites`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (recipeId !== undefined) {
+                localVarQueryParameter['recipe_id'] = recipeId;
+            }
+
+            if (uid !== undefined && uid !== null) {
+                localVarHeaderParameter['uid'] = String(uid);
+            }
+
+            if (accessToken !== undefined && accessToken !== null) {
+                localVarHeaderParameter['access-token'] = String(accessToken);
+            }
+
+            if (client !== undefined && client !== null) {
+                localVarHeaderParameter['client'] = String(client);
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * FavoritesApi - functional programming interface
+ * @export
+ */
+export const FavoritesApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = FavoritesApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * お気に入り情報を登録する
+         * @summary お気に入り情報を登録する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} recipeId お気に入りに登録するレシピのID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createFavorite(uid: string, accessToken: string, client: string, recipeId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createFavorite(uid, accessToken, client, recipeId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * お気に入り情報を削除する
+         * @summary お気に入り情報を削除する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} recipeId お気に入りを削除するレシピのID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteFavorite(uid: string, accessToken: string, client: string, recipeId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteFavorite(uid, accessToken, client, recipeId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * FavoritesApi - factory interface
+ * @export
+ */
+export const FavoritesApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = FavoritesApiFp(configuration)
+    return {
+        /**
+         * お気に入り情報を登録する
+         * @summary お気に入り情報を登録する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} recipeId お気に入りに登録するレシピのID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createFavorite(uid: string, accessToken: string, client: string, recipeId: number, options?: any): AxiosPromise<CreateResponse> {
+            return localVarFp.createFavorite(uid, accessToken, client, recipeId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * お気に入り情報を削除する
+         * @summary お気に入り情報を削除する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} recipeId お気に入りを削除するレシピのID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteFavorite(uid: string, accessToken: string, client: string, recipeId: number, options?: any): AxiosPromise<void> {
+            return localVarFp.deleteFavorite(uid, accessToken, client, recipeId, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * FavoritesApi - object-oriented interface
+ * @export
+ * @class FavoritesApi
+ * @extends {BaseAPI}
+ */
+export class FavoritesApi extends BaseAPI {
+    /**
+     * お気に入り情報を登録する
+     * @summary お気に入り情報を登録する
+     * @param {string} uid devise-token-auth用のuid
+     * @param {string} accessToken devise-token-auth用のaccess-token
+     * @param {string} client devise-token-auth用のclient
+     * @param {number} recipeId お気に入りに登録するレシピのID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof FavoritesApi
+     */
+    public createFavorite(uid: string, accessToken: string, client: string, recipeId: number, options?: AxiosRequestConfig) {
+        return FavoritesApiFp(this.configuration).createFavorite(uid, accessToken, client, recipeId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * お気に入り情報を削除する
+     * @summary お気に入り情報を削除する
+     * @param {string} uid devise-token-auth用のuid
+     * @param {string} accessToken devise-token-auth用のaccess-token
+     * @param {string} client devise-token-auth用のclient
+     * @param {number} recipeId お気に入りを削除するレシピのID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof FavoritesApi
+     */
+    public deleteFavorite(uid: string, accessToken: string, client: string, recipeId: number, options?: AxiosRequestConfig) {
+        return FavoritesApiFp(this.configuration).deleteFavorite(uid, accessToken, client, recipeId, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
  * PresignedUrlApi - axios parameter creator
  * @export
  */
@@ -1013,6 +1263,9 @@ export const RecipesApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * レシピ情報を一覧取得する
          * @summary レシピ情報を一覧取得する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
          * @param {number} limit 取得するレシピ情報の件数
          * @param {number} offset 取得をスキップするレシピ情報の件数
          * @param {string} category 絞り込みを行うカテゴリー
@@ -1020,7 +1273,13 @@ export const RecipesApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getRecipes: async (limit: number, offset: number, category: string, mainIngredient: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getRecipes: async (uid: string, accessToken: string, client: string, limit: number, offset: number, category: string, mainIngredient: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uid' is not null or undefined
+            assertParamExists('getRecipes', 'uid', uid)
+            // verify required parameter 'accessToken' is not null or undefined
+            assertParamExists('getRecipes', 'accessToken', accessToken)
+            // verify required parameter 'client' is not null or undefined
+            assertParamExists('getRecipes', 'client', client)
             // verify required parameter 'limit' is not null or undefined
             assertParamExists('getRecipes', 'limit', limit)
             // verify required parameter 'offset' is not null or undefined
@@ -1055,6 +1314,18 @@ export const RecipesApiAxiosParamCreator = function (configuration?: Configurati
 
             if (mainIngredient !== undefined) {
                 localVarQueryParameter['main_ingredient'] = mainIngredient;
+            }
+
+            if (uid !== undefined && uid !== null) {
+                localVarHeaderParameter['uid'] = String(uid);
+            }
+
+            if (accessToken !== undefined && accessToken !== null) {
+                localVarHeaderParameter['access-token'] = String(accessToken);
+            }
+
+            if (client !== undefined && client !== null) {
+                localVarHeaderParameter['client'] = String(client);
             }
 
 
@@ -1106,6 +1377,9 @@ export const RecipesApiFp = function(configuration?: Configuration) {
         /**
          * レシピ情報を一覧取得する
          * @summary レシピ情報を一覧取得する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
          * @param {number} limit 取得するレシピ情報の件数
          * @param {number} offset 取得をスキップするレシピ情報の件数
          * @param {string} category 絞り込みを行うカテゴリー
@@ -1113,8 +1387,8 @@ export const RecipesApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getRecipes(limit: number, offset: number, category: string, mainIngredient: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetRecipesResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getRecipes(limit, offset, category, mainIngredient, options);
+        async getRecipes(uid: string, accessToken: string, client: string, limit: number, offset: number, category: string, mainIngredient: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetRecipesResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getRecipes(uid, accessToken, client, limit, offset, category, mainIngredient, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -1153,6 +1427,9 @@ export const RecipesApiFactory = function (configuration?: Configuration, basePa
         /**
          * レシピ情報を一覧取得する
          * @summary レシピ情報を一覧取得する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
          * @param {number} limit 取得するレシピ情報の件数
          * @param {number} offset 取得をスキップするレシピ情報の件数
          * @param {string} category 絞り込みを行うカテゴリー
@@ -1160,8 +1437,8 @@ export const RecipesApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getRecipes(limit: number, offset: number, category: string, mainIngredient: string, options?: any): AxiosPromise<GetRecipesResponse> {
-            return localVarFp.getRecipes(limit, offset, category, mainIngredient, options).then((request) => request(axios, basePath));
+        getRecipes(uid: string, accessToken: string, client: string, limit: number, offset: number, category: string, mainIngredient: string, options?: any): AxiosPromise<GetRecipesResponse> {
+            return localVarFp.getRecipes(uid, accessToken, client, limit, offset, category, mainIngredient, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -1203,6 +1480,9 @@ export class RecipesApi extends BaseAPI {
     /**
      * レシピ情報を一覧取得する
      * @summary レシピ情報を一覧取得する
+     * @param {string} uid devise-token-auth用のuid
+     * @param {string} accessToken devise-token-auth用のaccess-token
+     * @param {string} client devise-token-auth用のclient
      * @param {number} limit 取得するレシピ情報の件数
      * @param {number} offset 取得をスキップするレシピ情報の件数
      * @param {string} category 絞り込みを行うカテゴリー
@@ -1211,8 +1491,8 @@ export class RecipesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof RecipesApi
      */
-    public getRecipes(limit: number, offset: number, category: string, mainIngredient: string, options?: AxiosRequestConfig) {
-        return RecipesApiFp(this.configuration).getRecipes(limit, offset, category, mainIngredient, options).then((request) => request(this.axios, this.basePath));
+    public getRecipes(uid: string, accessToken: string, client: string, limit: number, offset: number, category: string, mainIngredient: string, options?: AxiosRequestConfig) {
+        return RecipesApiFp(this.configuration).getRecipes(uid, accessToken, client, limit, offset, category, mainIngredient, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

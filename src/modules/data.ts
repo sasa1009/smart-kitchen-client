@@ -143,6 +143,8 @@ export const recipeDataList = reactive<Array<GetRecipesResponseRecipes>>([
     main_ingredient: '',
     category: '',
     image_url: '',
+    is_favorited: false,
+    favorited_count: 0,
     user: {
       id: 0,
       name: '',

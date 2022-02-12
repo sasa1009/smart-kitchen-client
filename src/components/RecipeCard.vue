@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { defineProps, PropType, reactive } from 'vue';
-import { GetRecipesResponseRecipes } from '@/api';
+import { defineProps, PropType, defineEmits } from 'vue';
+import { ElMessage } from 'element-plus';
+import { GetRecipesResponseRecipes, Configuration, FavoritesApi } from '@/api';
 import { useRouter } from 'vue-router';
+import { isLogin, authData } from '@/modules/auth';
 
 const router = useRouter();
 
@@ -20,18 +22,43 @@ const props = defineProps({
   }
 });
 
-const like = reactive({
-  likedNumber: 5,
-  liked: false
-});
+const emits = defineEmits(['update:recipeCardData']);
 
-function updateLike() {
-  if (like.liked) {
-    like.liked = !like.liked;
-    like.likedNumber--;
+const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
+
+async function updateFavorite() {
+  const recipeCardData = props.recipeCardData;
+  if (recipeCardData.is_favorited) {
+    const response = await new FavoritesApi(configuration).deleteFavorite(authData.value.uid, authData.value.accessToken, authData.value.client, props.recipeCardData.id);
+    if (response.status === 204) {
+      ElMessage({
+        showClose: true,
+        message: 'お気に入りを解除しました。',
+      });
+      recipeCardData.is_favorited = !recipeCardData.is_favorited;
+      recipeCardData.favorited_count--;
+      emits('update:recipeCardData', recipeCardData);
+    }
   } else {
-    like.liked = !like.liked;
-    like.likedNumber++;
+    if (isLogin.value) {
+      const response = await new FavoritesApi(configuration).createFavorite(authData.value.uid, authData.value.accessToken, authData.value.client, props.recipeCardData.id);
+      if (response.status === 201) {
+        ElMessage({
+          showClose: true,
+          message: 'お気に入りに登録しました。',
+          type: 'success'
+        });
+        recipeCardData.is_favorited = !recipeCardData.is_favorited;
+        recipeCardData.favorited_count++;
+        emits('update:recipeCardData', recipeCardData);
+      }
+    } else {
+      ElMessage({
+        showClose: true,
+        message: 'レシピをお気に入りに登録するにはログインしてください。',
+      });
+      router.push({name: 'Login'})
+    }
   }
 }
 </script>
@@ -93,8 +120,8 @@ function updateLike() {
         <div>
           <el-button
             type="text"
-            v-if="like.liked"
-            @click="updateLike"
+            v-if="props.recipeCardData.is_favorited"
+            @click="updateFavorite"
             style="padding: 0;"
             href=""
           >
@@ -106,7 +133,7 @@ function updateLike() {
           <el-button
             type="text"
             v-else
-            @click="updateLike"
+            @click="updateFavorite"
             style="padding: 0;"
             href=""
           >
@@ -117,7 +144,7 @@ function updateLike() {
           </el-button>
         </div>
         <div :class="'liked-number-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">
-          {{ like.likedNumber }}
+          {{ props.recipeCardData.favorited_count }}
         </div>
       </el-col>
       <el-col :span="5">
