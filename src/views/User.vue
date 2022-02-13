@@ -81,7 +81,7 @@ async function getUsersRecipeData() {
     } else {
       response = await new RecipesApi(configuration).getUsersRecipes('', '', '', Number(route.params.id), usersRecipePageData.limit, usersRecipePageData.limit * (usersRecipePageData.current - 1));
     }
-    if (response.status !== 200) throw new Error('ユーザー情報の取得に失敗しました。');
+    if (response.status !== 200) throw new Error('レシピ情報の取得に失敗しました。');
     usersRecipeDataList.splice(0);
     Object.assign(usersRecipeDataList, response.data.recipes);
     usersRecipePageData.total = response.data.meta.total;
@@ -120,7 +120,7 @@ async function getFavoritedRecipeData() {
     } else {
       response = await new RecipesApi(configuration).getFavoritedRecipes('', '', '', Number(route.params.id), favoritedRecipePageData.limit, favoritedRecipePageData.limit * (favoritedRecipePageData.current - 1));
     }
-    if (response.status !== 200) throw new Error('ユーザー情報の取得に失敗しました。');
+    if (response.status !== 200) throw new Error('レシピ情報の取得に失敗しました。');
     favoritedRecipeDataList.splice(0);
     Object.assign(favoritedRecipeDataList, response.data.recipes);
     favoritedRecipePageData.total = response.data.meta.total;

@@ -74,7 +74,7 @@ watch(
 async function getUsersRecipeData() {
   try {
     const response = await new RecipesApi(configuration).getUsersRecipes(authData.value.uid, authData.value.accessToken, authData.value.client, Number(authData.value.userId), usersRecipePageData.limit, usersRecipePageData.limit * (usersRecipePageData.current - 1));
-    if (response.status !== 200) throw new Error('ユーザー情報の取得に失敗しました。');
+    if (response.status !== 200) throw new Error('レシピ情報の取得に失敗しました。');
     usersRecipeDataList.splice(0);
     Object.assign(usersRecipeDataList, response.data.recipes);
     usersRecipePageData.total = response.data.meta.total;
@@ -108,7 +108,7 @@ watch(
 async function getFavoritedRecipeData() {
   try {
     const response = await new RecipesApi(configuration).getFavoritedRecipes(authData.value.uid, authData.value.accessToken, authData.value.client, Number(authData.value.userId), favoritedRecipePageData.limit, favoritedRecipePageData.limit * (favoritedRecipePageData.current - 1));
-    if (response.status !== 200) throw new Error('ユーザー情報の取得に失敗しました。');
+    if (response.status !== 200) throw new Error('レシピ情報の取得に失敗しました。');
     favoritedRecipeDataList.splice(0);
     Object.assign(favoritedRecipeDataList, response.data.recipes);
     favoritedRecipePageData.total = response.data.meta.total;
