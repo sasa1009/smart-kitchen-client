@@ -143,6 +143,48 @@ export const recipeDataList = reactive<Array<GetRecipesResponseRecipes>>([
     main_ingredient: '',
     category: '',
     image_url: '',
+    is_favorited: false,
+    favorited_count: 0,
+    user: {
+      id: 0,
+      name: '',
+      comment: '',
+      image_url: ''
+    }
+  },
+]);
+
+// ユーザーが作成したレシピ情報の配列
+export const usersRecipeDataList = reactive<Array<GetRecipesResponseRecipes>>([
+  {
+    id: 0,
+    title: '',
+    calorie: 0,
+    main_ingredient: '',
+    category: '',
+    image_url: '',
+    is_favorited: false,
+    favorited_count: 0,
+    user: {
+      id: 0,
+      name: '',
+      comment: '',
+      image_url: ''
+    }
+  },
+]);
+
+// ユーザーがお気に入りに登録したレシピ情報の配列
+export const favoritedRecipeDataList = reactive<Array<GetRecipesResponseRecipes>>([
+  {
+    id: 0,
+    title: '',
+    calorie: 0,
+    main_ingredient: '',
+    category: '',
+    image_url: '',
+    is_favorited: false,
+    favorited_count: 0,
     user: {
       id: 0,
       name: '',

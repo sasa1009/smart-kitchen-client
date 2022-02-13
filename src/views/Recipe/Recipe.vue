@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
-import { RecipesApi, Configuration, GetRecipeResponseRecipe } from '@/api';
+import { RecipesApi, Configuration, GetRecipeResponseRecipe, FavoritesApi } from '@/api';
 // eslint-disable-next-line
 // @ts-ignore
 import { useMq } from 'vue3-mq';
+import { isLogin, authData } from '@/modules/auth';
 
 const mq = useMq();
 const route = useRoute();
+const router = useRouter();
 
 // レシピ情報
 const recipeData = reactive<GetRecipeResponseRecipe>({
@@ -21,6 +23,7 @@ const recipeData = reactive<GetRecipeResponseRecipe>({
   category: '',
   tips: '',
   image_url: null,
+  is_favorited: false,
   user: {
     id: 0,
     name: '',
@@ -45,13 +48,50 @@ const recipeData = reactive<GetRecipeResponseRecipe>({
 
 const toggle = ref(true);
 
+const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
+
+async function updateFavorite() {
+  if (recipeData.is_favorited) {
+    const response = await new FavoritesApi(configuration).deleteFavorite(authData.value.uid, authData.value.accessToken, authData.value.client, recipeData.id);
+    if (response.status === 204) {
+      ElMessage({
+        showClose: true,
+        message: 'お気に入りを解除しました。',
+      });
+      recipeData.is_favorited = !recipeData.is_favorited;
+    }
+  } else {
+    if (isLogin.value) {
+      const response = await new FavoritesApi(configuration).createFavorite(authData.value.uid, authData.value.accessToken, authData.value.client, recipeData.id);
+      if (response.status === 201) {
+        ElMessage({
+          showClose: true,
+          message: 'お気に入りに登録しました。',
+          type: 'success'
+        });
+        recipeData.is_favorited = !recipeData.is_favorited;
+      }
+    } else {
+      ElMessage({
+        showClose: true,
+        message: 'レシピをお気に入りに登録するにはログインしてください。',
+      });
+      router.push({name: 'Login'})
+    }
+  }
+}
+
 /**
  * 単一のレシピ情報を取得
  */
 (async function init() {
-  const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
   try {
-    const response = await new RecipesApi(configuration).getRecipe(Number(route.params.id));
+    let response;
+    if (isLogin.value) {
+      response = await new RecipesApi(configuration).getRecipe(authData.value.uid, authData.value.accessToken, authData.value.client, Number(route.params.id));
+    } else {
+      response = await new RecipesApi(configuration).getRecipe('', '', '', Number(route.params.id));
+    }
     if (response.status !== 200) {
       ElMessage({
         showClose: true,
@@ -125,28 +165,30 @@ const toggle = ref(true);
           </div>
           <div class="button-wrapper">
             <el-button
-              v-if="toggle"
+              v-if="recipeData.is_favorited"
               round
               size="small"
               class="favorite-button"
-            >
-              <font-awesome-icon
-                :icon="['far', 'star']"
-                class="button-icon"
-              />
-              お気に入りに登録
-            </el-button>
-            <el-button
-              v-else
-              round
-              size="small"
-              class="favorite-button"
+              @click="updateFavorite"
             >
               <font-awesome-icon
                 :icon="['fas', 'star']"
                 class="button-icon favorited"
               />
               お気に入りを解除
+            </el-button>
+            <el-button
+              v-else
+              round
+              size="small"
+              class="favorite-button"
+              @click="updateFavorite"
+            >
+              <font-awesome-icon
+                :icon="['far', 'star']"
+                class="button-icon"
+              />
+              お気に入りに登録
             </el-button>
             <el-button
               round

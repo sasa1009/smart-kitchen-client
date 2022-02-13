@@ -8,6 +8,7 @@ import { useMq } from 'vue3-mq';
 import RecipeCard from '@/components/RecipeCard.vue';
 import { RecipesApi, Configuration } from '@/api';
 import { recipeDataList } from '@/modules/data';
+import { isLogin, authData } from '@/modules/auth';
 
 const route = useRoute();
 const mq = useMq();
@@ -41,7 +42,12 @@ const pageData = reactive({
 async function getRecipes() {
   try {
     const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
-    const response = await new RecipesApi(configuration).getRecipes(pageData.limit, pageData.limit * (pageData.current - 1), route.params.category ? route.params.category : '', route.params.main_ingredient ? route.params.main_ingredient : '');
+    let response;
+    if (isLogin.value) {
+      response = await new RecipesApi(configuration).getRecipes(authData.value.uid, authData.value.accessToken, authData.value.client, pageData.limit, pageData.limit * (pageData.current - 1), route.params.category ? route.params.category : '', route.params.main_ingredient ? route.params.main_ingredient : '');
+    } else {
+      response = await new RecipesApi(configuration).getRecipes('', '', '', pageData.limit, pageData.limit * (pageData.current - 1), route.params.category ? route.params.category : '', route.params.main_ingredient ? route.params.main_ingredient : '');
+    }
     if (response.status !== 200) {
       ElMessage({
         showClose: true,
@@ -61,8 +67,11 @@ async function getRecipes() {
 watch(
   () => route.params,
   async () => {
-  await getRecipes();
-});
+    if (route.name === 'Recipes') {
+      await getRecipes();
+    }
+  }
+);
 
 /**
  * ページネーションのページ番号がクリックされた時に新たなレシピ情報の一覧を取得してrecipeDataListに格納する
@@ -89,7 +98,7 @@ getRecipes();
       <div :class="'recipe-card-wrapper-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
         <RecipeCard
           :mq-current="mq.current"
-          :recipe-card-data="recipeDataList[index]"
+          v-model:recipe-card-data="recipeDataList[index]"
           :is-login="true"
         />
       </div>
