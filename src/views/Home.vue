@@ -269,4 +269,8 @@ const pageData = reactive({
   width: 350px;
   margin: 0 auto;
 }
+/* カテゴリータブの影を消す */
+.el-tabs--border-card {
+  box-shadow: none;
+}
 </style>

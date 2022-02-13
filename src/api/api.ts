@@ -1233,11 +1233,80 @@ export const RecipesApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * ユーザーがお気に入りに登録したレシピ情報の一覧を取得する
+         * @summary ユーザーがお気に入りに登録したレシピ情報の一覧を取得する
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
+         * @param {number} userId レシピを登録したユーザーのID
+         * @param {number} limit 取得するレシピ情報の件数
+         * @param {number} offset 取得をスキップするレシピ情報の件数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getFavoritedRecipes: async (uid: string, accessToken: string, client: string, userId: number, limit: number, offset: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uid' is not null or undefined
+            assertParamExists('getFavoritedRecipes', 'uid', uid)
+            // verify required parameter 'accessToken' is not null or undefined
+            assertParamExists('getFavoritedRecipes', 'accessToken', accessToken)
+            // verify required parameter 'client' is not null or undefined
+            assertParamExists('getFavoritedRecipes', 'client', client)
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('getFavoritedRecipes', 'userId', userId)
+            // verify required parameter 'limit' is not null or undefined
+            assertParamExists('getFavoritedRecipes', 'limit', limit)
+            // verify required parameter 'offset' is not null or undefined
+            assertParamExists('getFavoritedRecipes', 'offset', offset)
+            const localVarPath = `/recipes/{user_id}/favorite`
+                .replace(`{${"user_id"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+            if (uid !== undefined && uid !== null) {
+                localVarHeaderParameter['uid'] = String(uid);
+            }
+
+            if (accessToken !== undefined && accessToken !== null) {
+                localVarHeaderParameter['access-token'] = String(accessToken);
+            }
+
+            if (client !== undefined && client !== null) {
+                localVarHeaderParameter['client'] = String(client);
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 単一のレシピ情報を取得する
          * @summary 単一のレシピ情報を取得する
-         * @param {string} uid devise-token-auth用のuid
-         * @param {string} accessToken devise-token-auth用のaccess-token
-         * @param {string} client devise-token-auth用のclient
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
          * @param {number} recipeId レシピのID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1290,9 +1359,9 @@ export const RecipesApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * レシピ情報を一覧取得する
          * @summary レシピ情報を一覧取得する
-         * @param {string} uid devise-token-auth用のuid
-         * @param {string} accessToken devise-token-auth用のaccess-token
-         * @param {string} client devise-token-auth用のclient
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
          * @param {number} limit 取得するレシピ情報の件数
          * @param {number} offset 取得をスキップするレシピ情報の件数
          * @param {string} category 絞り込みを行うカテゴリー
@@ -1366,6 +1435,75 @@ export const RecipesApiAxiosParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * ユーザーが作成したレシピ情報の一覧を取得する
+         * @summary ユーザーが作成したレシピ情報の一覧を取得する
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
+         * @param {number} userId レシピを登録したユーザーのID
+         * @param {number} limit 取得するレシピ情報の件数
+         * @param {number} offset 取得をスキップするレシピ情報の件数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUsersRecipes: async (uid: string, accessToken: string, client: string, userId: number, limit: number, offset: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uid' is not null or undefined
+            assertParamExists('getUsersRecipes', 'uid', uid)
+            // verify required parameter 'accessToken' is not null or undefined
+            assertParamExists('getUsersRecipes', 'accessToken', accessToken)
+            // verify required parameter 'client' is not null or undefined
+            assertParamExists('getUsersRecipes', 'client', client)
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('getUsersRecipes', 'userId', userId)
+            // verify required parameter 'limit' is not null or undefined
+            assertParamExists('getUsersRecipes', 'limit', limit)
+            // verify required parameter 'offset' is not null or undefined
+            assertParamExists('getUsersRecipes', 'offset', offset)
+            const localVarPath = `/recipes/{user_id}/user`
+                .replace(`{${"user_id"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+            if (uid !== undefined && uid !== null) {
+                localVarHeaderParameter['uid'] = String(uid);
+            }
+
+            if (accessToken !== undefined && accessToken !== null) {
+                localVarHeaderParameter['access-token'] = String(accessToken);
+            }
+
+            if (client !== undefined && client !== null) {
+                localVarHeaderParameter['client'] = String(client);
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -1391,11 +1529,27 @@ export const RecipesApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * ユーザーがお気に入りに登録したレシピ情報の一覧を取得する
+         * @summary ユーザーがお気に入りに登録したレシピ情報の一覧を取得する
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
+         * @param {number} userId レシピを登録したユーザーのID
+         * @param {number} limit 取得するレシピ情報の件数
+         * @param {number} offset 取得をスキップするレシピ情報の件数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getFavoritedRecipes(uid: string, accessToken: string, client: string, userId: number, limit: number, offset: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetRecipesResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getFavoritedRecipes(uid, accessToken, client, userId, limit, offset, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * 単一のレシピ情報を取得する
          * @summary 単一のレシピ情報を取得する
-         * @param {string} uid devise-token-auth用のuid
-         * @param {string} accessToken devise-token-auth用のaccess-token
-         * @param {string} client devise-token-auth用のclient
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
          * @param {number} recipeId レシピのID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1407,9 +1561,9 @@ export const RecipesApiFp = function(configuration?: Configuration) {
         /**
          * レシピ情報を一覧取得する
          * @summary レシピ情報を一覧取得する
-         * @param {string} uid devise-token-auth用のuid
-         * @param {string} accessToken devise-token-auth用のaccess-token
-         * @param {string} client devise-token-auth用のclient
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
          * @param {number} limit 取得するレシピ情報の件数
          * @param {number} offset 取得をスキップするレシピ情報の件数
          * @param {string} category 絞り込みを行うカテゴリー
@@ -1419,6 +1573,22 @@ export const RecipesApiFp = function(configuration?: Configuration) {
          */
         async getRecipes(uid: string, accessToken: string, client: string, limit: number, offset: number, category: string, mainIngredient: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetRecipesResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getRecipes(uid, accessToken, client, limit, offset, category, mainIngredient, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * ユーザーが作成したレシピ情報の一覧を取得する
+         * @summary ユーザーが作成したレシピ情報の一覧を取得する
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
+         * @param {number} userId レシピを登録したユーザーのID
+         * @param {number} limit 取得するレシピ情報の件数
+         * @param {number} offset 取得をスキップするレシピ情報の件数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getUsersRecipes(uid: string, accessToken: string, client: string, userId: number, limit: number, offset: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetRecipesResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getUsersRecipes(uid, accessToken, client, userId, limit, offset, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -1445,11 +1615,26 @@ export const RecipesApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.createRecipe(uid, accessToken, client, createRecipeRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * ユーザーがお気に入りに登録したレシピ情報の一覧を取得する
+         * @summary ユーザーがお気に入りに登録したレシピ情報の一覧を取得する
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
+         * @param {number} userId レシピを登録したユーザーのID
+         * @param {number} limit 取得するレシピ情報の件数
+         * @param {number} offset 取得をスキップするレシピ情報の件数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getFavoritedRecipes(uid: string, accessToken: string, client: string, userId: number, limit: number, offset: number, options?: any): AxiosPromise<GetRecipesResponse> {
+            return localVarFp.getFavoritedRecipes(uid, accessToken, client, userId, limit, offset, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 単一のレシピ情報を取得する
          * @summary 単一のレシピ情報を取得する
-         * @param {string} uid devise-token-auth用のuid
-         * @param {string} accessToken devise-token-auth用のaccess-token
-         * @param {string} client devise-token-auth用のclient
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
          * @param {number} recipeId レシピのID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1460,9 +1645,9 @@ export const RecipesApiFactory = function (configuration?: Configuration, basePa
         /**
          * レシピ情報を一覧取得する
          * @summary レシピ情報を一覧取得する
-         * @param {string} uid devise-token-auth用のuid
-         * @param {string} accessToken devise-token-auth用のaccess-token
-         * @param {string} client devise-token-auth用のclient
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
          * @param {number} limit 取得するレシピ情報の件数
          * @param {number} offset 取得をスキップするレシピ情報の件数
          * @param {string} category 絞り込みを行うカテゴリー
@@ -1472,6 +1657,21 @@ export const RecipesApiFactory = function (configuration?: Configuration, basePa
          */
         getRecipes(uid: string, accessToken: string, client: string, limit: number, offset: number, category: string, mainIngredient: string, options?: any): AxiosPromise<GetRecipesResponse> {
             return localVarFp.getRecipes(uid, accessToken, client, limit, offset, category, mainIngredient, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * ユーザーが作成したレシピ情報の一覧を取得する
+         * @summary ユーザーが作成したレシピ情報の一覧を取得する
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
+         * @param {number} userId レシピを登録したユーザーのID
+         * @param {number} limit 取得するレシピ情報の件数
+         * @param {number} offset 取得をスキップするレシピ情報の件数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUsersRecipes(uid: string, accessToken: string, client: string, userId: number, limit: number, offset: number, options?: any): AxiosPromise<GetRecipesResponse> {
+            return localVarFp.getUsersRecipes(uid, accessToken, client, userId, limit, offset, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -1499,11 +1699,28 @@ export class RecipesApi extends BaseAPI {
     }
 
     /**
+     * ユーザーがお気に入りに登録したレシピ情報の一覧を取得する
+     * @summary ユーザーがお気に入りに登録したレシピ情報の一覧を取得する
+     * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+     * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+     * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
+     * @param {number} userId レシピを登録したユーザーのID
+     * @param {number} limit 取得するレシピ情報の件数
+     * @param {number} offset 取得をスキップするレシピ情報の件数
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RecipesApi
+     */
+    public getFavoritedRecipes(uid: string, accessToken: string, client: string, userId: number, limit: number, offset: number, options?: AxiosRequestConfig) {
+        return RecipesApiFp(this.configuration).getFavoritedRecipes(uid, accessToken, client, userId, limit, offset, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 単一のレシピ情報を取得する
      * @summary 単一のレシピ情報を取得する
-     * @param {string} uid devise-token-auth用のuid
-     * @param {string} accessToken devise-token-auth用のaccess-token
-     * @param {string} client devise-token-auth用のclient
+     * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+     * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+     * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
      * @param {number} recipeId レシピのID
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1516,9 +1733,9 @@ export class RecipesApi extends BaseAPI {
     /**
      * レシピ情報を一覧取得する
      * @summary レシピ情報を一覧取得する
-     * @param {string} uid devise-token-auth用のuid
-     * @param {string} accessToken devise-token-auth用のaccess-token
-     * @param {string} client devise-token-auth用のclient
+     * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+     * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+     * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
      * @param {number} limit 取得するレシピ情報の件数
      * @param {number} offset 取得をスキップするレシピ情報の件数
      * @param {string} category 絞り込みを行うカテゴリー
@@ -1529,6 +1746,23 @@ export class RecipesApi extends BaseAPI {
      */
     public getRecipes(uid: string, accessToken: string, client: string, limit: number, offset: number, category: string, mainIngredient: string, options?: AxiosRequestConfig) {
         return RecipesApiFp(this.configuration).getRecipes(uid, accessToken, client, limit, offset, category, mainIngredient, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ユーザーが作成したレシピ情報の一覧を取得する
+     * @summary ユーザーが作成したレシピ情報の一覧を取得する
+     * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+     * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+     * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
+     * @param {number} userId レシピを登録したユーザーのID
+     * @param {number} limit 取得するレシピ情報の件数
+     * @param {number} offset 取得をスキップするレシピ情報の件数
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RecipesApi
+     */
+    public getUsersRecipes(uid: string, accessToken: string, client: string, userId: number, limit: number, offset: number, options?: AxiosRequestConfig) {
+        return RecipesApiFp(this.configuration).getUsersRecipes(uid, accessToken, client, userId, limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

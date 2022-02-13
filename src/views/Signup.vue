@@ -105,6 +105,7 @@ function signUp(formEl: InstanceType<typeof ElForm> | undefined) {
       label-width="100px"
       :model="formData"
       :rules="rules"
+      :hide-required-asterisk="true"
       class="login-form"
     >
       <h3>ユーザー登録</h3>

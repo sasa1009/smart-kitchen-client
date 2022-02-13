@@ -64,7 +64,7 @@ async function updateFavorite() {
 </script>
 
 <template>
-  <div :class="'recipe-card-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">
+  <div :class="'recipe-card recipe-card-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">
     <div
       :class="'recipe-image-wrapper-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
       @click="router.push({ path: `/recipe/${props.recipeCardData.id}` })"
@@ -181,6 +181,10 @@ async function updateFavorite() {
 </template>
 
 <style scoped>
+/* カード共通 */
+.recipe-card {
+  border: 1px solid #dcdfe6;
+}
 /* カード大 */
 .recipe-card-mdlg {
   width: 200px;
