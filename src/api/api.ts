@@ -206,6 +206,30 @@ export interface CurrentUserResponseUser {
      * @memberof CurrentUserResponseUser
      */
     'image_url': string | null;
+    /**
+     * ユーザーをフォローしているか
+     * @type {boolean}
+     * @memberof CurrentUserResponseUser
+     */
+    'is_following': boolean;
+    /**
+     * ユーザーからフォローされているか
+     * @type {boolean}
+     * @memberof CurrentUserResponseUser
+     */
+    'is_followed': boolean;
+    /**
+     * ユーザーが他のユーザーをフォローしている人数
+     * @type {number}
+     * @memberof CurrentUserResponseUser
+     */
+    'following_count': number;
+    /**
+     * ユーザーが他のユーザーからフォローされている人数
+     * @type {number}
+     * @memberof CurrentUserResponseUser
+     */
+    'follower_count': number;
 }
 /**
  * 署名付きURL情報
@@ -516,6 +540,93 @@ export interface GetUserResponseUser {
      * @memberof GetUserResponseUser
      */
     'image_url': string | null;
+    /**
+     * ユーザーをフォローしているか
+     * @type {boolean}
+     * @memberof GetUserResponseUser
+     */
+    'is_following': boolean;
+    /**
+     * ユーザーからフォローされているか
+     * @type {boolean}
+     * @memberof GetUserResponseUser
+     */
+    'is_followed': boolean;
+    /**
+     * ユーザーが他のユーザーをフォローしている人数
+     * @type {number}
+     * @memberof GetUserResponseUser
+     */
+    'following_count': number;
+    /**
+     * ユーザーが他のユーザーからフォローされている人数
+     * @type {number}
+     * @memberof GetUserResponseUser
+     */
+    'follower_count': number;
+}
+/**
+ * ユーザー情報一覧のルートプロパティ
+ * @export
+ * @interface GetUsersResponse
+ */
+export interface GetUsersResponse {
+    /**
+     * ユーザー情報の一覧
+     * @type {Array<GetUsersResponseUsers>}
+     * @memberof GetUsersResponse
+     */
+    'users': Array<GetUsersResponseUsers>;
+    /**
+     * 
+     * @type {GetUsersResponseMeta}
+     * @memberof GetUsersResponse
+     */
+    'meta': GetUsersResponseMeta;
+}
+/**
+ * 追加情報
+ * @export
+ * @interface GetUsersResponseMeta
+ */
+export interface GetUsersResponseMeta {
+    /**
+     * ユーザー情報の総数
+     * @type {number}
+     * @memberof GetUsersResponseMeta
+     */
+    'total': number;
+}
+/**
+ * 
+ * @export
+ * @interface GetUsersResponseUsers
+ */
+export interface GetUsersResponseUsers {
+    /**
+     * ユーザーID
+     * @type {number}
+     * @memberof GetUsersResponseUsers
+     */
+    'id': number;
+    /**
+     * ユーザー名
+     * @type {string}
+     * @memberof GetUsersResponseUsers
+     */
+    'name': string;
+    /**
+     * ユーザーの画像のURL
+     * @type {string}
+     * @memberof GetUsersResponseUsers
+     */
+    'image_url': string | null;
+    /**
+     * ユーザーをフォローしているか
+     * @type {boolean}
+     * @memberof GetUsersResponseUsers
+     */
+    'is_following': boolean;
 }
 /**
  * 更新するユーザー情報
@@ -1768,19 +1879,404 @@ export class RecipesApi extends BaseAPI {
 
 
 /**
+ * RelationshipsApi - axios parameter creator
+ * @export
+ */
+export const RelationshipsApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * ユーザーをフォローする
+         * @summary ユーザーをフォローする
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} userId フォローするユーザーのID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createRelationship: async (uid: string, accessToken: string, client: string, userId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uid' is not null or undefined
+            assertParamExists('createRelationship', 'uid', uid)
+            // verify required parameter 'accessToken' is not null or undefined
+            assertParamExists('createRelationship', 'accessToken', accessToken)
+            // verify required parameter 'client' is not null or undefined
+            assertParamExists('createRelationship', 'client', client)
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('createRelationship', 'userId', userId)
+            const localVarPath = `/relationships`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (userId !== undefined) {
+                localVarQueryParameter['user_id'] = userId;
+            }
+
+            if (uid !== undefined && uid !== null) {
+                localVarHeaderParameter['uid'] = String(uid);
+            }
+
+            if (accessToken !== undefined && accessToken !== null) {
+                localVarHeaderParameter['access-token'] = String(accessToken);
+            }
+
+            if (client !== undefined && client !== null) {
+                localVarHeaderParameter['client'] = String(client);
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * ユーザーのフォローを解除する
+         * @summary ユーザーのフォローを解除する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} userId お気に入りを削除するレシピのID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteRelationship: async (uid: string, accessToken: string, client: string, userId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uid' is not null or undefined
+            assertParamExists('deleteRelationship', 'uid', uid)
+            // verify required parameter 'accessToken' is not null or undefined
+            assertParamExists('deleteRelationship', 'accessToken', accessToken)
+            // verify required parameter 'client' is not null or undefined
+            assertParamExists('deleteRelationship', 'client', client)
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('deleteRelationship', 'userId', userId)
+            const localVarPath = `/relationships`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (userId !== undefined) {
+                localVarQueryParameter['user_id'] = userId;
+            }
+
+            if (uid !== undefined && uid !== null) {
+                localVarHeaderParameter['uid'] = String(uid);
+            }
+
+            if (accessToken !== undefined && accessToken !== null) {
+                localVarHeaderParameter['access-token'] = String(accessToken);
+            }
+
+            if (client !== undefined && client !== null) {
+                localVarHeaderParameter['client'] = String(client);
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * RelationshipsApi - functional programming interface
+ * @export
+ */
+export const RelationshipsApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = RelationshipsApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * ユーザーをフォローする
+         * @summary ユーザーをフォローする
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} userId フォローするユーザーのID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createRelationship(uid: string, accessToken: string, client: string, userId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createRelationship(uid, accessToken, client, userId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * ユーザーのフォローを解除する
+         * @summary ユーザーのフォローを解除する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} userId お気に入りを削除するレシピのID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteRelationship(uid: string, accessToken: string, client: string, userId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteRelationship(uid, accessToken, client, userId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * RelationshipsApi - factory interface
+ * @export
+ */
+export const RelationshipsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = RelationshipsApiFp(configuration)
+    return {
+        /**
+         * ユーザーをフォローする
+         * @summary ユーザーをフォローする
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} userId フォローするユーザーのID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createRelationship(uid: string, accessToken: string, client: string, userId: number, options?: any): AxiosPromise<CreateResponse> {
+            return localVarFp.createRelationship(uid, accessToken, client, userId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * ユーザーのフォローを解除する
+         * @summary ユーザーのフォローを解除する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} userId お気に入りを削除するレシピのID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteRelationship(uid: string, accessToken: string, client: string, userId: number, options?: any): AxiosPromise<void> {
+            return localVarFp.deleteRelationship(uid, accessToken, client, userId, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * RelationshipsApi - object-oriented interface
+ * @export
+ * @class RelationshipsApi
+ * @extends {BaseAPI}
+ */
+export class RelationshipsApi extends BaseAPI {
+    /**
+     * ユーザーをフォローする
+     * @summary ユーザーをフォローする
+     * @param {string} uid devise-token-auth用のuid
+     * @param {string} accessToken devise-token-auth用のaccess-token
+     * @param {string} client devise-token-auth用のclient
+     * @param {number} userId フォローするユーザーのID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RelationshipsApi
+     */
+    public createRelationship(uid: string, accessToken: string, client: string, userId: number, options?: AxiosRequestConfig) {
+        return RelationshipsApiFp(this.configuration).createRelationship(uid, accessToken, client, userId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ユーザーのフォローを解除する
+     * @summary ユーザーのフォローを解除する
+     * @param {string} uid devise-token-auth用のuid
+     * @param {string} accessToken devise-token-auth用のaccess-token
+     * @param {string} client devise-token-auth用のclient
+     * @param {number} userId お気に入りを削除するレシピのID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RelationshipsApi
+     */
+    public deleteRelationship(uid: string, accessToken: string, client: string, userId: number, options?: AxiosRequestConfig) {
+        return RelationshipsApiFp(this.configuration).deleteRelationship(uid, accessToken, client, userId, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
  * UsersApi - axios parameter creator
  * @export
  */
 export const UsersApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
+         * ユーザーをフォローしているユーザーの情報を一覧取得する
+         * @summary ユーザーをフォローしているユーザーの情報を一覧取得する
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
+         * @param {number} userId ユーザーのID
+         * @param {number} limit 取得するユーザー情報の件数
+         * @param {number} offset 取得をスキップするユーザー情報の件数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getFollowers: async (uid: string, accessToken: string, client: string, userId: number, limit: number, offset: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uid' is not null or undefined
+            assertParamExists('getFollowers', 'uid', uid)
+            // verify required parameter 'accessToken' is not null or undefined
+            assertParamExists('getFollowers', 'accessToken', accessToken)
+            // verify required parameter 'client' is not null or undefined
+            assertParamExists('getFollowers', 'client', client)
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('getFollowers', 'userId', userId)
+            // verify required parameter 'limit' is not null or undefined
+            assertParamExists('getFollowers', 'limit', limit)
+            // verify required parameter 'offset' is not null or undefined
+            assertParamExists('getFollowers', 'offset', offset)
+            const localVarPath = `/users/{userId}/followers`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+            if (uid !== undefined && uid !== null) {
+                localVarHeaderParameter['uid'] = String(uid);
+            }
+
+            if (accessToken !== undefined && accessToken !== null) {
+                localVarHeaderParameter['access-token'] = String(accessToken);
+            }
+
+            if (client !== undefined && client !== null) {
+                localVarHeaderParameter['client'] = String(client);
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * ユーザーがフォローしているユーザーの情報を一覧取得する
+         * @summary ユーザーがフォローしているユーザーの情報を一覧取得する
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
+         * @param {number} userId ユーザーのID
+         * @param {number} limit 取得するユーザー情報の件数
+         * @param {number} offset 取得をスキップするユーザー情報の件数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getFollowings: async (uid: string, accessToken: string, client: string, userId: number, limit: number, offset: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uid' is not null or undefined
+            assertParamExists('getFollowings', 'uid', uid)
+            // verify required parameter 'accessToken' is not null or undefined
+            assertParamExists('getFollowings', 'accessToken', accessToken)
+            // verify required parameter 'client' is not null or undefined
+            assertParamExists('getFollowings', 'client', client)
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('getFollowings', 'userId', userId)
+            // verify required parameter 'limit' is not null or undefined
+            assertParamExists('getFollowings', 'limit', limit)
+            // verify required parameter 'offset' is not null or undefined
+            assertParamExists('getFollowings', 'offset', offset)
+            const localVarPath = `/users/{userId}/followings`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+            if (uid !== undefined && uid !== null) {
+                localVarHeaderParameter['uid'] = String(uid);
+            }
+
+            if (accessToken !== undefined && accessToken !== null) {
+                localVarHeaderParameter['access-token'] = String(accessToken);
+            }
+
+            if (client !== undefined && client !== null) {
+                localVarHeaderParameter['client'] = String(client);
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 単一のユーザー情報を取得する
          * @summary 単一のユーザー情報を取得する
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
          * @param {number} userId ユーザーのID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getUser: async (userId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getUser: async (uid: string, accessToken: string, client: string, userId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uid' is not null or undefined
+            assertParamExists('getUser', 'uid', uid)
+            // verify required parameter 'accessToken' is not null or undefined
+            assertParamExists('getUser', 'accessToken', accessToken)
+            // verify required parameter 'client' is not null or undefined
+            assertParamExists('getUser', 'client', client)
             // verify required parameter 'userId' is not null or undefined
             assertParamExists('getUser', 'userId', userId)
             const localVarPath = `/users/{userId}`
@@ -1795,6 +2291,18 @@ export const UsersApiAxiosParamCreator = function (configuration?: Configuration
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (uid !== undefined && uid !== null) {
+                localVarHeaderParameter['uid'] = String(uid);
+            }
+
+            if (accessToken !== undefined && accessToken !== null) {
+                localVarHeaderParameter['access-token'] = String(accessToken);
+            }
+
+            if (client !== undefined && client !== null) {
+                localVarHeaderParameter['client'] = String(client);
+            }
 
 
     
@@ -1818,14 +2326,49 @@ export const UsersApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = UsersApiAxiosParamCreator(configuration)
     return {
         /**
+         * ユーザーをフォローしているユーザーの情報を一覧取得する
+         * @summary ユーザーをフォローしているユーザーの情報を一覧取得する
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
+         * @param {number} userId ユーザーのID
+         * @param {number} limit 取得するユーザー情報の件数
+         * @param {number} offset 取得をスキップするユーザー情報の件数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getFollowers(uid: string, accessToken: string, client: string, userId: number, limit: number, offset: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetUsersResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getFollowers(uid, accessToken, client, userId, limit, offset, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * ユーザーがフォローしているユーザーの情報を一覧取得する
+         * @summary ユーザーがフォローしているユーザーの情報を一覧取得する
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
+         * @param {number} userId ユーザーのID
+         * @param {number} limit 取得するユーザー情報の件数
+         * @param {number} offset 取得をスキップするユーザー情報の件数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getFollowings(uid: string, accessToken: string, client: string, userId: number, limit: number, offset: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetUsersResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getFollowings(uid, accessToken, client, userId, limit, offset, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * 単一のユーザー情報を取得する
          * @summary 単一のユーザー情報を取得する
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
          * @param {number} userId ユーザーのID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getUser(userId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetUserResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getUser(userId, options);
+        async getUser(uid: string, accessToken: string, client: string, userId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetUserResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getUser(uid, accessToken, client, userId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -1839,14 +2382,47 @@ export const UsersApiFactory = function (configuration?: Configuration, basePath
     const localVarFp = UsersApiFp(configuration)
     return {
         /**
+         * ユーザーをフォローしているユーザーの情報を一覧取得する
+         * @summary ユーザーをフォローしているユーザーの情報を一覧取得する
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
+         * @param {number} userId ユーザーのID
+         * @param {number} limit 取得するユーザー情報の件数
+         * @param {number} offset 取得をスキップするユーザー情報の件数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getFollowers(uid: string, accessToken: string, client: string, userId: number, limit: number, offset: number, options?: any): AxiosPromise<GetUsersResponse> {
+            return localVarFp.getFollowers(uid, accessToken, client, userId, limit, offset, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * ユーザーがフォローしているユーザーの情報を一覧取得する
+         * @summary ユーザーがフォローしているユーザーの情報を一覧取得する
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
+         * @param {number} userId ユーザーのID
+         * @param {number} limit 取得するユーザー情報の件数
+         * @param {number} offset 取得をスキップするユーザー情報の件数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getFollowings(uid: string, accessToken: string, client: string, userId: number, limit: number, offset: number, options?: any): AxiosPromise<GetUsersResponse> {
+            return localVarFp.getFollowings(uid, accessToken, client, userId, limit, offset, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 単一のユーザー情報を取得する
          * @summary 単一のユーザー情報を取得する
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
          * @param {number} userId ユーザーのID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getUser(userId: number, options?: any): AxiosPromise<GetUserResponse> {
-            return localVarFp.getUser(userId, options).then((request) => request(axios, basePath));
+        getUser(uid: string, accessToken: string, client: string, userId: number, options?: any): AxiosPromise<GetUserResponse> {
+            return localVarFp.getUser(uid, accessToken, client, userId, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -1859,15 +2435,52 @@ export const UsersApiFactory = function (configuration?: Configuration, basePath
  */
 export class UsersApi extends BaseAPI {
     /**
+     * ユーザーをフォローしているユーザーの情報を一覧取得する
+     * @summary ユーザーをフォローしているユーザーの情報を一覧取得する
+     * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+     * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+     * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
+     * @param {number} userId ユーザーのID
+     * @param {number} limit 取得するユーザー情報の件数
+     * @param {number} offset 取得をスキップするユーザー情報の件数
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsersApi
+     */
+    public getFollowers(uid: string, accessToken: string, client: string, userId: number, limit: number, offset: number, options?: AxiosRequestConfig) {
+        return UsersApiFp(this.configuration).getFollowers(uid, accessToken, client, userId, limit, offset, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ユーザーがフォローしているユーザーの情報を一覧取得する
+     * @summary ユーザーがフォローしているユーザーの情報を一覧取得する
+     * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+     * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+     * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
+     * @param {number} userId ユーザーのID
+     * @param {number} limit 取得するユーザー情報の件数
+     * @param {number} offset 取得をスキップするユーザー情報の件数
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsersApi
+     */
+    public getFollowings(uid: string, accessToken: string, client: string, userId: number, limit: number, offset: number, options?: AxiosRequestConfig) {
+        return UsersApiFp(this.configuration).getFollowings(uid, accessToken, client, userId, limit, offset, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 単一のユーザー情報を取得する
      * @summary 単一のユーザー情報を取得する
+     * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+     * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+     * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
      * @param {number} userId ユーザーのID
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof UsersApi
      */
-    public getUser(userId: number, options?: AxiosRequestConfig) {
-        return UsersApiFp(this.configuration).getUser(userId, options).then((request) => request(this.axios, this.basePath));
+    public getUser(uid: string, accessToken: string, client: string, userId: number, options?: AxiosRequestConfig) {
+        return UsersApiFp(this.configuration).getUser(uid, accessToken, client, userId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

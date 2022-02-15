@@ -31,7 +31,11 @@ const userData = reactive<CurrentUserResponseUser>({
   id: 0,
   name: '',
   comment: '',
-  image_url: ''
+  image_url: '',
+  is_following: false,
+  is_followed: false,
+  following_count: 0,
+  follower_count: 0
 });
 
 const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
@@ -165,6 +169,32 @@ watch(
       </div>
       <div :class="'user-name-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
         <div class="name">{{ userData.name }}</div>
+        <div>
+          <div class="follow">
+            <el-button
+              type="text"
+              class="follow-title"
+              @click="$router.push({ name: 'Followings', params: { id: authData.userId } })"
+            >
+              フォロー
+            </el-button>
+            <span class="follow-count">
+              {{ userData.following_count }}
+            </span>
+          </div>
+          <div class="follow">
+            <el-button
+              type="text"
+              class="follow-title"
+              @click="$router.push({ name: 'Followers', params: { id: authData.userId } })"
+            >
+              フォロワー
+            </el-button>
+            <span class="follow-count">
+              {{ userData.follower_count }}
+            </span>
+          </div>
+        </div>
       </div>
       <div :class="'edit-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
         <el-button
@@ -323,6 +353,24 @@ watch(
 .edit-mdlg {
   padding-left: 10px;
   box-sizing: border-box;
+}
+/* フォロー関連 */
+.follow {
+  margin-top: 10px;
+  width: 120px;
+  float: left;
+}
+.follow > .el-button {
+  min-height: 25px;
+}
+.follow-title {
+  padding: 0;
+  height: 25px;
+}
+.follow-count {
+  margin-left: 8px;
+  font-size: 18px;
+  font-weight: bold;
 }
 /* コメント大 */
 .comment-mdlg {
