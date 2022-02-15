@@ -385,7 +385,6 @@ watch(
 /* ユーザーデータラッパー小 */
 .user-data-wrapper-sm {
   width: 375px;
-  height: 400px;
   background-color: white;
   margin: 10px auto 0 auto;
 }
@@ -398,7 +397,7 @@ watch(
 /* ユーザーデータ小 */
 .user-data-sm {
   width: 375px;
-  height: 400px;
+  height: 380px;
   padding: 10px;
   box-sizing: border-box;
 }
@@ -424,7 +423,7 @@ watch(
 /* ユーザーネームを含むユーザー情報大 */
 .user-name-mdlg {
   width: 100%;
-  height: 180px;
+  height: 170px;
   margin-top: 30px;
   padding-left: 10px;
   box-sizing: border-box;
@@ -432,7 +431,7 @@ watch(
 /* ユーザーネームを含むユーザー情報小 */
 .user-name-sm {
   width: 100%;
-  height: 180px;
+  height: 170px;
   margin-top: 30px;
 }
 .name {

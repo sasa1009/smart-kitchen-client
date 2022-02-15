@@ -188,7 +188,7 @@ async function updateFavorite() {
 /* カード大 */
 .recipe-card-mdlg {
   width: 200px;
-  height: 250px;
+  height: 255px;
   border-radius: 10px;
   overflow: hidden;
   background-color: white;
@@ -197,7 +197,7 @@ async function updateFavorite() {
 /* カード小 */
 .recipe-card-sm {
   width: 160px;
-  height: 220px;
+  height: 230px;
   border-radius: 10px;
   overflow: hidden;
   background-color: white;

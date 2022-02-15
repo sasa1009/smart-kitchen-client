@@ -164,7 +164,6 @@ if (route.meta.status === 'followings') {
 </script>
 
 <template>
-<div>{{userDataList}}</div>
   <el-row :class="'row row-' + mq.current">
     <el-col
       :span="currentSpan"
