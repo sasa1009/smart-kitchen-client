@@ -10,7 +10,7 @@ import { useMq } from 'vue3-mq';
 import { Carousel, Navigation, Slide } from 'vue3-carousel';
 import 'vue3-carousel/dist/carousel.css';
 import { Configuration, RecipesApi } from '@/api'
-import { ingredients, categories, recipeDataList } from '@/modules/data';
+import { ingredients, categories, recipeDataList, followingRecipeDataList } from '@/modules/data';
 import { isLogin, authData } from '@/modules/auth';
 
 const mq = useMq();
@@ -30,38 +30,46 @@ const breakpointSettings = {
   },
 }
 
-/**
- * ページングに使用するデータ
- */
-const pageData = reactive({
-  limit: 10,
-  current: 1,
-  total: 0,
-});
+const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
 
-// レシピ情報の一覧を取得してrecipeDataListに格納する
-(async function init() {
+/**
+ * 新着レシピ情報の一覧を取得する
+ */
+async function getRecipeData() {
   try {
-    const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
     let response;
     if (isLogin.value) {
-      response = await new RecipesApi(configuration).getRecipes(authData.value.uid, authData.value.accessToken, authData.value.client, pageData.limit, pageData.limit * (pageData.current - 1), '', '');
+      response = await new RecipesApi(configuration).getRecipes(authData.value.uid, authData.value.accessToken, authData.value.client, 10, 0, '', '');
     } else {
-      response = await new RecipesApi(configuration).getRecipes('', '', '', pageData.limit, pageData.limit * (pageData.current - 1), '', '');
+      response = await new RecipesApi(configuration).getRecipes('', '', '', 10, 0, '', '');
     }
-    if (response.status !== 200) {
-      ElMessage({
-        showClose: true,
-        message: 'レシピ情報の取得に失敗しました。',
-        type: 'error',
-      });
-      throw new Error('レシピ情報の取得に失敗しました。')
-    }
+    if (response.status !== 200) throw new Error('レシピ情報の取得に失敗しました。');
     recipeDataList.splice(0);
     Object.assign(recipeDataList, response.data.recipes);
-    pageData.total = response.data.meta.total;
   } catch (error) {
     console.error(error);
+  }
+}
+
+/**
+ * フォロー中のユーザーが作成したレシピ情報の一覧を取得する
+ */
+async function getFollowingRecipeData() {
+  try {
+    const response = await new RecipesApi(configuration).getFollowingRecipes(authData.value.uid, authData.value.accessToken, authData.value.client, Number(authData.value.userId), 10, 0);
+    if (response.status !== 200) throw new Error('フォロー中のレシピ情報の取得に失敗しました。');
+    followingRecipeDataList.splice(0);
+    Object.assign(followingRecipeDataList, response.data.recipes);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// レシピ情報の一覧を取得する
+(function init() {
+  getRecipeData();
+  if (isLogin.value) {
+    getFollowingRecipeData();
   }
 })();
 </script>
@@ -164,13 +172,13 @@ const pageData = reactive({
       :breakpoints="breakpointSettings"
     >
       <Slide
-        v-for="(recipeCardData, index) in recipeDataList"
+        v-for="(recipeCardData, index) in followingRecipeDataList"
         :key="index"
       >
         <div>
           <RecipeCard
             :mq-current="mq.current"
-            v-model:recipe-card-data="recipeDataList[index]"
+            v-model:recipe-card-data="followingRecipeDataList[index]"
             :is-login="true"
           />
         </div>

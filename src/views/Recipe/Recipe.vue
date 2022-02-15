@@ -146,25 +146,6 @@ async function updateFavorite() {
         <div class="buttons">
           <div class="button-wrapper">
             <el-button
-              v-if="toggle"
-              round
-              size="small"
-              class="follow-button"
-            >
-              フォローする
-            </el-button>
-            <el-button
-              v-else
-              round
-              size="small"
-              type="info"
-              class="follow-button"
-            >
-              フォロー解除
-            </el-button>
-          </div>
-          <div class="button-wrapper">
-            <el-button
               v-if="recipeData.is_favorited"
               round
               size="small"
@@ -202,7 +183,10 @@ async function updateFavorite() {
               食事記録
             </el-button>
           </div>
-          <div class="button-wrapper">
+          <div
+            v-if="recipeData.user.id === authData.userId"
+            class="button-wrapper"
+          >
             <el-button
               round
               size="small"
@@ -366,6 +350,7 @@ async function updateFavorite() {
 .user {
   width: 345px;
   height: 40px;
+  margin-top: 5px;
 }
 /* ユーザー画像 */
 .user-image-wrapper {
@@ -407,12 +392,9 @@ async function updateFavorite() {
 .button-wrapper {
   height: 40px;
 }
-.button-wrapper:nth-child(n + 2) {
-  margin-top: 8px;
-}
-.follow-button {
-  height: 30px;
-  width: 160px;
+.button-wrapper {
+  margin-top: 10px;
+  height: 35px;
 }
 .favorite-button {
   height: 30px;

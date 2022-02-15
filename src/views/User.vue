@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { reactive, ref, computed, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus';
 import RecipeCard from '@/components/RecipeCard.vue';
 import { authData, isLogin } from '@/modules/auth';
-import { useRoute } from 'vue-router';
-import { UsersApi, RecipesApi, Configuration, GetUserResponseUser } from '@/api';
+import { UsersApi, RecipesApi, RelationshipsApi, Configuration, GetUserResponseUser } from '@/api';
 // eslint-disable-next-line
 // @ts-ignore
 import { useMq } from 'vue3-mq';
@@ -11,6 +12,7 @@ import { usersRecipeDataList, favoritedRecipeDataList } from '@/modules/data';
 
 const mq = useMq();
 const route = useRoute();
+const router = useRouter();
 
 /**
  * 現在のページの幅に応じて数値を返す
@@ -33,7 +35,11 @@ const userData = reactive<GetUserResponseUser>({
   id: 0,
   name: '',
   comment: '',
-  image_url: ''
+  image_url: '',
+  is_following: false,
+  is_followed: false,
+  following_count: 0,
+  follower_count: 0
 });
 
 const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
@@ -43,9 +49,59 @@ const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE
  */
 async function getUserData() {
   try {
-    const response = await new UsersApi(configuration).getUser(Number(route.params.id));
+    let response;
+    if (isLogin.value) {
+      response = await new UsersApi(configuration).getUser(authData.value.uid, authData.value.accessToken, authData.value.client, Number(route.params.id));
+    } else {
+      response = await new UsersApi(configuration).getUser('', '', '', Number(route.params.id));
+    }
     if (response.status !== 200) throw new Error('ユーザー情報の取得に失敗しました。');
     Object.assign(userData, response.data.user)
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// ユーザーをフォローする
+async function follow() {
+  if (isLogin.value) {
+    try {
+      const response = await new RelationshipsApi(configuration).createRelationship(authData.value.uid, authData.value.accessToken, authData.value.client, userData.id);
+      if (response.status !== 201) {
+        throw new Error('ユーザーのフォローに失敗しました。')
+      }
+      userData.is_following = !userData.is_following;
+      userData.follower_count++;
+      ElMessage({
+        showClose: true,
+        message: 'ユーザーをフォローしました。',
+        type: 'success',
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  } else {
+    ElMessage({
+      showClose: true,
+      message: 'ユーザーをフォローするにはログインしてください。',
+    });
+    router.push({ name: 'Login' });
+  }
+}
+
+// ユーザーのフォローを解除する
+async function unfollow() {
+  try {
+    const response = await new RelationshipsApi(configuration).deleteRelationship(authData.value.uid, authData.value.accessToken, authData.value.client, userData.id);
+    if (response.status !== 204) {
+      throw new Error('フォローの解除に失敗しました。')
+    }
+    userData.is_following = !userData.is_following;
+    userData.follower_count--;
+    ElMessage({
+      showClose: true,
+      message: 'フォローを解除しました。',
+    });
   } catch (error) {
     console.error(error);
   }
@@ -176,7 +232,65 @@ watch(
         />
       </div>
       <div :class="'user-name-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
+        <div
+          v-if="userData.is_followed"
+          class="followed"
+        >
+          <span>フォローされています</span>
+        </div>
         <div class="name">{{ userData.name }}</div>
+        <div
+          class="follow-wrapper"
+        >
+          <div class="follow">
+            <el-button
+              type="text"
+              class="follow-title"
+              @click="$router.push({ name: 'Followings', params: { id: userData.id } })"
+            >
+              フォロー
+            </el-button>
+            <span class="follow-count">
+              {{ userData.following_count }}
+            </span>
+          </div>
+          <div class="follow">
+            <el-button
+              type="text"
+              class="follow-title"
+              @click="$router.push({ name: 'Followers', params: { id: userData.id } })"
+            >
+              フォロワー
+            </el-button>
+            <span class="follow-count">
+              {{ userData.follower_count }}
+            </span>
+          </div>
+        </div>
+        <div
+          v-if="userData.id !== authData.userId"
+          class="button-wrapper"
+        >
+          <el-button
+            v-if="userData.is_following"
+            round
+            size="small"
+            type="info"
+            class="follow-button"
+            @click="unfollow()"
+          >
+            フォロー解除
+          </el-button>
+          <el-button
+            v-else
+            round
+            size="small"
+            class="follow-button"
+            @click="follow()"
+          >
+            フォローする
+          </el-button>
+        </div>
       </div>
     </div>
     <div
@@ -264,14 +378,13 @@ watch(
 /* ユーザーデータラッパー大 */
 .user-data-wrapper-mdlg {
   width: 750px;
-  height: 600px;
+  height: 400px;
   background-color: white;
   margin: 10px auto 0 auto;
 }
 /* ユーザーデータラッパー小 */
 .user-data-wrapper-sm {
   width: 375px;
-  height: 600px;
   background-color: white;
   margin: 10px auto 0 auto;
 }
@@ -284,7 +397,7 @@ watch(
 /* ユーザーデータ小 */
 .user-data-sm {
   width: 375px;
-  height: 400px;
+  height: 380px;
   padding: 10px;
   box-sizing: border-box;
 }
@@ -310,7 +423,7 @@ watch(
 /* ユーザーネームを含むユーザー情報大 */
 .user-name-mdlg {
   width: 100%;
-  height: 180px;
+  height: 170px;
   margin-top: 30px;
   padding-left: 10px;
   box-sizing: border-box;
@@ -318,12 +431,50 @@ watch(
 /* ユーザーネームを含むユーザー情報小 */
 .user-name-sm {
   width: 100%;
-  height: 180px;
+  height: 170px;
   margin-top: 30px;
 }
 .name {
   font-size: 25px;
   font-weight: bold;
+}
+/* フォロー関連 */
+.followed > span {
+  display: block;
+  width: 130px;
+  font-size: 12px;
+  text-align: center;
+  color: white;
+  background-color: #909399;
+  border-radius: 5px;
+}
+.follow-wrapper {
+  margin-top: 10px;
+}
+.follow-wrapper::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+.follow {
+  width: 120px;
+  float: left;
+}
+.follow > .el-button {
+  min-height: 25px;
+}
+.follow-title {
+  padding: 0;
+  height: 25px;
+}
+.follow-count {
+  margin-left: 8px;
+  font-size: 18px;
+  font-weight: bold;
+}
+/* フォローボタン関連 */
+.button-wrapper {
+  margin-top: 10px;
 }
 /* コメント大 */
 .comment-mdlg {

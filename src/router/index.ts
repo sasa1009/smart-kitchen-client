@@ -6,6 +6,7 @@ import CurrentUserEdit from '../views/CurrentUser/CurrentUserEdit.vue';
 import Signup from '../views/Signup.vue';
 import Login from '../views/Login.vue';
 import User from '../views/User.vue';
+import Users from '../views/Users.vue';
 import PostRecipe from '../views/Recipe/PostRecipe.vue';
 import Recipe from '../views/Recipe/Recipe.vue';
 
@@ -48,6 +49,18 @@ const routes: Array<RouteRecordRaw> = [
     path: '/user/:id',
     name: 'User',
     component: User
+  },
+  {
+    path: '/followings/:id',
+    name: 'Followings',
+    component: Users,
+    meta: { status: 'followings' },
+  },
+  {
+    path: '/followers/:id',
+    name: 'Followers',
+    component: Users,
+    meta: { status: 'followers' },
   },
   {
     path: '/recipe/:id',

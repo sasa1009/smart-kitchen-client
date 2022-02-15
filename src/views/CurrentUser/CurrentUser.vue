@@ -6,7 +6,7 @@ import { CurrentUserApi, RecipesApi, Configuration, CurrentUserResponseUser } fr
 // eslint-disable-next-line
 // @ts-ignore
 import { useMq } from 'vue3-mq';
-import { usersRecipeDataList, favoritedRecipeDataList } from '@/modules/data';
+import { usersRecipeDataList, favoritedRecipeDataList, followingRecipeDataList } from '@/modules/data';
 
 const mq = useMq();
 
@@ -31,7 +31,11 @@ const userData = reactive<CurrentUserResponseUser>({
   id: 0,
   name: '',
   comment: '',
-  image_url: ''
+  image_url: '',
+  is_following: false,
+  is_followed: false,
+  following_count: 0,
+  follower_count: 0
 });
 
 const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
@@ -117,6 +121,40 @@ async function getFavoritedRecipeData() {
   }
 }
 
+/**
+ * フォロー中のユーザーが作成したレシピ情報一覧のページングに使用するデータ
+ */
+const followingRecipePageData = reactive({
+  limit: 6,
+  current: 1,
+  total: 0,
+});
+
+/**
+ * フォロー中のユーザーが作成したレシピのページネーションのページ番号がクリックされた時に新たなレシピ情報の一覧を取得してfavoritedRecipeDataListに格納する
+ */
+watch(
+  () => followingRecipePageData.current,
+  async () => {
+    await getFavoritedRecipeData();
+  }
+);
+
+/**
+ * フォロー中のユーザーが作成したレシピ情報の一覧を取得する
+ */
+async function getFollowingRecipeData() {
+  try {
+    const response = await new RecipesApi(configuration).getFollowingRecipes(authData.value.uid, authData.value.accessToken, authData.value.client, Number(authData.value.userId), favoritedRecipePageData.limit, favoritedRecipePageData.limit * (favoritedRecipePageData.current - 1));
+    if (response.status !== 200) throw new Error('レシピ情報の取得に失敗しました。');
+    followingRecipeDataList.splice(0);
+    Object.assign(followingRecipeDataList, response.data.recipes);
+    followingRecipePageData.total = response.data.meta.total;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 // 選択中のレシピ情報のタブを格納する
 const currentTab = ref('');
 
@@ -131,6 +169,9 @@ watch(
         break;
       case '1':
         await getFavoritedRecipeData();
+        break;
+      case '2':
+        await getFollowingRecipeData();
     }
   }
 );
@@ -165,6 +206,32 @@ watch(
       </div>
       <div :class="'user-name-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
         <div class="name">{{ userData.name }}</div>
+        <div>
+          <div class="follow">
+            <el-button
+              type="text"
+              class="follow-title"
+              @click="$router.push({ name: 'Followings', params: { id: authData.userId } })"
+            >
+              フォロー
+            </el-button>
+            <span class="follow-count">
+              {{ userData.following_count }}
+            </span>
+          </div>
+          <div class="follow">
+            <el-button
+              type="text"
+              class="follow-title"
+              @click="$router.push({ name: 'Followers', params: { id: authData.userId } })"
+            >
+              フォロワー
+            </el-button>
+            <span class="follow-count">
+              {{ userData.follower_count }}
+            </span>
+          </div>
+        </div>
       </div>
       <div :class="'edit-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
         <el-button
@@ -253,6 +320,39 @@ watch(
         />
       </div>
     </el-tab-pane>
+    <el-tab-pane
+      label="フォロー中のユーザーのレシピ"
+      :tab-click="getFavoritedRecipeData"
+    >
+      <el-row :class="'row-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
+        <el-col
+          :span="currentSpan"
+          v-for="(recipeCardData, index) in followingRecipeDataList"
+          :key="index"
+          class="col"
+        >
+          <div :class="'recipe-card-wrapper-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
+            <RecipeCard
+              :mq-current="mq.current"
+              v-model:recipe-card-data="followingRecipeDataList[index]"
+              :is-login="true"
+            />
+          </div>
+        </el-col>
+      </el-row>
+      <div class="pagination">
+        <el-pagination
+          layout="prev, pager, next"
+          v-model:currentPage="followingRecipePageData.current"
+          :total="followingRecipePageData.total"
+          :page-size="followingRecipePageData.limit"
+          :pager-count="5"
+          style="--el-pagination-hover-color: black;
+                --el-pagination-font-color: silver;
+                --el-pagination-font-size: 18px;"
+        />
+      </div>
+    </el-tab-pane>
   </el-tabs>
 </template>
 
@@ -323,6 +423,24 @@ watch(
 .edit-mdlg {
   padding-left: 10px;
   box-sizing: border-box;
+}
+/* フォロー関連 */
+.follow {
+  margin-top: 10px;
+  width: 120px;
+  float: left;
+}
+.follow > .el-button {
+  min-height: 25px;
+}
+.follow-title {
+  padding: 0;
+  height: 25px;
+}
+.follow-count {
+  margin-left: 8px;
+  font-size: 18px;
+  font-weight: bold;
 }
 /* コメント大 */
 .comment-mdlg {
