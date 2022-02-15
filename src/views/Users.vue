@@ -41,7 +41,7 @@ const userDataList = reactive<Array<GetUsersResponseUsers>>([
  * ページングに使用するデータ
  */
 const pageData = reactive({
-  limit: 4,
+  limit: 12,
   current: 1,
   total: 0,
 });

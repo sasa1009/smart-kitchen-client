@@ -148,7 +148,6 @@ export const recipeDataList = reactive<Array<GetRecipesResponseRecipes>>([
     user: {
       id: 0,
       name: '',
-      comment: '',
       image_url: ''
     }
   },
@@ -168,7 +167,6 @@ export const usersRecipeDataList = reactive<Array<GetRecipesResponseRecipes>>([
     user: {
       id: 0,
       name: '',
-      comment: '',
       image_url: ''
     }
   },
@@ -188,7 +186,25 @@ export const favoritedRecipeDataList = reactive<Array<GetRecipesResponseRecipes>
     user: {
       id: 0,
       name: '',
-      comment: '',
+      image_url: ''
+    }
+  },
+]);
+
+// フォロー中のユーザーが作成したレシピ情報の配列
+export const followingRecipeDataList = reactive<Array<GetRecipesResponseRecipes>>([
+  {
+    id: 0,
+    title: '',
+    calorie: 0,
+    main_ingredient: '',
+    category: '',
+    image_url: '',
+    is_favorited: false,
+    favorited_count: 0,
+    user: {
+      id: 0,
+      name: '',
       image_url: ''
     }
   },

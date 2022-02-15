@@ -331,10 +331,10 @@ export interface GetRecipeResponseRecipe {
     'is_favorited': boolean;
     /**
      * 
-     * @type {GetRecipesResponseUser}
+     * @type {GetRecipeResponseRecipeUser}
      * @memberof GetRecipeResponseRecipe
      */
-    'user': GetRecipesResponseUser;
+    'user': GetRecipeResponseRecipeUser;
     /**
      * レシピで使用する材料
      * @type {Array<CreateRecipeRequestIngredients>}
@@ -370,6 +370,37 @@ export interface GetRecipeResponseRecipeProcedures {
      * 手順の画像のURL
      * @type {string}
      * @memberof GetRecipeResponseRecipeProcedures
+     */
+    'image_url': string | null;
+}
+/**
+ * レシピを作成したユーザー情報
+ * @export
+ * @interface GetRecipeResponseRecipeUser
+ */
+export interface GetRecipeResponseRecipeUser {
+    /**
+     * ユーザーのID
+     * @type {number}
+     * @memberof GetRecipeResponseRecipeUser
+     */
+    'id': number;
+    /**
+     * ユーザー名
+     * @type {string}
+     * @memberof GetRecipeResponseRecipeUser
+     */
+    'name': string;
+    /**
+     * 一言コメント
+     * @type {string}
+     * @memberof GetRecipeResponseRecipeUser
+     */
+    'comment': string;
+    /**
+     * ユーザーの画像のURL
+     * @type {string}
+     * @memberof GetRecipeResponseRecipeUser
      */
     'image_url': string | null;
 }
@@ -484,12 +515,6 @@ export interface GetRecipesResponseUser {
      * @memberof GetRecipesResponseUser
      */
     'name': string;
-    /**
-     * 一言コメント
-     * @type {string}
-     * @memberof GetRecipesResponseUser
-     */
-    'comment': string;
     /**
      * ユーザーの画像のURL
      * @type {string}
@@ -1413,6 +1438,75 @@ export const RecipesApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * フォロー中のユーザーが作成したレシピ情報の一覧を取得する
+         * @summary フォロー中のユーザーが作成したレシピ情報の一覧を取得する
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
+         * @param {number} userId レシピを登録したユーザーのID
+         * @param {number} limit 取得するレシピ情報の件数
+         * @param {number} offset 取得をスキップするレシピ情報の件数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getFollowingRecipes: async (uid: string, accessToken: string, client: string, userId: number, limit: number, offset: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uid' is not null or undefined
+            assertParamExists('getFollowingRecipes', 'uid', uid)
+            // verify required parameter 'accessToken' is not null or undefined
+            assertParamExists('getFollowingRecipes', 'accessToken', accessToken)
+            // verify required parameter 'client' is not null or undefined
+            assertParamExists('getFollowingRecipes', 'client', client)
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('getFollowingRecipes', 'userId', userId)
+            // verify required parameter 'limit' is not null or undefined
+            assertParamExists('getFollowingRecipes', 'limit', limit)
+            // verify required parameter 'offset' is not null or undefined
+            assertParamExists('getFollowingRecipes', 'offset', offset)
+            const localVarPath = `/recipes/{user_id}/following`
+                .replace(`{${"user_id"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+            if (uid !== undefined && uid !== null) {
+                localVarHeaderParameter['uid'] = String(uid);
+            }
+
+            if (accessToken !== undefined && accessToken !== null) {
+                localVarHeaderParameter['access-token'] = String(accessToken);
+            }
+
+            if (client !== undefined && client !== null) {
+                localVarHeaderParameter['client'] = String(client);
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 単一のレシピ情報を取得する
          * @summary 単一のレシピ情報を取得する
          * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
@@ -1656,6 +1750,22 @@ export const RecipesApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * フォロー中のユーザーが作成したレシピ情報の一覧を取得する
+         * @summary フォロー中のユーザーが作成したレシピ情報の一覧を取得する
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
+         * @param {number} userId レシピを登録したユーザーのID
+         * @param {number} limit 取得するレシピ情報の件数
+         * @param {number} offset 取得をスキップするレシピ情報の件数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getFollowingRecipes(uid: string, accessToken: string, client: string, userId: number, limit: number, offset: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetRecipesResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getFollowingRecipes(uid, accessToken, client, userId, limit, offset, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * 単一のレシピ情報を取得する
          * @summary 単一のレシピ情報を取得する
          * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
@@ -1741,6 +1851,21 @@ export const RecipesApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getFavoritedRecipes(uid, accessToken, client, userId, limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
+         * フォロー中のユーザーが作成したレシピ情報の一覧を取得する
+         * @summary フォロー中のユーザーが作成したレシピ情報の一覧を取得する
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
+         * @param {number} userId レシピを登録したユーザーのID
+         * @param {number} limit 取得するレシピ情報の件数
+         * @param {number} offset 取得をスキップするレシピ情報の件数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getFollowingRecipes(uid: string, accessToken: string, client: string, userId: number, limit: number, offset: number, options?: any): AxiosPromise<GetRecipesResponse> {
+            return localVarFp.getFollowingRecipes(uid, accessToken, client, userId, limit, offset, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 単一のレシピ情報を取得する
          * @summary 単一のレシピ情報を取得する
          * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
@@ -1824,6 +1949,23 @@ export class RecipesApi extends BaseAPI {
      */
     public getFavoritedRecipes(uid: string, accessToken: string, client: string, userId: number, limit: number, offset: number, options?: AxiosRequestConfig) {
         return RecipesApiFp(this.configuration).getFavoritedRecipes(uid, accessToken, client, userId, limit, offset, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * フォロー中のユーザーが作成したレシピ情報の一覧を取得する
+     * @summary フォロー中のユーザーが作成したレシピ情報の一覧を取得する
+     * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+     * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+     * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
+     * @param {number} userId レシピを登録したユーザーのID
+     * @param {number} limit 取得するレシピ情報の件数
+     * @param {number} offset 取得をスキップするレシピ情報の件数
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RecipesApi
+     */
+    public getFollowingRecipes(uid: string, accessToken: string, client: string, userId: number, limit: number, offset: number, options?: AxiosRequestConfig) {
+        return RecipesApiFp(this.configuration).getFollowingRecipes(uid, accessToken, client, userId, limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
