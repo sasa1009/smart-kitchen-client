@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { RecipesApi, Configuration, GetRecipeResponseRecipe, FavoritesApi } from '@/api';
@@ -45,8 +45,6 @@ const recipeData = reactive<GetRecipeResponseRecipe>({
       }
   ]
 });
-
-const toggle = ref(true);
 
 const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
 

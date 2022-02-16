@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
-import { ElMessage } from 'element-plus';
 import RecipeCard from '@/components/RecipeCard.vue';
 // eslint-disable-next-line
 // @ts-ignore

@@ -18,7 +18,7 @@ interface ImageData {
 
 const mq = useMq();
 const router = useRouter();
-const formRef = ref<InstanceType<typeof ElForm>>()
+const formRef = ref<InstanceType<typeof ElForm>>();
 
 // フォームのバリデーションルール
 const rules = reactive({
@@ -326,7 +326,6 @@ function createRecipe(formEl: InstanceType<typeof ElForm> | undefined) {
       :model="recipeData"
       :rules="rules"
       :hide-required-asterisk="true"
-      class="login-form"
     >
       <div :class="'recipe-data-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
         <h3>レシピ作成</h3>
