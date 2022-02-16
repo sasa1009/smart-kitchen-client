@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue';
+import { ElMessage } from 'element-plus';
 import type { ElForm } from 'element-plus';
 // eslint-disable-next-line
 // @ts-ignore
@@ -10,11 +11,12 @@ interface FoodData {
   calorie: number;
   amount: number;
   recipe_id: number | null;
-  recipe_name: number | null;
+  add_template: boolean,
+  show_error_message: boolean
 }
 interface FormData {
-  dateTime: Date;
-  foodDataList: Array<FoodData>;
+  date_time: Date;
+  food_data_list: Array<FoodData>;
 }
 
 const mq = useMq();
@@ -38,53 +40,110 @@ const currentSpan = computed(() => {
 
 // フォームのバリデーションルール
 const rules = {
-  // title: [
-  //   {
-  //     required: true,
-  //     message: 'タイトルを入力してください。',
-  //     trigger: 'blur',
-  //   }
-  // ],
-  // main_ingredient: [
-  //   {
-  //     required: true,
-  //     message: 'メイン食材を選択してください。',
-  //     trigger: 'change',
-  //   },
-  // ],
-  // category: [
-  //   {
-  //     required: true,
-  //     message: 'カテゴリーを入力してください。',
-  //     trigger: 'change',
-  //   },
-  // ],
+  date_time: [
+    {
+      required: true,
+      message: '日時を入力してください。',
+      trigger: 'blur',
+    }
+  ]
 };
 const formData = reactive<FormData>({
-  dateTime: new Date(),
-  foodDataList: [
+  date_time: new Date(),
+  food_data_list: [
     {
       name: '',
       calorie: 0,
       amount: 0,
       recipe_id: null,
-      recipe_name: null
+      add_template: false,
+      show_error_message: false
     },
   ]
 });
 
-function addFoodData() {
-  formData.foodDataList.push({
-    name: '',
-    calorie: 0,
-    amount: 0,
+const templates = reactive<Array<FoodData>>([
+  {
+    name: 'ご飯が進む！豚肉の生姜焼き',
+    calorie: 374,
+    amount: 1,
+    recipe_id: 1,
+    add_template: false,
+    show_error_message: false
+  },
+  {
+    name: 'ブロッコリーとツナのサラダ',
+    calorie: 430,
+    amount: 1,
     recipe_id: null,
-    recipe_name: null
-  });
+    add_template: false,
+    show_error_message: false
+  },
+  {
+    name: '海老とブロッコリーのマカロニグラタン',
+    calorie: 374,
+    amount: 1,
+    recipe_id: null,
+    add_template: false,
+    show_error_message: false
+  }
+]);
+
+function addFoodData(food_data: FoodData | undefined) {
+  if (food_data) {
+    const food_data_copy = JSON.stringify(food_data);
+    formData.food_data_list.push(JSON.parse(food_data_copy));
+  } else {
+    formData.food_data_list.push({
+      name: '',
+      calorie: 0,
+      amount: 0,
+      recipe_id: null,
+      add_template: false,
+      show_error_message: false
+    });
+  }
 }
 
 function removeFoodData(index: number) {
-  formData.foodDataList.splice(index, 1);
+  formData.food_data_list.splice(index, 1);
+}
+
+const dialogVisible = ref(false);
+
+/**
+ * 情報を登録する
+ */
+function postFoodLog(formRef: InstanceType<typeof ElForm> | undefined) {
+  if (!formRef) return;
+  formRef.validate(async (valid) => {
+    if (valid) {
+      let isError = false;
+      for (const food_data of formData.food_data_list) {
+        if (food_data.name === '') {
+          food_data.show_error_message = true
+          isError = true;
+        } else {
+          food_data.show_error_message = false
+        }
+      }
+      if (isError) {
+        ElMessage({
+          showClose: true,
+          message: '未入力の項目があります。',
+          type: 'error',
+        });
+        return;
+      }
+    } else {
+      console.log('error submit!');
+      ElMessage({
+        showClose: true,
+        message: '未入力の項目があります。',
+        type: 'error',
+      })
+    }
+  });
 }
 </script>
 
@@ -102,17 +161,17 @@ function removeFoodData(index: number) {
       >
         <el-form-item
           label="日時"
-          prop="dateTime"
+          prop="date_time"
         >
           <el-date-picker
-            v-model="formData.dateTime"
+            v-model="formData.date_time"
             type="datetime"
             format="YYYY-MM-DD HH:mm"
             placeholder="日時を選択してください。"
           />
         </el-form-item>
         <div
-          v-for="(foodData, index) in formData.foodDataList"
+          v-for="(foodData, index) in formData.food_data_list"
           :key="index"
           class="form-row"
         >
@@ -122,6 +181,7 @@ function removeFoodData(index: number) {
             <el-form-item
               label="品名"
               prop="name"
+              class="name"
             >
               <el-input
                 v-model="foodData.name"
@@ -129,6 +189,12 @@ function removeFoodData(index: number) {
                 :show-word-limit="true"
                 :disabled="!!foodData.recipe_id"
               />
+              <span
+                v-if="foodData.show_error_message"
+                :class="'name-error-message-' + (mq.current === 'sm' ? 'sm' : 'mdlg')"
+              >
+                品名を入力してください。
+              </span>
             </el-form-item>
             <el-row>
               <el-col :span="currentSpan">
@@ -164,24 +230,28 @@ function removeFoodData(index: number) {
             :class="'form-col-right-' + (mq.current === 'sm' ? 'sm' : 'mdlg')"
           >
             <font-awesome-icon
-              v-if="formData.foodDataList.length >= 2"
+              v-if="formData.food_data_list.length >= 2"
               :icon="['far', 'times-circle']"
               :class="'delete-button delete-button-' + (mq.current === 'sm' ? 'sm' : 'mdlg')"
               @click="removeFoodData(index)"
             />
+          </div>
+          <div>
+            <el-checkbox v-model="foodData.add_template" label="テンプレートに登録する" size="large"></el-checkbox>
           </div>
         </div>
       </el-form>
       <div :class="'add-buttons add-buttons-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
         <div class="add-button">
           <el-button
-            @click="addFoodData"
+            @click="addFoodData(undefined)"
           >
             品目を追加する
           </el-button>
         </div>
         <div class="template-button">
           <el-button
+            @click="dialogVisible = true"
           >
             テンプレートを開く
           </el-button>
@@ -190,12 +260,77 @@ function removeFoodData(index: number) {
       <div class="registration-button">
         <el-button
           type="primary"
+          @click="postFoodLog(formRef)"
         >
           食事記録を登録
         </el-button>
       </div>
     </div>
   </div>
+  <el-dialog
+    v-model="dialogVisible"
+    title="テンプレート"
+    :width="(mq.current === 'sm' ? '350px' : '500px')"
+  >
+    <el-row class="dialog-row">
+      <el-col
+        :span="18"
+      >
+        品名
+      </el-col>
+      <el-col
+        :span="6"
+      >
+        <span v-if="mq.current !== 'sm'">カロリー(kcal)</span>
+        <span v-else>カロリー<br>(kcal)</span>
+      </el-col>
+    </el-row>
+    <el-row
+      v-for="(template, index) in templates"
+      :key="index"
+      class="dialog-row"
+    >
+      <el-col
+        :span="18"
+        class="inner-row"
+      >
+        {{ template.name }}
+      </el-col>
+      <el-col
+        :span="6"
+        class="inner-row"
+      >
+        {{ template.calorie }}
+      </el-col>
+      <el-col
+        :span="10"
+      >
+        <el-button
+          @click="addFoodData(template)"
+          size="small"
+          :class="'template-button-' + (mq.current === 'sm' ? 'sm' : 'mdlg')"
+        >
+          追加する
+        </el-button>
+      </el-col>
+      <el-col
+        :span="10"
+      >
+        <el-button
+          size="small"
+          :class="'template-button-' + (mq.current === 'sm' ? 'sm' : 'mdlg')"
+          type="danger"
+        >
+          削除する
+        </el-button>
+      </el-col>
+    </el-row>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="dialogVisible = false">閉じる</el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <style scoped>
@@ -259,6 +394,26 @@ h1 {
   width: 305px;
   float: left;
 }
+/* 品名 */
+.name {
+  position: relative;
+}
+/* 品名のエラーメッセージ大 */
+.name-error-message-mdlg {
+  font-size: 12px;
+  color: #F56C6C;
+  position: absolute;
+  bottom: -30px;
+  right: 287px;
+}
+/* 品名のエラーメッセージ小 */
+.name-error-message-sm {
+  font-size: 12px;
+  color: #F56C6C;
+  position: absolute;
+  bottom: -30px;
+  right: 162px;
+}
 /* フォームの右側大 */
 .form-col-right-mdlg {
   width: 50px;
@@ -315,5 +470,21 @@ h1 {
 }
 .registration-button {
   margin-top: 30px;
+}
+/* テンプレートのダイアログ */
+.dialog-row {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+.inner-row {
+  margin-bottom: 5px;
+}
+.template-button-mdlg {
+  width: 150px;
+  text-align: center;
+}
+.template-button-sm {
+  width: 120px;
+  text-align: center;
 }
 </style>
