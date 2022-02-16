@@ -5,7 +5,7 @@ import type { ElForm } from 'element-plus';
 // @ts-ignore
 import { useMq } from 'vue3-mq';
 
-interface FoodDataList {
+interface FoodData {
   name: string;
   calorie: number;
   amount: number;
@@ -14,7 +14,7 @@ interface FoodDataList {
 }
 interface FormData {
   dateTime: Date;
-  foodDataList: Array<FoodDataList>;
+  foodDataList: Array<FoodData>;
 }
 
 const mq = useMq();
@@ -70,13 +70,6 @@ const formData = reactive<FormData>({
       recipe_id: null,
       recipe_name: null
     },
-    {
-      name: '',
-      calorie: 0,
-      amount: 0,
-      recipe_id: null,
-      recipe_name: null
-    },
   ]
 });
 
@@ -124,7 +117,7 @@ function removeFoodData(index: number) {
           class="form-row"
         >
           <div
-            class="form-col-left"
+            :class="'form-col-left-' + (mq.current === 'sm' ? 'sm' : 'mdlg')"
           >
             <el-form-item
               label="品名"
@@ -168,18 +161,18 @@ function removeFoodData(index: number) {
             </el-row>
           </div>
           <div
-            class="form-col-right"
+            :class="'form-col-right-' + (mq.current === 'sm' ? 'sm' : 'mdlg')"
           >
             <font-awesome-icon
               v-if="formData.foodDataList.length >= 2"
               :icon="['far', 'times-circle']"
-              class="delete-button"
+              :class="'delete-button delete-button-' + (mq.current === 'sm' ? 'sm' : 'mdlg')"
               @click="removeFoodData(index)"
             />
           </div>
         </div>
       </el-form>
-      <div class="add-buttons">
+      <div :class="'add-buttons add-buttons-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
         <div class="add-button">
           <el-button
             @click="addFoodData"
@@ -256,30 +249,54 @@ h1 {
   display: block;
   clear: both;
 }
-/* フォームの左側 */
-.form-col-left {
+/* フォームの左側大 */
+.form-col-left-mdlg {
   width: 430px;
   float: left;
 }
-/* フォームの右側 */
-.form-col-right {
+/* フォームの左側小 */
+.form-col-left-sm {
+  width: 305px;
+  float: left;
+}
+/* フォームの右側大 */
+.form-col-right-mdlg {
   width: 50px;
   height: 172px;
   float: left;
 }
-.delete-button {
+/* フォームの右側小 */
+.form-col-right-sm {
+  width: 50px;
+  height: 258px;
+  float: left;
+}
+/* 品目の削除ボタン大 */
+.delete-button-mdlg {
   font-size: 25px;
   color: #F56C6C;
   cursor: pointer;
   display: block;
   margin: 74px auto 0 auto;
 }
+/* 品目の削除ボタン小 */
+.delete-button-sm {
+  font-size: 25px;
+  color: #F56C6C;
+  cursor: pointer;
+  display: block;
+  margin: 117px auto 0 auto;
+}
 .delete-button:hover {
   opacity: 0.8;
 }
 /* ボタン類 */
-.add-buttons {
+.add-buttons-mdlg {
   width: 430px;
+  margin-top: 10px;
+}
+.add-buttons-sm {
+  width: 355px;
   margin-top: 10px;
 }
 .add-buttons::after {
