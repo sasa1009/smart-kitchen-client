@@ -299,6 +299,12 @@ export interface GetFoodLogTemplatesResponse {
      * @memberof GetFoodLogTemplatesResponse
      */
     'food_log_templates': Array<GetFoodLogTemplatesResponseFoodLogTemplates>;
+    /**
+     * 
+     * @type {GetFoodLogTemplatesResponseMeta}
+     * @memberof GetFoodLogTemplatesResponse
+     */
+    'meta': GetFoodLogTemplatesResponseMeta;
 }
 /**
  * 
@@ -330,6 +336,19 @@ export interface GetFoodLogTemplatesResponseFoodLogTemplates {
      * @memberof GetFoodLogTemplatesResponseFoodLogTemplates
      */
     'recipe_id': number | null;
+}
+/**
+ * 追加情報
+ * @export
+ * @interface GetFoodLogTemplatesResponseMeta
+ */
+export interface GetFoodLogTemplatesResponseMeta {
+    /**
+     * 食事記録のテンプレート情報の総数
+     * @type {number}
+     * @memberof GetFoodLogTemplatesResponseMeta
+     */
+    'total': number;
 }
 /**
  * 署名付きURL情報

@@ -3,7 +3,7 @@ import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import type { ElForm } from 'element-plus';
-import { authData } from '@/modules/auth';
+import { authData, isLogin } from '@/modules/auth';
 import { ingredientsForForm, categories } from '@/modules/data';
 import { uploadImageFileToS3 } from '@/modules/presignedUrl';
 // eslint-disable-next-line
@@ -219,7 +219,7 @@ function createRecipe(formEl: InstanceType<typeof ElForm> | undefined) {
   formEl.validate(async (valid) => {
     if (valid) {
       try {
-        // if (!authData.value.userId) throw new Error('未ログインです。');
+        if (!isLogin.value) throw new Error('未ログインです。');
 
         // 食材と作り方の項目をバリデーション
         let isError = false;

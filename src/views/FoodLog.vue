@@ -5,6 +5,8 @@ import type { ElForm } from 'element-plus';
 // eslint-disable-next-line
 // @ts-ignore
 import { useMq } from 'vue3-mq';
+import { FoodLogsApi, FoodLogTemplatesApi, Configuration, GetFoodLogTemplatesResponseFoodLogTemplates, CreateFoodLogsRequest } from '@/api';
+import { isLogin, authData } from '@/modules/auth';
 
 interface FoodData {
   name: string;
@@ -48,6 +50,7 @@ const rules = {
     }
   ]
 };
+
 const formData = reactive<FormData>({
   meal_date_time: new Date(),
   food_data_list: [
@@ -62,37 +65,23 @@ const formData = reactive<FormData>({
   ]
 });
 
-const templates = reactive<Array<FoodData>>([
-  {
-    name: 'ご飯が進む！豚肉の生姜焼き',
-    calorie: 374,
-    amount: 1,
-    recipe_id: 1,
-    is_create_template: false,
-    is_show_error_message: false
-  },
-  {
-    name: 'ブロッコリーとツナのサラダ',
-    calorie: 430,
-    amount: 1,
-    recipe_id: null,
-    is_create_template: false,
-    is_show_error_message: false
-  },
-  {
-    name: '海老とブロッコリーのマカロニグラタン',
-    calorie: 374,
-    amount: 1,
-    recipe_id: null,
-    is_create_template: false,
-    is_show_error_message: false
-  }
-]);
+const templates = reactive<Array<GetFoodLogTemplatesResponseFoodLogTemplates>>([]);
 
-function addFoodData(food_data: FoodData | undefined) {
+/**
+ * 食事記録フォームに品目を追加する
+ */
+function addFoodData(food_data: GetFoodLogTemplatesResponseFoodLogTemplates | undefined) {
   if (food_data) {
-    const food_data_copy = JSON.stringify(food_data);
-    formData.food_data_list.push(JSON.parse(food_data_copy));
+    const food_data_json = JSON.stringify(food_data);
+    const food_data_copy = JSON.parse(food_data_json);
+    formData.food_data_list.push({
+      name: food_data_copy.name,
+      calorie: food_data_copy.calorie,
+      amount: 1,
+      recipe_id: food_data_copy.recipe_id,
+      is_create_template: false,
+      is_show_error_message: false
+    });
   } else {
     formData.food_data_list.push({
       name: '',
@@ -105,35 +94,117 @@ function addFoodData(food_data: FoodData | undefined) {
   }
 }
 
+/**
+ * 食事記録フォームから品目を削除する
+ */
 function removeFoodData(index: number) {
   formData.food_data_list.splice(index, 1);
 }
 
+// 食事記録テンプレートダイアログの表示切り替え
 const dialogVisible = ref(false);
 
+// 食事記録テンプレートのページングに使用するパラメーター
+const pageData = reactive({
+  limit: 5,
+  offset: 0,
+  total: 0
+});
+
+const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
+
 /**
- * 情報を登録する
+ * 食事記録のテンプレート情報を取得する
  */
-function postFoodLog(formRef: InstanceType<typeof ElForm> | undefined) {
+async function getFoodLogTemplates() {
+  try {
+    const response = await new FoodLogTemplatesApi(configuration).getFoodLogTemplates(authData.value.uid, authData.value.accessToken, authData.value.client, pageData.limit, pageData.offset);
+    if (response.status !== 200) throw new Error('テンプレート情報の取得に失敗しました。');
+    templates.push(...response.data.food_log_templates);
+    pageData.total = response.data.meta.total;
+    pageData.offset += response.data.food_log_templates.length;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+/**
+ * 食事記録のテンプレート情報を削除する
+ */
+async function deleteFoodLogTemplate(index: number) {
+  if (!isLogin.value) return;
+  try {
+    // 食事記録のテンプレート情報を削除するリクエストを送信
+    const response = await new FoodLogTemplatesApi(configuration).deleteFoodLogTemplate(authData.value.uid, authData.value.accessToken, authData.value.client, String(templates[index].id));
+    if (response.status !== 204) throw new Error('テンプレートの削除に失敗しました。');
+
+    // templates内の該当のテンプレートを削除
+    templates.splice(index, 1);
+    ElMessage({
+      showClose: true,
+      message: 'テンプレートを削除しました。',
+      type: 'success',
+    })
+  } catch (error) {
+    console.error(error);
+    ElMessage({
+      showClose: true,
+      message: error.message,
+      type: 'error',
+    })
+  }
+}
+
+/**
+ * 食事記録情報を登録する
+ */
+function postFoodLogs(formRef: InstanceType<typeof ElForm> | undefined) {
+  if (isLogin.value) return;
   if (!formRef) return;
   formRef.validate(async (valid) => {
     if (valid) {
-      let isError = false;
-      for (const food_data of formData.food_data_list) {
-        if (food_data.name === '') {
-          food_data.is_show_error_message = true
-          isError = true;
-        } else {
-          food_data.is_show_error_message = false
+      try {
+        // 食事記録の品名が入力されているか確認する
+        let isError = false;
+        for (const food_data of formData.food_data_list) {
+          if (food_data.name === '') {
+            food_data.is_show_error_message = true
+            isError = true;
+          } else {
+            food_data.is_show_error_message = false
+          }
         }
-      }
-      if (isError) {
+        if (isError) throw new Error('未入力の項目があります。');
+
+        // リクエストデータの作成
+        const foodLogs: CreateFoodLogsRequest = {
+          food_logs: formData.food_data_list.map(food_data => {
+            return ({
+              name: food_data.name,
+              calorie: food_data.calorie,
+              amount: food_data.amount,
+              meal_date_time: formData.meal_date_time.toISOString(),
+              recipe_id: food_data.recipe_id,
+              is_create_template: food_data.is_create_template,
+            });
+          })
+        };
+
+        // 登録
+        const response = await new FoodLogsApi(configuration).createFoodLogs(authData.value.uid, authData.value.accessToken, authData.value.client, foodLogs);
+        if (response.status !== 201) throw new Error('食事記録の登録に失敗しました。');
         ElMessage({
           showClose: true,
-          message: '未入力の項目があります。',
+          message: '食事記録を登録しました。',
+          type: 'success',
+        })
+      } catch (error) {
+        console.error(error);
+        ElMessage({
+          showClose: true,
+          message: error.message,
           type: 'error',
-        });
-        return;
+        })
       }
     } else {
       console.log('error submit!');
@@ -145,6 +216,8 @@ function postFoodLog(formRef: InstanceType<typeof ElForm> | undefined) {
     }
   });
 }
+
+getFoodLogTemplates();
 </script>
 
 <template>
@@ -199,7 +272,7 @@ function postFoodLog(formRef: InstanceType<typeof ElForm> | undefined) {
             <el-row>
               <el-col :span="currentSpan">
                 <el-form-item
-                  label="カロリー"
+                  label="カロリー(kcal)"
                   prop="calorie"
                 >
                   <el-input-number
@@ -260,7 +333,7 @@ function postFoodLog(formRef: InstanceType<typeof ElForm> | undefined) {
       <div class="registration-button">
         <el-button
           type="primary"
-          @click="postFoodLog(formRef)"
+          @click="postFoodLogs(formRef)"
         >
           食事記録を登録
         </el-button>
@@ -320,6 +393,7 @@ function postFoodLog(formRef: InstanceType<typeof ElForm> | undefined) {
           size="small"
           :class="'dialog-button-' + (mq.current === 'sm' ? 'sm' : 'mdlg')"
           type="danger"
+          @click="deleteFoodLogTemplate(index)"
         >
           削除
         </el-button>
@@ -327,6 +401,12 @@ function postFoodLog(formRef: InstanceType<typeof ElForm> | undefined) {
     </el-row>
     <template #footer>
       <span class="dialog-footer">
+        <el-button
+          v-if="pageData.total > pageData.offset"
+          @click="getFoodLogTemplates"
+        >
+          テンプレートを読み込む
+        </el-button>
         <el-button @click="dialogVisible = false">閉じる</el-button>
       </span>
     </template>
