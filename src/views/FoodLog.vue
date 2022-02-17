@@ -11,11 +11,11 @@ interface FoodData {
   calorie: number;
   amount: number;
   recipe_id: number | null;
-  add_template: boolean,
-  show_error_message: boolean
+  is_create_template: boolean,
+  is_show_error_message: boolean
 }
 interface FormData {
-  date_time: Date;
+  meal_date_time: Date;
   food_data_list: Array<FoodData>;
 }
 
@@ -40,7 +40,7 @@ const currentSpan = computed(() => {
 
 // フォームのバリデーションルール
 const rules = {
-  date_time: [
+  meal_date_time: [
     {
       required: true,
       message: '日時を入力してください。',
@@ -49,15 +49,15 @@ const rules = {
   ]
 };
 const formData = reactive<FormData>({
-  date_time: new Date(),
+  meal_date_time: new Date(),
   food_data_list: [
     {
       name: '',
       calorie: 0,
       amount: 0,
       recipe_id: null,
-      add_template: false,
-      show_error_message: false
+      is_create_template: false,
+      is_show_error_message: false
     },
   ]
 });
@@ -68,24 +68,24 @@ const templates = reactive<Array<FoodData>>([
     calorie: 374,
     amount: 1,
     recipe_id: 1,
-    add_template: false,
-    show_error_message: false
+    is_create_template: false,
+    is_show_error_message: false
   },
   {
     name: 'ブロッコリーとツナのサラダ',
     calorie: 430,
     amount: 1,
     recipe_id: null,
-    add_template: false,
-    show_error_message: false
+    is_create_template: false,
+    is_show_error_message: false
   },
   {
     name: '海老とブロッコリーのマカロニグラタン',
     calorie: 374,
     amount: 1,
     recipe_id: null,
-    add_template: false,
-    show_error_message: false
+    is_create_template: false,
+    is_show_error_message: false
   }
 ]);
 
@@ -99,8 +99,8 @@ function addFoodData(food_data: FoodData | undefined) {
       calorie: 0,
       amount: 0,
       recipe_id: null,
-      add_template: false,
-      show_error_message: false
+      is_create_template: false,
+      is_show_error_message: false
     });
   }
 }
@@ -121,10 +121,10 @@ function postFoodLog(formRef: InstanceType<typeof ElForm> | undefined) {
       let isError = false;
       for (const food_data of formData.food_data_list) {
         if (food_data.name === '') {
-          food_data.show_error_message = true
+          food_data.is_show_error_message = true
           isError = true;
         } else {
-          food_data.show_error_message = false
+          food_data.is_show_error_message = false
         }
       }
       if (isError) {
@@ -161,10 +161,10 @@ function postFoodLog(formRef: InstanceType<typeof ElForm> | undefined) {
       >
         <el-form-item
           label="日時"
-          prop="date_time"
+          prop="meal_date_time"
         >
           <el-date-picker
-            v-model="formData.date_time"
+            v-model="formData.meal_date_time"
             type="datetime"
             format="YYYY-MM-DD HH:mm"
             placeholder="日時を選択してください。"
@@ -190,7 +190,7 @@ function postFoodLog(formRef: InstanceType<typeof ElForm> | undefined) {
                 :disabled="!!foodData.recipe_id"
               />
               <span
-                v-if="foodData.show_error_message"
+                v-if="foodData.is_show_error_message"
                 :class="'name-error-message-' + (mq.current === 'sm' ? 'sm' : 'mdlg')"
               >
                 品名を入力してください。
@@ -237,23 +237,23 @@ function postFoodLog(formRef: InstanceType<typeof ElForm> | undefined) {
             />
           </div>
           <div>
-            <el-checkbox v-model="foodData.add_template" label="テンプレートに登録する" size="large"></el-checkbox>
+            <el-checkbox v-model="foodData.is_create_template" label="テンプレートに登録する" size="large"></el-checkbox>
           </div>
         </div>
       </el-form>
       <div :class="'add-buttons add-buttons-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
-        <div class="add-button">
+        <div :class="'add-button-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
           <el-button
             @click="addFoodData(undefined)"
           >
-            品目を追加する
+            品目を追加
           </el-button>
         </div>
-        <div class="template-button">
+        <div :class="'template-button-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
           <el-button
             @click="dialogVisible = true"
           >
-            テンプレートを開く
+            テンプレートから選択
           </el-button>
         </div>
       </div>
@@ -308,9 +308,9 @@ function postFoodLog(formRef: InstanceType<typeof ElForm> | undefined) {
         <el-button
           @click="addFoodData(template)"
           size="small"
-          :class="'template-button-' + (mq.current === 'sm' ? 'sm' : 'mdlg')"
+          :class="'dialog-button-' + (mq.current === 'sm' ? 'sm' : 'mdlg')"
         >
-          追加する
+          選択
         </el-button>
       </el-col>
       <el-col
@@ -318,10 +318,10 @@ function postFoodLog(formRef: InstanceType<typeof ElForm> | undefined) {
       >
         <el-button
           size="small"
-          :class="'template-button-' + (mq.current === 'sm' ? 'sm' : 'mdlg')"
+          :class="'dialog-button-' + (mq.current === 'sm' ? 'sm' : 'mdlg')"
           type="danger"
         >
-          削除する
+          削除
         </el-button>
       </el-col>
     </el-row>
@@ -459,14 +459,21 @@ h1 {
   display: block;
   clear: both;
 }
-.add-button {
+.add-button-mdlg {
   width: 50%;
   float: left;
 }
-.template-button {
+.template-button-mdlg {
   width: 50%;
   float: left;
   text-align: right;
+}
+.add-button-sm {
+  float: left;
+  margin-right: 20px;
+}
+.template-button-sm {
+  float: left;
 }
 .registration-button {
   margin-top: 30px;
@@ -479,11 +486,11 @@ h1 {
 .inner-row {
   margin-bottom: 5px;
 }
-.template-button-mdlg {
+.dialog-button-mdlg {
   width: 150px;
   text-align: center;
 }
-.template-button-sm {
+.dialog-button-sm {
   width: 120px;
   text-align: center;
 }
