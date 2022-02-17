@@ -22,6 +22,62 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
 
 /**
+ * 新規登録する食事記録情報
+ * @export
+ * @interface CreateFoodLogsRequest
+ */
+export interface CreateFoodLogsRequest {
+    /**
+     * 新規登録する食事記録情報の配列
+     * @type {Array<CreateFoodLogsRequestFoodLogs>}
+     * @memberof CreateFoodLogsRequest
+     */
+    'food_logs': Array<CreateFoodLogsRequestFoodLogs>;
+}
+/**
+ * 
+ * @export
+ * @interface CreateFoodLogsRequestFoodLogs
+ */
+export interface CreateFoodLogsRequestFoodLogs {
+    /**
+     * 食品名
+     * @type {string}
+     * @memberof CreateFoodLogsRequestFoodLogs
+     */
+    'name': string;
+    /**
+     * カロリー(kcal)
+     * @type {number}
+     * @memberof CreateFoodLogsRequestFoodLogs
+     */
+    'calorie': number;
+    /**
+     * 数量
+     * @type {number}
+     * @memberof CreateFoodLogsRequestFoodLogs
+     */
+    'amount': number;
+    /**
+     * 食事をした日時
+     * @type {string}
+     * @memberof CreateFoodLogsRequestFoodLogs
+     */
+    'meal_date_time': string;
+    /**
+     * レシピのID
+     * @type {number}
+     * @memberof CreateFoodLogsRequestFoodLogs
+     */
+    'recipe_id': number | null;
+    /**
+     * テンプレートを作成するか
+     * @type {boolean}
+     * @memberof CreateFoodLogsRequestFoodLogs
+     */
+    'is_create_template': boolean;
+}
+/**
  * 新規登録するレシピ情報
  * @export
  * @interface CreateRecipeRequest
@@ -230,6 +286,69 @@ export interface CurrentUserResponseUser {
      * @memberof CurrentUserResponseUser
      */
     'follower_count': number;
+}
+/**
+ * 食事記録のテンプレート情報
+ * @export
+ * @interface GetFoodLogTemplatesResponse
+ */
+export interface GetFoodLogTemplatesResponse {
+    /**
+     * 食事記録のテンプレート情報の配列
+     * @type {Array<GetFoodLogTemplatesResponseFoodLogTemplates>}
+     * @memberof GetFoodLogTemplatesResponse
+     */
+    'food_log_templates': Array<GetFoodLogTemplatesResponseFoodLogTemplates>;
+    /**
+     * 
+     * @type {GetFoodLogTemplatesResponseMeta}
+     * @memberof GetFoodLogTemplatesResponse
+     */
+    'meta': GetFoodLogTemplatesResponseMeta;
+}
+/**
+ * 
+ * @export
+ * @interface GetFoodLogTemplatesResponseFoodLogTemplates
+ */
+export interface GetFoodLogTemplatesResponseFoodLogTemplates {
+    /**
+     * 食事記録のテンプレートのID
+     * @type {number}
+     * @memberof GetFoodLogTemplatesResponseFoodLogTemplates
+     */
+    'id': number;
+    /**
+     * 食品名
+     * @type {string}
+     * @memberof GetFoodLogTemplatesResponseFoodLogTemplates
+     */
+    'name': string;
+    /**
+     * カロリー(kcal)
+     * @type {number}
+     * @memberof GetFoodLogTemplatesResponseFoodLogTemplates
+     */
+    'calorie': number;
+    /**
+     * レシピのID
+     * @type {number}
+     * @memberof GetFoodLogTemplatesResponseFoodLogTemplates
+     */
+    'recipe_id': number | null;
+}
+/**
+ * 追加情報
+ * @export
+ * @interface GetFoodLogTemplatesResponseMeta
+ */
+export interface GetFoodLogTemplatesResponseMeta {
+    /**
+     * 食事記録のテンプレート情報の総数
+     * @type {number}
+     * @memberof GetFoodLogTemplatesResponseMeta
+     */
+    'total': number;
 }
 /**
  * 署名付きURL情報
@@ -1153,6 +1272,485 @@ export class FavoritesApi extends BaseAPI {
      */
     public deleteFavorite(uid: string, accessToken: string, client: string, recipeId: number, options?: AxiosRequestConfig) {
         return FavoritesApiFp(this.configuration).deleteFavorite(uid, accessToken, client, recipeId, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * FoodLogTemplatesApi - axios parameter creator
+ * @export
+ */
+export const FoodLogTemplatesApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 食事記録のテンプレート情報を削除する
+         * @summary 食事記録のテンプレート情報を削除する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {string} id 食事記録のテンプレート情報のID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteFoodLogTemplate: async (uid: string, accessToken: string, client: string, id: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uid' is not null or undefined
+            assertParamExists('deleteFoodLogTemplate', 'uid', uid)
+            // verify required parameter 'accessToken' is not null or undefined
+            assertParamExists('deleteFoodLogTemplate', 'accessToken', accessToken)
+            // verify required parameter 'client' is not null or undefined
+            assertParamExists('deleteFoodLogTemplate', 'client', client)
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('deleteFoodLogTemplate', 'id', id)
+            const localVarPath = `/food_log_templates/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (uid !== undefined && uid !== null) {
+                localVarHeaderParameter['uid'] = String(uid);
+            }
+
+            if (accessToken !== undefined && accessToken !== null) {
+                localVarHeaderParameter['access-token'] = String(accessToken);
+            }
+
+            if (client !== undefined && client !== null) {
+                localVarHeaderParameter['client'] = String(client);
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 食事記録のテンプレート情報を一覧取得する
+         * @summary 食事記録のテンプレート情報を一覧取得する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} limit 取得するテンプレート情報の件数
+         * @param {number} offset 取得をスキップするテンプレート情報の件数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getFoodLogTemplates: async (uid: string, accessToken: string, client: string, limit: number, offset: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uid' is not null or undefined
+            assertParamExists('getFoodLogTemplates', 'uid', uid)
+            // verify required parameter 'accessToken' is not null or undefined
+            assertParamExists('getFoodLogTemplates', 'accessToken', accessToken)
+            // verify required parameter 'client' is not null or undefined
+            assertParamExists('getFoodLogTemplates', 'client', client)
+            // verify required parameter 'limit' is not null or undefined
+            assertParamExists('getFoodLogTemplates', 'limit', limit)
+            // verify required parameter 'offset' is not null or undefined
+            assertParamExists('getFoodLogTemplates', 'offset', offset)
+            const localVarPath = `/food_log_templates`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+            if (uid !== undefined && uid !== null) {
+                localVarHeaderParameter['uid'] = String(uid);
+            }
+
+            if (accessToken !== undefined && accessToken !== null) {
+                localVarHeaderParameter['access-token'] = String(accessToken);
+            }
+
+            if (client !== undefined && client !== null) {
+                localVarHeaderParameter['client'] = String(client);
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * FoodLogTemplatesApi - functional programming interface
+ * @export
+ */
+export const FoodLogTemplatesApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = FoodLogTemplatesApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 食事記録のテンプレート情報を削除する
+         * @summary 食事記録のテンプレート情報を削除する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {string} id 食事記録のテンプレート情報のID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteFoodLogTemplate(uid: string, accessToken: string, client: string, id: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteFoodLogTemplate(uid, accessToken, client, id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 食事記録のテンプレート情報を一覧取得する
+         * @summary 食事記録のテンプレート情報を一覧取得する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} limit 取得するテンプレート情報の件数
+         * @param {number} offset 取得をスキップするテンプレート情報の件数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getFoodLogTemplates(uid: string, accessToken: string, client: string, limit: number, offset: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetFoodLogTemplatesResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getFoodLogTemplates(uid, accessToken, client, limit, offset, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * FoodLogTemplatesApi - factory interface
+ * @export
+ */
+export const FoodLogTemplatesApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = FoodLogTemplatesApiFp(configuration)
+    return {
+        /**
+         * 食事記録のテンプレート情報を削除する
+         * @summary 食事記録のテンプレート情報を削除する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {string} id 食事記録のテンプレート情報のID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteFoodLogTemplate(uid: string, accessToken: string, client: string, id: string, options?: any): AxiosPromise<void> {
+            return localVarFp.deleteFoodLogTemplate(uid, accessToken, client, id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 食事記録のテンプレート情報を一覧取得する
+         * @summary 食事記録のテンプレート情報を一覧取得する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} limit 取得するテンプレート情報の件数
+         * @param {number} offset 取得をスキップするテンプレート情報の件数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getFoodLogTemplates(uid: string, accessToken: string, client: string, limit: number, offset: number, options?: any): AxiosPromise<GetFoodLogTemplatesResponse> {
+            return localVarFp.getFoodLogTemplates(uid, accessToken, client, limit, offset, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * FoodLogTemplatesApi - object-oriented interface
+ * @export
+ * @class FoodLogTemplatesApi
+ * @extends {BaseAPI}
+ */
+export class FoodLogTemplatesApi extends BaseAPI {
+    /**
+     * 食事記録のテンプレート情報を削除する
+     * @summary 食事記録のテンプレート情報を削除する
+     * @param {string} uid devise-token-auth用のuid
+     * @param {string} accessToken devise-token-auth用のaccess-token
+     * @param {string} client devise-token-auth用のclient
+     * @param {string} id 食事記録のテンプレート情報のID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof FoodLogTemplatesApi
+     */
+    public deleteFoodLogTemplate(uid: string, accessToken: string, client: string, id: string, options?: AxiosRequestConfig) {
+        return FoodLogTemplatesApiFp(this.configuration).deleteFoodLogTemplate(uid, accessToken, client, id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 食事記録のテンプレート情報を一覧取得する
+     * @summary 食事記録のテンプレート情報を一覧取得する
+     * @param {string} uid devise-token-auth用のuid
+     * @param {string} accessToken devise-token-auth用のaccess-token
+     * @param {string} client devise-token-auth用のclient
+     * @param {number} limit 取得するテンプレート情報の件数
+     * @param {number} offset 取得をスキップするテンプレート情報の件数
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof FoodLogTemplatesApi
+     */
+    public getFoodLogTemplates(uid: string, accessToken: string, client: string, limit: number, offset: number, options?: AxiosRequestConfig) {
+        return FoodLogTemplatesApiFp(this.configuration).getFoodLogTemplates(uid, accessToken, client, limit, offset, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * FoodLogsApi - axios parameter creator
+ * @export
+ */
+export const FoodLogsApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 食事記録情報を登録する
+         * @summary 食事記録情報を登録する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {CreateFoodLogsRequest} createFoodLogsRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createFoodLogs: async (uid: string, accessToken: string, client: string, createFoodLogsRequest: CreateFoodLogsRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uid' is not null or undefined
+            assertParamExists('createFoodLogs', 'uid', uid)
+            // verify required parameter 'accessToken' is not null or undefined
+            assertParamExists('createFoodLogs', 'accessToken', accessToken)
+            // verify required parameter 'client' is not null or undefined
+            assertParamExists('createFoodLogs', 'client', client)
+            // verify required parameter 'createFoodLogsRequest' is not null or undefined
+            assertParamExists('createFoodLogs', 'createFoodLogsRequest', createFoodLogsRequest)
+            const localVarPath = `/food_logs`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (uid !== undefined && uid !== null) {
+                localVarHeaderParameter['uid'] = String(uid);
+            }
+
+            if (accessToken !== undefined && accessToken !== null) {
+                localVarHeaderParameter['access-token'] = String(accessToken);
+            }
+
+            if (client !== undefined && client !== null) {
+                localVarHeaderParameter['client'] = String(client);
+            }
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createFoodLogsRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 食事記録情報を削除する
+         * @summary 食事記録情報を削除する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {string} id 食事記録情報のID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteFoodLog: async (uid: string, accessToken: string, client: string, id: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uid' is not null or undefined
+            assertParamExists('deleteFoodLog', 'uid', uid)
+            // verify required parameter 'accessToken' is not null or undefined
+            assertParamExists('deleteFoodLog', 'accessToken', accessToken)
+            // verify required parameter 'client' is not null or undefined
+            assertParamExists('deleteFoodLog', 'client', client)
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('deleteFoodLog', 'id', id)
+            const localVarPath = `/food_logs/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (uid !== undefined && uid !== null) {
+                localVarHeaderParameter['uid'] = String(uid);
+            }
+
+            if (accessToken !== undefined && accessToken !== null) {
+                localVarHeaderParameter['access-token'] = String(accessToken);
+            }
+
+            if (client !== undefined && client !== null) {
+                localVarHeaderParameter['client'] = String(client);
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * FoodLogsApi - functional programming interface
+ * @export
+ */
+export const FoodLogsApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = FoodLogsApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 食事記録情報を登録する
+         * @summary 食事記録情報を登録する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {CreateFoodLogsRequest} createFoodLogsRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createFoodLogs(uid: string, accessToken: string, client: string, createFoodLogsRequest: CreateFoodLogsRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createFoodLogs(uid, accessToken, client, createFoodLogsRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 食事記録情報を削除する
+         * @summary 食事記録情報を削除する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {string} id 食事記録情報のID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteFoodLog(uid: string, accessToken: string, client: string, id: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteFoodLog(uid, accessToken, client, id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * FoodLogsApi - factory interface
+ * @export
+ */
+export const FoodLogsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = FoodLogsApiFp(configuration)
+    return {
+        /**
+         * 食事記録情報を登録する
+         * @summary 食事記録情報を登録する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {CreateFoodLogsRequest} createFoodLogsRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createFoodLogs(uid: string, accessToken: string, client: string, createFoodLogsRequest: CreateFoodLogsRequest, options?: any): AxiosPromise<void> {
+            return localVarFp.createFoodLogs(uid, accessToken, client, createFoodLogsRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 食事記録情報を削除する
+         * @summary 食事記録情報を削除する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {string} id 食事記録情報のID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteFoodLog(uid: string, accessToken: string, client: string, id: string, options?: any): AxiosPromise<void> {
+            return localVarFp.deleteFoodLog(uid, accessToken, client, id, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * FoodLogsApi - object-oriented interface
+ * @export
+ * @class FoodLogsApi
+ * @extends {BaseAPI}
+ */
+export class FoodLogsApi extends BaseAPI {
+    /**
+     * 食事記録情報を登録する
+     * @summary 食事記録情報を登録する
+     * @param {string} uid devise-token-auth用のuid
+     * @param {string} accessToken devise-token-auth用のaccess-token
+     * @param {string} client devise-token-auth用のclient
+     * @param {CreateFoodLogsRequest} createFoodLogsRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof FoodLogsApi
+     */
+    public createFoodLogs(uid: string, accessToken: string, client: string, createFoodLogsRequest: CreateFoodLogsRequest, options?: AxiosRequestConfig) {
+        return FoodLogsApiFp(this.configuration).createFoodLogs(uid, accessToken, client, createFoodLogsRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 食事記録情報を削除する
+     * @summary 食事記録情報を削除する
+     * @param {string} uid devise-token-auth用のuid
+     * @param {string} accessToken devise-token-auth用のaccess-token
+     * @param {string} client devise-token-auth用のclient
+     * @param {string} id 食事記録情報のID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof FoodLogsApi
+     */
+    public deleteFoodLog(uid: string, accessToken: string, client: string, id: string, options?: AxiosRequestConfig) {
+        return FoodLogsApiFp(this.configuration).deleteFoodLog(uid, accessToken, client, id, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

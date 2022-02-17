@@ -204,6 +204,7 @@ function logout() {
       <el-button
         type="text"
         class="menu-item"
+        @click="$router.push({ name: 'FoodLog' })"
       >
         食事記録
       </el-button>
@@ -324,6 +325,7 @@ function logout() {
       <el-button
         type="text"
         class="menu-icon"
+        @click="$router.push({ name: 'FoodLog' })"
       >
         <font-awesome-icon
           :icon="['fas', 'pencil-alt']"
