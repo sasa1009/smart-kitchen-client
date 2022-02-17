@@ -151,7 +151,14 @@ async function updateFavorite() {
         <el-button
           type="text"
           style="padding: 0;"
-          href=""
+          @click="$router.push({
+            name: 'FoodLog',
+            params: {
+              name: props.recipeCardData.title,
+              calorie: props.recipeCardData.calorie,
+              recipe_id: props.recipeCardData.id,
+            }
+          })"
         >
           <font-awesome-icon
             :icon="['fas', 'pencil-alt']"

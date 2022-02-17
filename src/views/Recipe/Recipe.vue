@@ -173,6 +173,14 @@ async function updateFavorite() {
               round
               size="small"
               class="food-log-button"
+              @click="$router.push({
+                name: 'FoodLog',
+                params: {
+                  name: recipeData.title,
+                  calorie: recipeData.calorie,
+                  recipe_id: recipeData.id,
+                }
+              })"
             >
               <font-awesome-icon
                 :icon="['fas', 'pencil-alt']"

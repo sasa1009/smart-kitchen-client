@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue';
+import { useRoute } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import type { ElForm } from 'element-plus';
 // eslint-disable-next-line
@@ -21,6 +22,7 @@ interface FormData {
   food_data_list: Array<FoodData>;
 }
 
+const route = useRoute();
 const mq = useMq();
 const formRef = ref<InstanceType<typeof ElForm>>();
 
@@ -51,6 +53,7 @@ const rules = {
   ]
 };
 
+// 食事記録情報
 const formData = reactive<FormData>({
   meal_date_time: new Date(),
   food_data_list: [
@@ -65,6 +68,7 @@ const formData = reactive<FormData>({
   ]
 });
 
+// 食事記録のテンプレート情報
 const templates = reactive<Array<GetFoodLogTemplatesResponseFoodLogTemplates>>([]);
 
 /**
@@ -217,7 +221,21 @@ function postFoodLogs(formRef: InstanceType<typeof ElForm> | undefined) {
   });
 }
 
+// コンポーネント作成時に食事記録のテンプレート情報を取得
 getFoodLogTemplates();
+
+// レシピ情報のリンクから遷移した場合はレシピ情報をformDataに格納する
+if (route.params.name) {
+  formData.food_data_list.splice(0);
+  formData.food_data_list.push({
+    name: String(route.params.name),
+    calorie: Number(route.params.calorie),
+    amount: 1,
+    recipe_id: Number(route.params.recipe_id),
+    is_create_template: false,
+    is_show_error_message: false
+  })
+}
 </script>
 
 <template>
