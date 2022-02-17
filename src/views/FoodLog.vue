@@ -159,7 +159,7 @@ async function deleteFoodLogTemplate(index: number) {
  * 食事記録情報を登録する
  */
 function postFoodLogs(formRef: InstanceType<typeof ElForm> | undefined) {
-  if (isLogin.value) return;
+  if (!isLogin.value) return;
   if (!formRef) return;
   formRef.validate(async (valid) => {
     if (valid) {
