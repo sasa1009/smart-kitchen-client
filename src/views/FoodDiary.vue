@@ -117,7 +117,7 @@ async function getFoodLogs() {
         return array;
       }, [] as Array<FoodLogData>);
 
-      // 食事記録を時間でソート
+      // 食事記録を食事時間でソート
       foodLogData.sort((a, b) => {
         return a.date.getTime() - b.date.getTime();
       })
