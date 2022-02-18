@@ -198,6 +198,7 @@ function logout() {
       <el-button
         type="text"
         class="menu-item"
+        @click="$router.push({ name: 'FoodDiary' })"
       >
         フード日誌
       </el-button>
@@ -242,7 +243,10 @@ function logout() {
           >
             <span>レシピ一覧</span>
           </el-menu-item>
-          <el-menu-item index="2">
+          <el-menu-item
+            index="2"
+            @click="$router.push({ name: 'FoodDiary' })"
+          >
             <span>フード日誌</span>
           </el-menu-item>
           <el-menu-item
