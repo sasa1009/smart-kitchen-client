@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import type { ElForm } from 'element-plus';
 // eslint-disable-next-line
@@ -23,6 +23,7 @@ interface FormData {
 }
 
 const route = useRoute();
+const router = useRouter();
 const mq = useMq();
 const formRef = ref<InstanceType<typeof ElForm>>();
 
@@ -148,14 +149,14 @@ async function deleteFoodLogTemplate(index: number) {
       showClose: true,
       message: 'テンプレートを削除しました。',
       type: 'success',
-    })
+    });
   } catch (error) {
     console.error(error);
     ElMessage({
       showClose: true,
       message: error.message,
       type: 'error',
-    })
+    });
   }
 }
 
@@ -201,14 +202,15 @@ function postFoodLogs(formRef: InstanceType<typeof ElForm> | undefined) {
           showClose: true,
           message: '食事記録を登録しました。',
           type: 'success',
-        })
+        });
+        router.push({ name: 'FoodDiary' });
       } catch (error) {
         console.error(error);
         ElMessage({
           showClose: true,
           message: error.message,
           type: 'error',
-        })
+        });
       }
     } else {
       console.log('error submit!');
@@ -216,7 +218,7 @@ function postFoodLogs(formRef: InstanceType<typeof ElForm> | undefined) {
         showClose: true,
         message: '未入力の項目があります。',
         type: 'error',
-      })
+      });
     }
   });
 }
@@ -407,14 +409,20 @@ if (route.params.name) {
       <el-col
         :span="10"
       >
-        <el-button
-          size="small"
-          :class="'dialog-button-' + (mq.current === 'sm' ? 'sm' : 'mdlg')"
-          type="danger"
-          @click="deleteFoodLogTemplate(index)"
+        <el-popconfirm
+          title="削除してもよろしいですか？"
+          @confirm="deleteFoodLogTemplate(index)"
         >
-          削除
-        </el-button>
+          <template #reference>
+            <el-button
+              size="small"
+              :class="'dialog-button-' + (mq.current === 'sm' ? 'sm' : 'mdlg')"
+              type="danger"
+            >
+              削除
+            </el-button>
+          </template>
+        </el-popconfirm>
       </el-col>
     </el-row>
     <template #footer>
@@ -472,6 +480,7 @@ if (route.params.name) {
 /* ページタイトル */
 h1 {
   font-size: 18px;
+  margin: 10px 0;
 }
 /* フォームの行 */
 .form-row {

@@ -10,6 +10,7 @@ import Users from '../views/Users.vue';
 import PostRecipe from '../views/Recipe/PostRecipe.vue';
 import Recipe from '../views/Recipe/Recipe.vue';
 import FoodLog from '../views/FoodLog.vue';
+import FoodDiary from '../views/FoodDiary.vue';
 
 import { authData, isLogin, isExpired } from '@/modules/auth';
 
@@ -78,6 +79,12 @@ const routes: Array<RouteRecordRaw> = [
     path: '/food-log',
     name: 'FoodLog',
     component: FoodLog,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/food-diary',
+    name: 'FoodDiary',
+    component: FoodDiary,
     meta: { requiresAuth: true },
   },
   // {

@@ -351,6 +351,7 @@ async function updateFavorite() {
   margin: 0 5px 0 10px;
   font-size: 20px;
   font-weight: bold;
+  color: #0000cd;
 }
 /* ユーザー情報 */
 .user {
