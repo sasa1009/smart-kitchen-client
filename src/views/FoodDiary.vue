@@ -359,9 +359,6 @@ watch(
   padding-bottom: 3px;
   border-bottom: 1px solid lightgray;
 }
-.row:first-child {
-  border-top: 1px solid lightgray;
-}
 /* ダイアログ内の削除ボタン */
 .delete-button {
   font-size: 20px;
