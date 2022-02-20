@@ -43,6 +43,22 @@ const userData = reactive<CurrentUserResponseUser>({
   weight_loss_target: 0
 });
 
+// 基礎代謝量を計算する
+const calculateBasalMetabolism = computed(() => {
+  if (!userData.weight || !userData.height || !userData.age || !userData.sex) return;
+  if (userData.sex === 'male') {
+    return Math.floor(66.47 + (userData.weight * 13.75) + (userData.height * 5) - (userData.age * 6.76));
+  } else {
+    return Math.floor(665.1 + (userData.weight * 9.56) + (userData.height * 1.85) - (userData.age * 4.68));
+  }
+});
+
+// 1日あたりの代謝量を計算する
+const calculateMetabolismPerDay = computed(() => {
+  if (!calculateBasalMetabolism.value || !userData.activity_amount) return;
+  return Math.floor(calculateBasalMetabolism.value * userData.activity_amount);
+});
+
 const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
 
 /**
@@ -189,70 +205,200 @@ watch(
 
 <template>
   <div :class="'user-data-wrapper-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
-    <div :class="'user-data-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
-      <div
-        v-if="userData.image_url"
-        :class="'user-image-wrapper'"
-      >
-        <el-image
-          :class="'user-image'"
-          :src="userData.image_url"
-          fit="cover"
-        ></el-image>
-      </div>
-      <div
-        v-else
-        class="user-icon-wrapper"
-      >
-        <font-awesome-icon
-          :icon="['far', 'user-circle']"
-          class="user-icon"
-        />
-      </div>
-      <div :class="'user-name-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
-        <div class="name">{{ userData.name }}</div>
-        <div>
-          <div class="follow">
-            <el-button
-              type="text"
-              class="follow-title"
-              @click="$router.push({ name: 'Followings', params: { id: authData.userId } })"
-            >
-              フォロー
-            </el-button>
-            <span class="follow-count">
-              {{ userData.following_count }}
-            </span>
-          </div>
-          <div class="follow">
-            <el-button
-              type="text"
-              class="follow-title"
-              @click="$router.push({ name: 'Followers', params: { id: authData.userId } })"
-            >
-              フォロワー
-            </el-button>
-            <span class="follow-count">
-              {{ userData.follower_count }}
-            </span>
+    <div class="clearfix">
+      <div :class="'user-data-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
+        <div
+          v-if="userData.image_url"
+          :class="'user-image-wrapper'"
+        >
+          <el-image
+            :class="'user-image'"
+            :src="userData.image_url"
+            fit="cover"
+          ></el-image>
+        </div>
+        <div
+          v-else
+          class="user-icon-wrapper"
+        >
+          <font-awesome-icon
+            :icon="['far', 'user-circle']"
+            class="user-icon"
+          />
+        </div>
+        <div :class="'user-name-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
+          <div class="name">{{ userData.name }}</div>
+          <div>
+            <div class="follow">
+              <el-button
+                type="text"
+                class="follow-title"
+                @click="$router.push({ name: 'Followings', params: { id: authData.userId } })"
+              >
+                フォロー
+              </el-button>
+              <span class="follow-count">
+                {{ userData.following_count }}
+              </span>
+            </div>
+            <div class="follow">
+              <el-button
+                type="text"
+                class="follow-title"
+                @click="$router.push({ name: 'Followers', params: { id: authData.userId } })"
+              >
+                フォロワー
+              </el-button>
+              <span class="follow-count">
+                {{ userData.follower_count }}
+              </span>
+            </div>
           </div>
         </div>
+        <div :class="'edit-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
+          <el-button
+            type="text"
+            @click="$router.push({ name: 'CurrentUserEdit' })"
+          >
+            ユーザー情報を編集する
+          </el-button>
+        </div>
       </div>
-      <div :class="'edit-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
-        <el-button
-          type="text"
-          @click="$router.push({ name: 'CurrentUserEdit' })"
+      <div
+        :class="'comment-' + (mq.current === 'sm' ? 'sm' : 'mdlg')"
+      >
+        <h1
+          v-if="userData.comment"
+          class="title"
         >
-          ユーザー情報を編集する
-        </el-button>
+          一言コメント
+        </h1>
+        <div
+          v-html="userData.comment.replace(/\n/g, '<br>')"
+          class="comment-description"
+        />
+        <h1
+          v-if="userData.is_set_weight_loss_target"
+          class="title"
+        >
+          減量目標関連情報
+        </h1>
+        <div
+          v-if="userData.is_set_weight_loss_target"
+          class="weight-loss-target"
+        >
+          <el-row>
+            <el-col
+              :span="12"
+              class="cell"
+            >
+              身長
+            </el-col>
+            <el-col
+              :span="12"
+              class="cell data-cell"
+            >
+              <span class="weight-loss-target-data">{{ userData.height }}</span>cm
+            </el-col>
+            <el-col
+              :span="12"
+              class="cell"
+            >
+              体重
+            </el-col>
+            <el-col
+              :span="12"
+              class="cell data-cell"
+            >
+              <span class="weight-loss-target-data">{{ userData.weight }}</span>kg
+            </el-col>
+            <el-col
+              :span="12"
+              class="cell"
+            >
+              性別
+            </el-col>
+            <el-col
+              :span="12"
+              class="cell data-cell"
+            >
+              <span class="weight-loss-target-data">{{ userData.sex === 'male' ? '男性' : '女性' }}</span>
+            </el-col>
+            <el-col
+              :span="12"
+              class="cell"
+            >
+              年齢
+            </el-col>
+            <el-col
+              :span="12"
+              class="cell data-cell"
+            >
+              <span class="weight-loss-target-data">{{ userData.age }}</span>歳
+            </el-col>
+            <el-col
+              :span="12"
+              class="cell"
+            >
+              活動量
+            </el-col>
+            <el-col
+              :span="12"
+              class="cell data-cell"
+            >
+              <span class="weight-loss-target-data">{{ userData.activity_amount }}</span>
+            </el-col>
+            <el-col
+              :span="12"
+              class="cell"
+            >
+              １ヶ月あたりの減量目標
+            </el-col>
+            <el-col
+              :span="12"
+              class="cell data-cell"
+            >
+              <span class="weight-loss-target-data">{{ userData.weight_loss_target }}</span>kg
+            </el-col>
+            <el-col
+              :span="12"
+              class="cell"
+            >
+              基礎代謝量
+            </el-col>
+            <el-col
+              :span="12"
+              class="cell data-cell"
+            >
+              <span class="weight-loss-target-data">{{ calculateBasalMetabolism }}</span>kcal
+            </el-col>
+            <el-col
+              :span="12"
+              class="cell"
+            >
+              １日の代謝量
+            </el-col>
+            <el-col
+              :span="12"
+              class="cell data-cell"
+            >
+              <span class="weight-loss-target-data">{{ calculateMetabolismPerDay }}</span>kcal
+            </el-col>
+            <el-col
+              :span="12"
+              class="cell"
+            >
+              減量目標を達成するための１日の摂取カロリー
+            </el-col>
+            <el-col
+              :span="12"
+              class="cell data-cell"
+            >
+              <span class="weight-loss-target-data">{{ Number(calculateMetabolismPerDay) - Math.floor((7000 * Number(userData.weight_loss_target) / 30)) }}</span>kcal
+            </el-col>
+          </el-row>
+        </div>
       </div>
-    </div>
-    <div
-      v-if="userData.comment"
-      :class="'comment-' + (mq.current === 'sm' ? 'sm' : 'mdlg')"
-    >
-      <h3>一言コメント</h3>
-      <div v-html="userData.comment.replace(/\n/g, '<br>')" />
     </div>
   </div>
   <el-tabs
@@ -365,15 +511,24 @@ watch(
 /* ユーザーデータラッパー大 */
 .user-data-wrapper-mdlg {
   width: 750px;
-  height: 450px;
+  min-height: 450px;
   background-color: white;
   margin: 10px auto 0 auto;
+  padding-bottom: 10px;
+  box-sizing: border-box;
 }
 /* ユーザーデータラッパー小 */
 .user-data-wrapper-sm {
   width: 375px;
   background-color: white;
   margin: 10px auto 0 auto;
+  padding-bottom: 15px;
+  box-sizing: border-box;
+}
+.clearfix::after {
+   content: "";
+   display: block;
+   clear: both;
 }
 /* ユーザーデータ大 */
 .user-data-mdlg {
@@ -450,17 +605,42 @@ watch(
 /* コメント大 */
 .comment-mdlg {
   width: 375px;
-  height: 400px;
   float: left;
   font-size: 14px;
+  padding: 0 10px;
+  box-sizing: border-box;
 }
 /* コメント小 */
 .comment-sm {
   width: 375px;
-  height: 200px;
   font-size: 14px;
   padding: 10px;
   box-sizing: border-box;
+}
+.title {
+  font-size: 16px;
+  margin: 10px 0;
+}
+.comment-description {
+  margin-bottom: 30px;
+}
+/* 減量目標関連 */
+.weight-loss-target {
+  font-size: 14px;
+}
+.cell {
+  padding: 5px 10px 5px 5px;
+  box-sizing: border-box;
+  border: 1px solid #DCDFE6;
+  margin-bottom: -1px;
+}
+.data-cell {
+  padding-left: 10px;
+  margin-left: -1px;
+}
+.weight-loss-target-data {
+  margin-right: 5px;
+  font-weight: bold;
 }
 /* レシピタブ大 */
 .recipe-pane-mdlg {
