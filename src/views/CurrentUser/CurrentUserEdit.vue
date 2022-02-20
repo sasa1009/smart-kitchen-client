@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import type { ElForm } from 'element-plus';
@@ -10,6 +10,20 @@ import axios from 'axios';
 // eslint-disable-next-line
 // @ts-ignore
 import { useMq } from 'vue3-mq';
+
+interface UserData {
+  id: number;
+  name: string;
+  comment: string | null;
+  image_url: string | null;
+  is_set_weight_loss_target: boolean;
+  height?: number;
+  weight?: number;
+  sex?: string;
+  age?: number;
+  activity_amount?: number | null;
+  weight_loss_target?: number;
+}
 
 interface ImageData {
   imageDataUrl: string | ArrayBuffer | null;
@@ -46,15 +60,56 @@ const rules = reactive({
   ],
 });
 
-const formData = reactive<CurrentUserResponseUser>({
+const formData = reactive<UserData>({
   id: 0,
   name: '',
   comment: '',
-  image_url: ''
+  image_url: '',
+  is_set_weight_loss_target: true,
+  height: 160,
+  weight: 56,
+  sex: 'male',
+  age: 30,
+  activity_amount: null,
+  weight_loss_target: 1
 });
 const imageData = reactive<ImageData>({
   imageDataUrl: null,
   file: null
+});
+const activityAmountOptions = [
+  {
+    value: 1.3,
+    label: '低い'
+  },
+  {
+    value: 1.5,
+    label: '普通'
+  },
+  {
+    value: 1.7,
+    label: '高い'
+  },
+  {
+    value: 1.9,
+    label: 'とても高い'
+  },
+]
+
+// 基礎代謝量を計算する
+const calculateBasalMetabolism = computed(() => {
+  if (!formData.weight || !formData.height || !formData.age) return;
+  if (formData.sex === 'male') {
+    return Math.floor(66.47 + (formData.weight * 13.75) + (formData.height * 5) - (formData.age * 6.76));
+  } else {
+    return Math.floor(665.1 + (formData.weight * 9.56) + (formData.height * 1.85) - (formData.age * 4.68));
+  }
+});
+
+// 1日あたりの代謝量を計算する
+const calculateMetabolismPerDay = computed(() => {
+  if (!calculateBasalMetabolism.value || !formData.activity_amount) return;
+  return Math.floor(calculateBasalMetabolism.value * formData.activity_amount);
 });
 
 /**
@@ -192,7 +247,11 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
   try {
     const response = await new CurrentUserApi(configuration).getCurrentUser(authData.value.uid, authData.value.accessToken, authData.value.client);
     if (response.status !== 200) throw new Error('ユーザー情報の取得に失敗しました。');
-    Object.assign(formData, response.data.user)
+    // Object.assign(formData, response.data.user)
+    formData.id = response.data.user.id;
+    formData.name = response.data.user.name;
+    formData.comment = response.data.user.comment;
+    formData.image_url = response.data.user.image_url;
   } catch (error) {
     console.error(error);
   }
@@ -200,6 +259,10 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
 </script>
 
 <template>
+  <div>{{ formData }}</div>
+  <div>{{ calculateBasalMetabolism }}</div>
+  <div>{{ calculateMetabolismPerDay }}</div>
+  <div>{{ Math.floor((7000 * Number(formData.weight_loss_target) / 30)) }}</div>
   <div :class="'user-data-wrapper-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
     <el-form
       ref="formRef"
@@ -207,6 +270,7 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
       label-width="100px"
       :model="formData"
       :rules="rules"
+      :hide-required-asterisk="true"
       class="login-form"
     >
       <div :class="'user-data-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
@@ -272,6 +336,147 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
             :show-word-limit="true"
           />
         </el-form-item>
+        <el-form-item
+          label="減量目標を設定する"
+        >
+          <el-switch
+            v-model="formData.is_set_weight_loss_target"
+            active-color="#049EFF"
+          />
+        </el-form-item>
+        <div
+          v-if="formData.is_set_weight_loss_target"
+        >
+          <el-form-item
+            label="身長"
+          >
+            <el-input-number
+              v-model="formData.height"
+              :min="1"
+              :max="300"
+            />
+            <span class="unit">cm</span>
+          </el-form-item>
+          <el-form-item
+            label="体重"
+          >
+            <el-input-number
+              v-model="formData.weight"
+              :min="1"
+              :max="300"
+            />
+            <span class="unit">kg</span>
+          </el-form-item>
+          <el-form-item
+            label="年齢"
+          >
+            <el-input-number
+              v-model="formData.age"
+              :min="1"
+              :max="150"
+            />
+            <span class="unit">歳</span>
+          </el-form-item>
+          <el-form-item
+            label="性別"
+            style="--el-color-primary: #409eff"
+          >
+            <el-radio v-model="formData.sex" label="male" size="large">男性</el-radio>
+            <el-radio v-model="formData.sex" label="female" size="large">女性</el-radio>
+          </el-form-item>
+          <el-form-item
+            label="基礎代謝量(ハリス・ベネディクトの式による計算)"
+            class="basal-metabolism"
+          >
+            あなたの基礎代謝量は<span class="number">{{ calculateBasalMetabolism }}</span>kcalです。
+          </el-form-item>
+          <el-form-item
+            label="活動レベル"
+          >
+            <el-row :class="'activity-amount-table-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
+              <el-col
+                :span="8"
+                :class="'activity-amount-table-cell-left-' + (mq.current === 'sm' ? 'sm' : 'mdlg')"
+              >
+                <el-select
+                  v-model="formData.activity_amount"
+                  class="m-2 activity-amount-select"
+                  placeholder="活動レベルを選択"
+                >
+                  <el-option
+                    v-for="item in activityAmountOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                    style="font-size: 12px;"
+                  >
+                  </el-option>
+                </el-select>
+              </el-col>
+              <el-col :span="16">
+                <div class="activity-amount-table-cell-right-inner">
+                  <p class="activity-amount-title">
+                    低い: 1.3
+                  </p>
+                  <p class="activity-amount-description">
+                    生活のほとんどが座位で活動が少ない。<br>
+                    家事による立ち仕事もあまりなし。
+                  </p>
+                </div>
+                <div class="activity-amount-table-cell-right-inner">
+                  <p class="activity-amount-title">
+                    普通: 1.5
+                  </p>
+                  <p class="activity-amount-description">
+                    座位が中心の仕事だが、移動や立位での作業。<br>
+                    接客などの仕事。
+                  </p>
+                </div>
+                <div class="activity-amount-table-cell-right-inner">
+                  <p class="activity-amount-title">
+                    高い: 1.7
+                  </p>
+                  <p class="activity-amount-description">
+                    １時間以上の運動を週５日以上行う。<br>
+                    軽度の肉体労働。
+                  </p>
+                </div>
+                <div class="activity-amount-table-cell-right-inner">
+                  <p class="activity-amount-title">
+                    とても高い: 1.9
+                  </p>
+                  <p class="activity-amount-description">
+                    １時間以上の激しい運動を週５日以上行う。<br>
+                    宅配業者や引越し業者などの重度の肉体労働。
+                  </p>
+                </div>
+              </el-col>
+            </el-row>
+          </el-form-item>
+          <el-form-item
+            v-if="!isNaN(Number(calculateMetabolismPerDay))"
+            label="代謝量"
+          >
+            あなたの１日の代謝量は<span class="number">{{ calculateMetabolismPerDay }}</span>kcalです。
+          </el-form-item>
+          <el-form-item
+            label="１ヶ月あたりの減量目標"
+          >
+            <el-input-number
+              v-model="formData.weight_loss_target"
+              :min="1"
+              :max="10"
+              :precision="1"
+            />
+            <span class="unit">kg</span>
+          </el-form-item>
+          <el-form-item
+            v-if="!isNaN(Number(calculateMetabolismPerDay))"
+            label="減量目標を達成するための１日の摂取カロリー"
+          >
+            <span class="number">{{ Number(calculateMetabolismPerDay) - Math.floor((7000 * Number(formData.weight_loss_target) / 30)) }}</span>kcalです。
+          </el-form-item>
+        </div>
         <el-form-item>
           <el-button type="primary" @click="updateUser(formRef)">更新</el-button>
         </el-form-item>
@@ -284,14 +489,12 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
 /* ユーザーデータラッパー大 */
 .user-data-wrapper-mdlg {
   width: 750px;
-  height: 600px;
   background-color: white;
   margin: 10px auto 0 auto;
 }
 /* ユーザーデータラッパー小 */
 .user-data-wrapper-sm {
   width: 375px;
-  height: 600px;
   background-color: white;
   margin: 10px auto 0 auto;
 }
@@ -318,14 +521,13 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
 /* ユーザーデータ大 */
 .user-data-mdlg {
   width: 500px;
-  height: 600px;
+  /* height: 600px; */
   margin: 0 auto;
-  padding-top: 10px;
+  padding: 10px 0;
 }
 /* ユーザーデータ小 */
 .user-data-sm {
   width: 375px;
-  height: 400px;
   padding: 10px;
   box-sizing: border-box;
 }
@@ -383,5 +585,67 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
 }
 .delete-button:hover {
   opacity: 0.8;
+}
+/* el-formのスタイル調整 */
+.el-form-item {
+  margin-bottom: 15px;
+}
+.el-form-item ::v-deep(.el-form-item__label) {
+  line-height: 25px;
+  padding-bottom: 5px;
+}
+.unit {
+  margin-left: 10px;
+}
+/* 基礎代謝量 */
+.basal-metabolism {
+  color: #606266;
+}
+.number {
+  margin: 0 5px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #0000cd;
+}
+/* 活動量の選択欄 */
+.activity-amount-table-mdlg {
+  border: 1px solid #DCDFE6;
+  height: 347px
+}
+.activity-amount-table-sm {
+  border: 1px solid #DCDFE6;
+  height: 422px
+}
+.activity-amount-table-cell-left-mdlg {
+  border-right: 1px solid #DCDFE6;
+  padding: 153.5px 3px;
+  box-sizing: border-box;
+}
+.activity-amount-table-cell-left-sm {
+  border-right: 1px solid #DCDFE6;
+  padding: 191px 3px;
+  box-sizing: border-box;
+}
+.activity-amount-select ::v-deep(.el-input__inner) {
+  font-size: 12px;
+}
+.activity-amount-table-cell-right-inner {
+  border-bottom: 1px solid #DCDFE6;
+  padding: 3px 5px;
+  box-sizing: border-box;
+}
+.activity-amount-table-cell-right-inner:last-child {
+  border-bottom: none;
+}
+.activity-amount-title {
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 25px;
+  margin: 0 0 5px 0;
+}
+.activity-amount-description {
+  font-size: 12px;
+  margin: 0;
+  line-height: 25px;
 }
 </style>
