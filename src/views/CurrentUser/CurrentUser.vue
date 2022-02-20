@@ -622,7 +622,7 @@ watch(
   margin: 10px 0;
 }
 .comment-description {
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 /* 減量目標関連 */
 .weight-loss-target {
