@@ -243,7 +243,7 @@ export interface CurrentUserResponseUser {
      * @type {number}
      * @memberof CurrentUserResponseUser
      */
-    'id': number;
+    'id'?: number;
     /**
      * ユーザー名
      * @type {string}
@@ -263,18 +263,6 @@ export interface CurrentUserResponseUser {
      */
     'image_url': string | null;
     /**
-     * ユーザーをフォローしているか
-     * @type {boolean}
-     * @memberof CurrentUserResponseUser
-     */
-    'is_following': boolean;
-    /**
-     * ユーザーからフォローされているか
-     * @type {boolean}
-     * @memberof CurrentUserResponseUser
-     */
-    'is_followed': boolean;
-    /**
      * ユーザーが他のユーザーをフォローしている人数
      * @type {number}
      * @memberof CurrentUserResponseUser
@@ -286,6 +274,48 @@ export interface CurrentUserResponseUser {
      * @memberof CurrentUserResponseUser
      */
     'follower_count': number;
+    /**
+     * 減量目標を設定するか
+     * @type {boolean}
+     * @memberof CurrentUserResponseUser
+     */
+    'is_set_weight_loss_target': boolean;
+    /**
+     * 身長
+     * @type {number}
+     * @memberof CurrentUserResponseUser
+     */
+    'height': number | null;
+    /**
+     * 体重
+     * @type {number}
+     * @memberof CurrentUserResponseUser
+     */
+    'weight': number | null;
+    /**
+     * 性別
+     * @type {string}
+     * @memberof CurrentUserResponseUser
+     */
+    'sex': string | null;
+    /**
+     * 年齢
+     * @type {number}
+     * @memberof CurrentUserResponseUser
+     */
+    'age': number | null;
+    /**
+     * 活動量
+     * @type {number}
+     * @memberof CurrentUserResponseUser
+     */
+    'activity_amount': number | null;
+    /**
+     * 1ヶ月あたりの減量目標(kg)
+     * @type {number}
+     * @memberof CurrentUserResponseUser
+     */
+    'weight_loss_target': number | null;
 }
 /**
  * 食事記録のテンプレート情報
@@ -845,19 +875,61 @@ export interface UpdateCurrentUserRequest {
      * @type {string}
      * @memberof UpdateCurrentUserRequest
      */
-    'comment'?: string;
+    'comment'?: string | null;
     /**
      * ユーザーの画像のURL
      * @type {string}
      * @memberof UpdateCurrentUserRequest
      */
-    'image_url'?: string;
+    'image_url'?: string | null;
     /**
      * ユーザーの画像のkey
      * @type {string}
      * @memberof UpdateCurrentUserRequest
      */
-    'image_key'?: string;
+    'image_key'?: string | null;
+    /**
+     * 減量目標を設定するか
+     * @type {boolean}
+     * @memberof UpdateCurrentUserRequest
+     */
+    'is_set_weight_loss_target'?: boolean;
+    /**
+     * 身長
+     * @type {number}
+     * @memberof UpdateCurrentUserRequest
+     */
+    'height'?: number | null;
+    /**
+     * 体重
+     * @type {number}
+     * @memberof UpdateCurrentUserRequest
+     */
+    'weight'?: number | null;
+    /**
+     * 性別
+     * @type {string}
+     * @memberof UpdateCurrentUserRequest
+     */
+    'sex'?: string | null;
+    /**
+     * 年齢
+     * @type {number}
+     * @memberof UpdateCurrentUserRequest
+     */
+    'age'?: number | null;
+    /**
+     * 活動量
+     * @type {number}
+     * @memberof UpdateCurrentUserRequest
+     */
+    'activity_amount'?: number | null;
+    /**
+     * 1ヶ月あたりの減量目標(kg)
+     * @type {number}
+     * @memberof UpdateCurrentUserRequest
+     */
+    'weight_loss_target'?: number | null;
 }
 
 /**
@@ -1696,8 +1768,8 @@ export const FoodLogsApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * 食事記録情報を一覧表示する
-         * @summary 食事記録情報を一覧表示する
+         * 食事記録情報を一覧取得する
+         * @summary 食事記録情報を一覧取得する
          * @param {string} uid devise-token-auth用のuid
          * @param {string} accessToken devise-token-auth用のaccess-token
          * @param {string} client devise-token-auth用のclient
@@ -1799,8 +1871,8 @@ export const FoodLogsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * 食事記録情報を一覧表示する
-         * @summary 食事記録情報を一覧表示する
+         * 食事記録情報を一覧取得する
+         * @summary 食事記録情報を一覧取得する
          * @param {string} uid devise-token-auth用のuid
          * @param {string} accessToken devise-token-auth用のaccess-token
          * @param {string} client devise-token-auth用のclient
@@ -1850,8 +1922,8 @@ export const FoodLogsApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.deleteFoodLog(uid, accessToken, client, id, options).then((request) => request(axios, basePath));
         },
         /**
-         * 食事記録情報を一覧表示する
-         * @summary 食事記録情報を一覧表示する
+         * 食事記録情報を一覧取得する
+         * @summary 食事記録情報を一覧取得する
          * @param {string} uid devise-token-auth用のuid
          * @param {string} accessToken devise-token-auth用のaccess-token
          * @param {string} client devise-token-auth用のclient
@@ -1904,8 +1976,8 @@ export class FoodLogsApi extends BaseAPI {
     }
 
     /**
-     * 食事記録情報を一覧表示する
-     * @summary 食事記録情報を一覧表示する
+     * 食事記録情報を一覧取得する
+     * @summary 食事記録情報を一覧取得する
      * @param {string} uid devise-token-auth用のuid
      * @param {string} accessToken devise-token-auth用のaccess-token
      * @param {string} client devise-token-auth用のclient

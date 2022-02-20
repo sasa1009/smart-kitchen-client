@@ -5,25 +5,11 @@ import { ElMessage } from 'element-plus';
 import type { ElForm } from 'element-plus';
 import { authData } from '@/modules/auth';
 import { getPresignedUrl } from '@/modules/presignedUrl';
-import { CurrentUserApi, Configuration, CurrentUserResponseUser, UpdateCurrentUserRequest } from '@/api';
+import { CurrentUserApi, Configuration, UpdateCurrentUserRequest } from '@/api';
 import axios from 'axios';
 // eslint-disable-next-line
 // @ts-ignore
 import { useMq } from 'vue3-mq';
-
-interface UserData {
-  id: number;
-  name: string;
-  comment: string | null;
-  image_url: string | null;
-  is_set_weight_loss_target: boolean;
-  height?: number;
-  weight?: number;
-  sex?: string;
-  age?: number;
-  activity_amount?: number | null;
-  weight_loss_target?: number;
-}
 
 interface ImageData {
   imageDataUrl: string | ArrayBuffer | null;
@@ -58,18 +44,31 @@ const rules = reactive({
       trigger: ['blur'],
     },
   ],
+  sex: [
+    {
+      required: true,
+      message: '性別を入力して下さい。',
+      trigger: ['change'],
+    },
+  ],
+  activity_amount: [
+    {
+      required: true,
+      message: '活動レベルを入力して下さい。',
+      trigger: ['change'],
+    },
+  ],
 });
 
-const formData = reactive<UserData>({
-  id: 0,
+const formData = reactive<UpdateCurrentUserRequest>({
   name: '',
   comment: '',
-  image_url: '',
-  is_set_weight_loss_target: true,
-  height: 160,
-  weight: 56,
-  sex: 'male',
-  age: 30,
+  image_url: null,
+  is_set_weight_loss_target: false,
+  height: 1,
+  weight: 1,
+  sex: null,
+  age: 1,
   activity_amount: null,
   weight_loss_target: 1
 });
@@ -98,7 +97,7 @@ const activityAmountOptions = [
 
 // 基礎代謝量を計算する
 const calculateBasalMetabolism = computed(() => {
-  if (!formData.weight || !formData.height || !formData.age) return;
+  if (!formData.weight || !formData.height || !formData.age || !formData.sex) return;
   if (formData.sex === 'male') {
     return Math.floor(66.47 + (formData.weight * 13.75) + (formData.height * 5) - (formData.age * 6.76));
   } else {
@@ -200,20 +199,16 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
     if (valid) {
       try {
         if (!authData.value.userId) throw new Error('未ログインです。');
-        const updateParams: UpdateCurrentUserRequest = {
-          name: formData.name,
-          comment: formData.comment ? formData.comment : undefined,
-        };
 
         // 画像が投稿されている場合はS3にアップロード
         if (imageData.file) {
           const imageMetaData = await uploadImageFileToS3(imageData.file);
-          Object.assign(updateParams, imageMetaData);
+          Object.assign(formData, imageMetaData);
         }
 
         // ユーザー情報を更新
         const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
-        const response = await new CurrentUserApi(configuration).updateCurrentUser(authData.value.uid, authData.value.accessToken, authData.value.client, authData.value.userId, updateParams)
+        const response = await new CurrentUserApi(configuration).updateCurrentUser(authData.value.uid, authData.value.accessToken, authData.value.client, authData.value.userId, formData)
         if (response.status === 200) {
           ElMessage({
             showClose: true,
@@ -247,11 +242,15 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
   try {
     const response = await new CurrentUserApi(configuration).getCurrentUser(authData.value.uid, authData.value.accessToken, authData.value.client);
     if (response.status !== 200) throw new Error('ユーザー情報の取得に失敗しました。');
-    // Object.assign(formData, response.data.user)
-    formData.id = response.data.user.id;
-    formData.name = response.data.user.name;
-    formData.comment = response.data.user.comment;
-    formData.image_url = response.data.user.image_url;
+    for (const key of Object.keys(formData)) {
+      // eslint-disable-next-line
+      // @ts-ignore
+      if (response.data.user[key]) {
+        // eslint-disable-next-line
+        // @ts-ignore
+        formData[key] = response.data.user[key];
+      }
+    }
   } catch (error) {
     console.error(error);
   }
@@ -259,10 +258,6 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
 </script>
 
 <template>
-  <div>{{ formData }}</div>
-  <div>{{ calculateBasalMetabolism }}</div>
-  <div>{{ calculateMetabolismPerDay }}</div>
-  <div>{{ Math.floor((7000 * Number(formData.weight_loss_target) / 30)) }}</div>
   <div :class="'user-data-wrapper-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
     <el-form
       ref="formRef"
@@ -349,6 +344,7 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
         >
           <el-form-item
             label="身長"
+            prop="height"
           >
             <el-input-number
               v-model="formData.height"
@@ -359,6 +355,7 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
           </el-form-item>
           <el-form-item
             label="体重"
+            prop="weight"
           >
             <el-input-number
               v-model="formData.weight"
@@ -369,6 +366,7 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
           </el-form-item>
           <el-form-item
             label="年齢"
+            prop="age"
           >
             <el-input-number
               v-model="formData.age"
@@ -379,19 +377,23 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
           </el-form-item>
           <el-form-item
             label="性別"
+            prop="sex"
             style="--el-color-primary: #409eff"
           >
-            <el-radio v-model="formData.sex" label="male" size="large">男性</el-radio>
-            <el-radio v-model="formData.sex" label="female" size="large">女性</el-radio>
+            <el-radio-group v-model="formData.sex">
+              <el-radio label="male" size="large">男性</el-radio>
+              <el-radio label="female" size="large">女性</el-radio>
+            </el-radio-group>
           </el-form-item>
           <el-form-item
+            v-if="calculateBasalMetabolism"
             label="基礎代謝量(ハリス・ベネディクトの式による計算)"
-            class="basal-metabolism"
           >
             あなたの基礎代謝量は<span class="number">{{ calculateBasalMetabolism }}</span>kcalです。
           </el-form-item>
           <el-form-item
             label="活動レベル"
+            prop="activity_amount"
           >
             <el-row :class="'activity-amount-table-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
               <el-col
@@ -454,24 +456,25 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
             </el-row>
           </el-form-item>
           <el-form-item
-            v-if="!isNaN(Number(calculateMetabolismPerDay))"
+            v-if="calculateMetabolismPerDay"
             label="代謝量"
           >
             あなたの１日の代謝量は<span class="number">{{ calculateMetabolismPerDay }}</span>kcalです。
           </el-form-item>
           <el-form-item
             label="１ヶ月あたりの減量目標"
+            prop="weight_loss_target"
           >
             <el-input-number
               v-model="formData.weight_loss_target"
-              :min="1"
+              :min="0.1"
               :max="10"
               :precision="1"
             />
             <span class="unit">kg</span>
           </el-form-item>
           <el-form-item
-            v-if="!isNaN(Number(calculateMetabolismPerDay))"
+            v-if="calculateMetabolismPerDay"
             label="減量目標を達成するための１日の摂取カロリー"
           >
             <span class="number">{{ Number(calculateMetabolismPerDay) - Math.floor((7000 * Number(formData.weight_loss_target) / 30)) }}</span>kcalです。
@@ -596,10 +599,6 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
 }
 .unit {
   margin-left: 10px;
-}
-/* 基礎代謝量 */
-.basal-metabolism {
-  color: #606266;
 }
 .number {
   margin: 0 5px;

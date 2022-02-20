@@ -32,10 +32,15 @@ const userData = reactive<CurrentUserResponseUser>({
   name: '',
   comment: '',
   image_url: '',
-  is_following: false,
-  is_followed: false,
   following_count: 0,
-  follower_count: 0
+  follower_count: 0,
+  is_set_weight_loss_target: false,
+  height: 0,
+  weight: 0,
+  sex: '',
+  age: 0,
+  activity_amount: 0,
+  weight_loss_target: 0
 });
 
 const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
