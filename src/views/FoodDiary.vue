@@ -13,10 +13,6 @@ import { Chart, registerables, ChartData } from "chart.js";
 interface FoodLogData extends GetFoodLogsResponseFoodLogs {
   date: Date;
 }
-interface FoodLogDataWithTotalCalorie {
-  total_calorie: number,
-  food_log_data: Array<FoodLogData>
-}
 
 // メディアクエリ
 const mq = useMq();
@@ -43,47 +39,47 @@ const formatDate = computed(() => (date: string) => {
  * 1日の合計カロリーを計算する
  */
 const calculateTotalCalorie = computed(() => (index: number) => {
-  return foodLogDataList[index].food_log_data.reduce((total, foodLog) => {
+  return foodLogDataList[index].reduce((total, foodLog) => {
     return Math.ceil((total += (foodLog.calorie * foodLog.amount)));
   }, 0);
 });
 
 const emptyFoodLogData = reactive([
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
-  { total_calorie: 0, food_log_data: [] },
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
 ]);
 
-const foodLogDataList: Array<FoodLogDataWithTotalCalorie> = reactive([...emptyFoodLogData]);
+const foodLogDataList: Array<Array<FoodLogData>> = reactive([...emptyFoodLogData]);
 
 const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
 
@@ -124,16 +120,8 @@ async function getFoodLogs() {
         return a.date.getTime() - b.date.getTime();
       })
 
-      // 1日のカロリーを集計
-      const totalCalorie = foodLogData.reduce((total, foodLog) => {
-        return (total += foodLog.calorie);
-      }, 0);
-
       // データを格納
-      foodLogDataList.push({
-        total_calorie: totalCalorie,
-        food_log_data: foodLogData
-      });
+      foodLogDataList.push(foodLogData);
     }
   } catch (error) {
     console.error(error);
@@ -151,7 +139,7 @@ async function deleteFoodData(id: number, date: number, index: number) {
     if (response.status !== 204) throw new Error('食事記録の削除に失敗しました。');
 
     // 該当の食事記録を削除
-    foodLogDataList[date].food_log_data.splice(index, 1);
+    foodLogDataList[date].splice(index, 1);
     ElMessage({
       showClose: true,
       message: '食事記録を削除しました。',
@@ -487,7 +475,7 @@ async function updateChart(status: 'previous' | 'next') {
       </el-col>
     </el-row>
     <el-row
-      v-for="(foodLog, index) in foodLogDataList[(date.getDate() - 1)].food_log_data"
+      v-for="(foodLog, index) in foodLogDataList[(date.getDate() - 1)]"
       :key="index"
       class="row"
     >
