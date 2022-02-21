@@ -42,7 +42,7 @@ const formatDate = computed(() => (date: string) => {
  */
 const calculateTotalCalorie = computed(() => (index: number) => {
   return foodLogDataList[index].food_log_data.reduce((total, foodLog) => {
-    return (total += (foodLog.calorie * foodLog.amount));
+    return Math.ceil((total += (foodLog.calorie * foodLog.amount)));
   }, 0);
 });
 

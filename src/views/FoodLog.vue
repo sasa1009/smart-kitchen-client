@@ -310,8 +310,9 @@ if (route.params.name) {
                 >
                   <el-input-number
                     v-model="foodData.amount"
-                    :min="1"
+                    :min="0.1"
                     :max="100"
+                    :precision="1"
                   />
                 </el-form-item>
               </el-col>
