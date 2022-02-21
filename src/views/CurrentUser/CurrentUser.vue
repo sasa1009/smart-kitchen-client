@@ -43,6 +43,24 @@ const userData = reactive<CurrentUserResponseUser>({
   weight_loss_target: 0
 });
 
+/**
+ * ユーザーの活動量を変換する
+ */
+const convertActivityAmount = computed(() => {
+  switch (userData.activity_amount) {
+    case 1.3:
+      return '低い';
+    case 1.5:
+      return '普通';
+    case 1.7:
+      return '高い';
+    case 1.9:
+      return 'とても高い';
+    default:
+      return '普通';
+  }
+});
+
 // 基礎代謝量を計算する
 const calculateBasalMetabolism = computed(() => {
   if (!userData.weight || !userData.height || !userData.age || !userData.sex) return;
@@ -346,7 +364,7 @@ watch(
               :span="12"
               class="cell data-cell"
             >
-              <span class="weight-loss-target-data">{{ userData.activity_amount }}</span>
+              <span class="weight-loss-target-data">{{ convertActivityAmount }}</span>
             </el-col>
             <el-col
               :span="12"
