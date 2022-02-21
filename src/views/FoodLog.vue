@@ -61,7 +61,7 @@ const formData = reactive<FormData>({
     {
       name: '',
       calorie: 0,
-      amount: 0,
+      amount: 1,
       recipe_id: null,
       is_create_template: false,
       is_show_error_message: false
@@ -300,7 +300,6 @@ if (route.params.name) {
                     :min="0"
                     :max="100000"
                     :disabled="!!foodData.recipe_id"
-                    class="input-number"
                   />
                 </el-form-item>
               </el-col>
@@ -311,9 +310,9 @@ if (route.params.name) {
                 >
                   <el-input-number
                     v-model="foodData.amount"
-                    :min="1"
+                    :min="0.1"
                     :max="100"
-                    class="input-number"
+                    :precision="1"
                   />
                 </el-form-item>
               </el-col>
