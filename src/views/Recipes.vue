@@ -44,9 +44,9 @@ async function getRecipes() {
     const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
     let response;
     if (isLogin.value) {
-      response = await new RecipesApi(configuration).getRecipes(authData.value.uid, authData.value.accessToken, authData.value.client, pageData.limit, pageData.limit * (pageData.current - 1), route.params.category ? route.params.category : '', route.params.main_ingredient ? route.params.main_ingredient : '');
+      response = await new RecipesApi(configuration).getRecipes(authData.value.uid, authData.value.accessToken, authData.value.client, pageData.limit, pageData.limit * (pageData.current - 1), route.params.searchKeyword ? route.params.searchKeyword : '', route.params.category ? route.params.category : '', route.params.main_ingredient ? route.params.main_ingredient : '');
     } else {
-      response = await new RecipesApi(configuration).getRecipes('', '', '', pageData.limit, pageData.limit * (pageData.current - 1), route.params.category ? route.params.category : '', route.params.main_ingredient ? route.params.main_ingredient : '');
+      response = await new RecipesApi(configuration).getRecipes('', '', '', pageData.limit, pageData.limit * (pageData.current - 1), route.params.searchKeyword ? route.params.searchKeyword : '', route.params.category ? route.params.category : '', route.params.main_ingredient ? route.params.main_ingredient : '');
     }
     if (response.status !== 200) {
       ElMessage({

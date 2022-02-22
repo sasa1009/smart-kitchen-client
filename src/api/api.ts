@@ -2405,12 +2405,13 @@ export const RecipesApiAxiosParamCreator = function (configuration?: Configurati
          * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
          * @param {number} limit 取得するレシピ情報の件数
          * @param {number} offset 取得をスキップするレシピ情報の件数
+         * @param {string} searchKeyword 絞り込みを行う検索キーワード
          * @param {string} category 絞り込みを行うカテゴリー
          * @param {string} mainIngredient 絞り込みを行うメイン食材
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getRecipes: async (uid: string, accessToken: string, client: string, limit: number, offset: number, category: string, mainIngredient: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getRecipes: async (uid: string, accessToken: string, client: string, limit: number, offset: number, searchKeyword: string, category: string, mainIngredient: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'uid' is not null or undefined
             assertParamExists('getRecipes', 'uid', uid)
             // verify required parameter 'accessToken' is not null or undefined
@@ -2421,6 +2422,8 @@ export const RecipesApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('getRecipes', 'limit', limit)
             // verify required parameter 'offset' is not null or undefined
             assertParamExists('getRecipes', 'offset', offset)
+            // verify required parameter 'searchKeyword' is not null or undefined
+            assertParamExists('getRecipes', 'searchKeyword', searchKeyword)
             // verify required parameter 'category' is not null or undefined
             assertParamExists('getRecipes', 'category', category)
             // verify required parameter 'mainIngredient' is not null or undefined
@@ -2443,6 +2446,10 @@ export const RecipesApiAxiosParamCreator = function (configuration?: Configurati
 
             if (offset !== undefined) {
                 localVarQueryParameter['offset'] = offset;
+            }
+
+            if (searchKeyword !== undefined) {
+                localVarQueryParameter['search_keyword'] = searchKeyword;
             }
 
             if (category !== undefined) {
@@ -2623,13 +2630,14 @@ export const RecipesApiFp = function(configuration?: Configuration) {
          * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
          * @param {number} limit 取得するレシピ情報の件数
          * @param {number} offset 取得をスキップするレシピ情報の件数
+         * @param {string} searchKeyword 絞り込みを行う検索キーワード
          * @param {string} category 絞り込みを行うカテゴリー
          * @param {string} mainIngredient 絞り込みを行うメイン食材
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getRecipes(uid: string, accessToken: string, client: string, limit: number, offset: number, category: string, mainIngredient: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetRecipesResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getRecipes(uid, accessToken, client, limit, offset, category, mainIngredient, options);
+        async getRecipes(uid: string, accessToken: string, client: string, limit: number, offset: number, searchKeyword: string, category: string, mainIngredient: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetRecipesResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getRecipes(uid, accessToken, client, limit, offset, searchKeyword, category, mainIngredient, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -2722,13 +2730,14 @@ export const RecipesApiFactory = function (configuration?: Configuration, basePa
          * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
          * @param {number} limit 取得するレシピ情報の件数
          * @param {number} offset 取得をスキップするレシピ情報の件数
+         * @param {string} searchKeyword 絞り込みを行う検索キーワード
          * @param {string} category 絞り込みを行うカテゴリー
          * @param {string} mainIngredient 絞り込みを行うメイン食材
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getRecipes(uid: string, accessToken: string, client: string, limit: number, offset: number, category: string, mainIngredient: string, options?: any): AxiosPromise<GetRecipesResponse> {
-            return localVarFp.getRecipes(uid, accessToken, client, limit, offset, category, mainIngredient, options).then((request) => request(axios, basePath));
+        getRecipes(uid: string, accessToken: string, client: string, limit: number, offset: number, searchKeyword: string, category: string, mainIngredient: string, options?: any): AxiosPromise<GetRecipesResponse> {
+            return localVarFp.getRecipes(uid, accessToken, client, limit, offset, searchKeyword, category, mainIngredient, options).then((request) => request(axios, basePath));
         },
         /**
          * ユーザーが作成したレシピ情報の一覧を取得する
@@ -2827,14 +2836,15 @@ export class RecipesApi extends BaseAPI {
      * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
      * @param {number} limit 取得するレシピ情報の件数
      * @param {number} offset 取得をスキップするレシピ情報の件数
+     * @param {string} searchKeyword 絞り込みを行う検索キーワード
      * @param {string} category 絞り込みを行うカテゴリー
      * @param {string} mainIngredient 絞り込みを行うメイン食材
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RecipesApi
      */
-    public getRecipes(uid: string, accessToken: string, client: string, limit: number, offset: number, category: string, mainIngredient: string, options?: AxiosRequestConfig) {
-        return RecipesApiFp(this.configuration).getRecipes(uid, accessToken, client, limit, offset, category, mainIngredient, options).then((request) => request(this.axios, this.basePath));
+    public getRecipes(uid: string, accessToken: string, client: string, limit: number, offset: number, searchKeyword: string, category: string, mainIngredient: string, options?: AxiosRequestConfig) {
+        return RecipesApiFp(this.configuration).getRecipes(uid, accessToken, client, limit, offset, searchKeyword, category, mainIngredient, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

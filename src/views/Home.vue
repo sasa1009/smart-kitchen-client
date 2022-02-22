@@ -37,9 +37,9 @@ async function getRecipeData() {
   try {
     let response;
     if (isLogin.value) {
-      response = await new RecipesApi(configuration).getRecipes(authData.value.uid, authData.value.accessToken, authData.value.client, 10, 0, '', '');
+      response = await new RecipesApi(configuration).getRecipes(authData.value.uid, authData.value.accessToken, authData.value.client, 10, 0, '', '', '');
     } else {
-      response = await new RecipesApi(configuration).getRecipes('', '', '', 10, 0, '', '');
+      response = await new RecipesApi(configuration).getRecipes('', '', '', 10, 0, '', '', '');
     }
     if (response.status !== 200) throw new Error('レシピ情報の取得に失敗しました。');
     recipeDataList.splice(0);
