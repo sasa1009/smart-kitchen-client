@@ -529,6 +529,12 @@ export interface GetRecipeResponseRecipe {
      */
     'image_url': string | null;
     /**
+     * メイン画像のkey
+     * @type {string}
+     * @memberof GetRecipeResponseRecipe
+     */
+    'image_key': string | null;
+    /**
      * お気に入り登録済みか
      * @type {boolean}
      * @memberof GetRecipeResponseRecipe
@@ -548,35 +554,10 @@ export interface GetRecipeResponseRecipe {
     'ingredients': Array<CreateRecipeRequestIngredients>;
     /**
      * 手順
-     * @type {Array<GetRecipeResponseRecipeProcedures>}
+     * @type {Array<CreateRecipeRequestProcedures>}
      * @memberof GetRecipeResponseRecipe
      */
-    'procedures': Array<GetRecipeResponseRecipeProcedures>;
-}
-/**
- * 
- * @export
- * @interface GetRecipeResponseRecipeProcedures
- */
-export interface GetRecipeResponseRecipeProcedures {
-    /**
-     * 手順の並び順
-     * @type {number}
-     * @memberof GetRecipeResponseRecipeProcedures
-     */
-    'index': number;
-    /**
-     * 手順の詳細
-     * @type {string}
-     * @memberof GetRecipeResponseRecipeProcedures
-     */
-    'description': string;
-    /**
-     * 手順の画像のURL
-     * @type {string}
-     * @memberof GetRecipeResponseRecipeProcedures
-     */
-    'image_url': string | null;
+    'procedures': Array<CreateRecipeRequestProcedures>;
 }
 /**
  * レシピを作成したユーザー情報
@@ -2348,21 +2329,21 @@ export const RecipesApiAxiosParamCreator = function (configuration?: Configurati
          * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
          * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
          * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
-         * @param {number} recipeId レシピのID
+         * @param {number} id レシピのID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getRecipe: async (uid: string, accessToken: string, client: string, recipeId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getRecipe: async (uid: string, accessToken: string, client: string, id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'uid' is not null or undefined
             assertParamExists('getRecipe', 'uid', uid)
             // verify required parameter 'accessToken' is not null or undefined
             assertParamExists('getRecipe', 'accessToken', accessToken)
             // verify required parameter 'client' is not null or undefined
             assertParamExists('getRecipe', 'client', client)
-            // verify required parameter 'recipeId' is not null or undefined
-            assertParamExists('getRecipe', 'recipeId', recipeId)
-            const localVarPath = `/recipes/{recipeId}`
-                .replace(`{${"recipeId"}}`, encodeURIComponent(String(recipeId)));
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getRecipe', 'id', id)
+            const localVarPath = `/recipes/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2631,6 +2612,67 @@ export const RecipesApiAxiosParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * レシピ情報を更新する
+         * @summary レシピ情報を更新する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} id レシピのID
+         * @param {CreateRecipeRequest} createRecipeRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateRecipe: async (uid: string, accessToken: string, client: string, id: number, createRecipeRequest: CreateRecipeRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uid' is not null or undefined
+            assertParamExists('updateRecipe', 'uid', uid)
+            // verify required parameter 'accessToken' is not null or undefined
+            assertParamExists('updateRecipe', 'accessToken', accessToken)
+            // verify required parameter 'client' is not null or undefined
+            assertParamExists('updateRecipe', 'client', client)
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('updateRecipe', 'id', id)
+            // verify required parameter 'createRecipeRequest' is not null or undefined
+            assertParamExists('updateRecipe', 'createRecipeRequest', createRecipeRequest)
+            const localVarPath = `/recipes/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (uid !== undefined && uid !== null) {
+                localVarHeaderParameter['uid'] = String(uid);
+            }
+
+            if (accessToken !== undefined && accessToken !== null) {
+                localVarHeaderParameter['access-token'] = String(accessToken);
+            }
+
+            if (client !== undefined && client !== null) {
+                localVarHeaderParameter['client'] = String(client);
+            }
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createRecipeRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -2693,12 +2735,12 @@ export const RecipesApiFp = function(configuration?: Configuration) {
          * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
          * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
          * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
-         * @param {number} recipeId レシピのID
+         * @param {number} id レシピのID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getRecipe(uid: string, accessToken: string, client: string, recipeId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetRecipeResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getRecipe(uid, accessToken, client, recipeId, options);
+        async getRecipe(uid: string, accessToken: string, client: string, id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetRecipeResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getRecipe(uid, accessToken, client, id, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -2750,6 +2792,21 @@ export const RecipesApiFp = function(configuration?: Configuration) {
          */
         async getUsersRecipes(uid: string, accessToken: string, client: string, userId: number, limit: number, offset: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetRecipesResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getUsersRecipes(uid, accessToken, client, userId, limit, offset, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * レシピ情報を更新する
+         * @summary レシピ情報を更新する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} id レシピのID
+         * @param {CreateRecipeRequest} createRecipeRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateRecipe(uid: string, accessToken: string, client: string, id: number, createRecipeRequest: CreateRecipeRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateRecipe(uid, accessToken, client, id, createRecipeRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -2811,12 +2868,12 @@ export const RecipesApiFactory = function (configuration?: Configuration, basePa
          * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
          * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
          * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
-         * @param {number} recipeId レシピのID
+         * @param {number} id レシピのID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getRecipe(uid: string, accessToken: string, client: string, recipeId: number, options?: any): AxiosPromise<GetRecipeResponse> {
-            return localVarFp.getRecipe(uid, accessToken, client, recipeId, options).then((request) => request(axios, basePath));
+        getRecipe(uid: string, accessToken: string, client: string, id: number, options?: any): AxiosPromise<GetRecipeResponse> {
+            return localVarFp.getRecipe(uid, accessToken, client, id, options).then((request) => request(axios, basePath));
         },
         /**
          * 指定した期間で最も多くお気に入りに登録されたレシピ情報の一覧を取得する
@@ -2865,6 +2922,20 @@ export const RecipesApiFactory = function (configuration?: Configuration, basePa
          */
         getUsersRecipes(uid: string, accessToken: string, client: string, userId: number, limit: number, offset: number, options?: any): AxiosPromise<GetRecipesResponse> {
             return localVarFp.getUsersRecipes(uid, accessToken, client, userId, limit, offset, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * レシピ情報を更新する
+         * @summary レシピ情報を更新する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} id レシピのID
+         * @param {CreateRecipeRequest} createRecipeRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateRecipe(uid: string, accessToken: string, client: string, id: number, createRecipeRequest: CreateRecipeRequest, options?: any): AxiosPromise<CreateResponse> {
+            return localVarFp.updateRecipe(uid, accessToken, client, id, createRecipeRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -2931,13 +3002,13 @@ export class RecipesApi extends BaseAPI {
      * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
      * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
      * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
-     * @param {number} recipeId レシピのID
+     * @param {number} id レシピのID
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RecipesApi
      */
-    public getRecipe(uid: string, accessToken: string, client: string, recipeId: number, options?: AxiosRequestConfig) {
-        return RecipesApiFp(this.configuration).getRecipe(uid, accessToken, client, recipeId, options).then((request) => request(this.axios, this.basePath));
+    public getRecipe(uid: string, accessToken: string, client: string, id: number, options?: AxiosRequestConfig) {
+        return RecipesApiFp(this.configuration).getRecipe(uid, accessToken, client, id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -2992,6 +3063,22 @@ export class RecipesApi extends BaseAPI {
      */
     public getUsersRecipes(uid: string, accessToken: string, client: string, userId: number, limit: number, offset: number, options?: AxiosRequestConfig) {
         return RecipesApiFp(this.configuration).getUsersRecipes(uid, accessToken, client, userId, limit, offset, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * レシピ情報を更新する
+     * @summary レシピ情報を更新する
+     * @param {string} uid devise-token-auth用のuid
+     * @param {string} accessToken devise-token-auth用のaccess-token
+     * @param {string} client devise-token-auth用のclient
+     * @param {number} id レシピのID
+     * @param {CreateRecipeRequest} createRecipeRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RecipesApi
+     */
+    public updateRecipe(uid: string, accessToken: string, client: string, id: number, createRecipeRequest: CreateRecipeRequest, options?: AxiosRequestConfig) {
+        return RecipesApiFp(this.configuration).updateRecipe(uid, accessToken, client, id, createRecipeRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

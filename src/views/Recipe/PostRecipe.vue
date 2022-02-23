@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, reactive, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import type { ElForm } from 'element-plus';
 import { authData, isLogin } from '@/modules/auth';
@@ -18,6 +18,7 @@ interface ImageData {
 
 const mq = useMq();
 const router = useRouter();
+const route = useRoute();
 const formRef = ref<InstanceType<typeof ElForm>>();
 
 // フォームのバリデーションルール
@@ -68,7 +69,7 @@ const ingredientData = reactive([
     amount: '',
     showErrorMessage: false
   },
-])
+]);
 const procedureData = reactive([
   {
     description: '',
@@ -86,7 +87,7 @@ const procedureData = reactive([
     image_url: null,
     image_key: null
   },
-])
+]);
 
 // レシピのメイン画像データを格納する
 const mainImageData = reactive<ImageData>({
@@ -211,6 +212,8 @@ function addProcedure() {
   });
 }
 
+const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
+
 /**
  * レシピ情報を登録する
  */
@@ -284,23 +287,34 @@ function createRecipe(formEl: InstanceType<typeof ElForm> | undefined) {
         };
 
         // レシピ情報を登録
-        const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
-        const response = await new RecipesApi(configuration).createRecipe(authData.value.uid, authData.value.accessToken, authData.value.client, params);
-        if (response.status === 201) {
+        if (!route.params.id) {
+          const response = await new RecipesApi(configuration).createRecipe(authData.value.uid, authData.value.accessToken, authData.value.client, params);
           ElMessage({
             showClose: true,
             message: 'レシピを登録しました。',
             type: 'success',
-          })
-          router.push(`/recipe/${response.data.id}`)
+          });
+          router.push(`/recipe/${response.data.id}`);
         } else {
-          throw new Error('レシピ登録失敗。');
+          const response = await new RecipesApi(configuration).updateRecipe(authData.value.uid, authData.value.accessToken, authData.value.client, Number(route.params.id), params);
+          ElMessage({
+            showClose: true,
+            message: 'レシピを更新しました。',
+            type: 'success',
+          });
+          router.push(`/recipe/${response.data.id}`)
         }
       } catch (error) {
         console.error(error);
+        let message = '';
+        if (route.params.id) {
+          message = 'レシピの更新に失敗しました。'
+        } else {
+          message = 'レシピの登録に失敗しました。'
+        }
         ElMessage({
           showClose: true,
-          message: 'レシピの登録に失敗しました。',
+          message,
           type: 'error',
         });
       }
@@ -315,6 +329,121 @@ function createRecipe(formEl: InstanceType<typeof ElForm> | undefined) {
     }
   });
 }
+
+async function getRecipeData() {
+  try {
+    const response = await new RecipesApi(configuration).getRecipe('', '', '', Number(route.params.id));
+    if (response.status !== 200) {
+      ElMessage({
+        showClose: true,
+        message: 'レシピ情報の取得に失敗しました。',
+        type: 'error',
+      });
+      throw new Error('レシピ情報の取得に失敗しました。')
+    }
+
+    // recipeDataに取得したレシピデータを格納
+    for (const key of Object.keys(recipeData)) {
+      // eslint-disable-next-line
+      // @ts-ignore
+      if (response.data.recipe[key]) {
+        // eslint-disable-next-line
+        // @ts-ignore
+        recipeData[key] = response.data.recipe[key];
+      }
+    }
+
+    // ingredientCategoryにレシピデータのメイン食材が属するメイン食材カテゴリを格納する
+    for (const key of Object.keys(ingredientsForForm)) {
+      if (ingredientsForForm[key].includes(response.data.recipe.main_ingredient)) {
+        ingredientCategory.value = key;
+      }
+    }
+
+    // ingredientDataに取得したレシピデータを格納
+    ingredientData.splice(0);
+    for (const ingredient of response.data.recipe.ingredients) {
+      ingredientData.push({
+        name: ingredient.name,
+        amount: ingredient.amount,
+        showErrorMessage: false,
+      });
+    }
+
+    // procedureDataに取得したレシピデータを格納
+    procedureData.splice(0);
+    for (const procedure of response.data.recipe.procedures) {
+      procedureData.push({
+        description: procedure.description,
+        imageDataUrl: null,
+        file: null,
+        showErrorMessage: false,
+        image_url: procedure.image_url,
+        image_key: procedure.image_key
+      });
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+watch(() => route.path, (path: string) => {
+  // レシピ編集ページからレシピ作成ページに遷移した場合にデータを初期化
+  if (path === '/recipe/post') {
+    Object.assign(recipeData, {
+      title: '',
+      comment: '',
+      amount: 1,
+      calorie: 0,
+      main_ingredient: '',
+      category: '',
+      tips: '',
+      image_url: null,
+      image_key: null
+    });
+    ingredientCategory.value = '';
+    ingredientData.splice(0);
+    ingredientData.push(...[
+      {
+        name: '',
+        amount: '',
+        showErrorMessage: false
+      },
+      {
+        name: '',
+        amount: '',
+        showErrorMessage: false
+      },
+    ]);
+    procedureData.splice(0);
+    procedureData.push(...[
+      {
+        description: '',
+        imageDataUrl: null,
+        file: null,
+        showErrorMessage: false,
+        image_url: null,
+        image_key: null
+      },
+      {
+        description: '',
+        imageDataUrl: null,
+        file: null,
+        showErrorMessage: false,
+        image_url: null,
+        image_key: null
+      },
+    ]);
+  
+  // レシピ作成ページからレシピ編集ページに遷移した場合は再度レシピデータを取得
+  } else {
+    getRecipeData();
+  }
+});
+
+if (route.params.id) {
+  getRecipeData();
+}
 </script>
 
 <template>
@@ -328,7 +457,18 @@ function createRecipe(formEl: InstanceType<typeof ElForm> | undefined) {
       :hide-required-asterisk="true"
     >
       <div :class="'recipe-data-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
-        <h3>レシピ作成</h3>
+        <h1
+          v-if="route.params.id"
+          class="title"
+        >
+          レシピ編集
+        </h1>
+        <h1
+          v-else
+          class="title"
+        >
+          レシピ作成
+        </h1>
         <div class="label">
           メイン画像
         </div>
@@ -337,8 +477,16 @@ function createRecipe(formEl: InstanceType<typeof ElForm> | undefined) {
         >
           <el-image
             class="recipe-main-image"
-            :src="mainImageData.imageDataUrl ? mainImageData.imageDataUrl : require('@/assets/noimage.png')"
-            fit="cover"
+            :src="(() => {
+              if (mainImageData.imageDataUrl) {
+                return mainImageData.imageDataUrl;
+              } else if (recipeData.image_url) {
+                return recipeData.image_url;
+              } else {
+                return require('@/assets/noimage.png');
+              }
+            })()"
+            fit="contain"
           />
         </div>
         <div class="upload-wrapper">
@@ -609,10 +757,10 @@ function createRecipe(formEl: InstanceType<typeof ElForm> | undefined) {
               </div>
               <div>
                 <el-image
-                  v-if="procedureData[index].imageDataUrl"
+                  v-if="procedureData[index].imageDataUrl || procedureData[index].image_url"
                   class="procedure-image"
-                  :src="procedureData[index].imageDataUrl"
-                  fit="cover"
+                  :src="procedureData[index].imageDataUrl ? procedureData[index].imageDataUrl : procedureData[index].image_url"
+                  fit="contain"
                 />
               </div>
             </div>
@@ -635,7 +783,12 @@ function createRecipe(formEl: InstanceType<typeof ElForm> | undefined) {
           />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="createRecipe(formRef)">登録</el-button>
+          <el-button
+            type="primary"
+            @click="createRecipe(formRef)"
+          >
+            {{ route.params.id ? '更新' : '登録' }}
+          </el-button>
         </el-form-item>
       </div>
     </el-form>
@@ -658,6 +811,11 @@ function createRecipe(formEl: InstanceType<typeof ElForm> | undefined) {
   margin: 10px auto 0 auto;
   padding-bottom: 10px;
   box-sizing: border-box;
+}
+/* ページタイトル */
+.title {
+  font-size: 18px;
+  margin: 10px 0;
 }
 /* ラベル */
 .label {

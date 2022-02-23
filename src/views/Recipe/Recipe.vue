@@ -23,6 +23,7 @@ const recipeData = reactive<GetRecipeResponseRecipe>({
   category: '',
   tips: '',
   image_url: null,
+  image_key: null,
   is_favorited: false,
   user: {
     id: 0,
@@ -42,6 +43,7 @@ const recipeData = reactive<GetRecipeResponseRecipe>({
           index: 0,
           description: '',
           image_url: null,
+          image_key: null,
       }
   ]
 });
@@ -199,6 +201,7 @@ async function updateFavorite() {
               type="warning"
               plain
               class="food-log-button"
+              @click="$router.push({ name: 'EditRecipe', params: { id: recipeData.id } })"
             >
               レシピを編集する
             </el-button>
