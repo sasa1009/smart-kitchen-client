@@ -2398,6 +2398,85 @@ export const RecipesApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 指定した期間で最も多くお気に入りに登録されたレシピ情報の一覧を取得する
+         * @summary 指定した期間で最も多くお気に入りに登録されたレシピ情報の一覧を取得する
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
+         * @param {number} limit 取得するレシピ情報の件数
+         * @param {number} offset 取得をスキップするレシピ情報の件数
+         * @param {string} from 取得するレシピがお気に入りに登録された期間の始期
+         * @param {string} to 取得するレシピがお気に入りに登録された期間の終期
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRecipeRanking: async (uid: string, accessToken: string, client: string, limit: number, offset: number, from: string, to: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uid' is not null or undefined
+            assertParamExists('getRecipeRanking', 'uid', uid)
+            // verify required parameter 'accessToken' is not null or undefined
+            assertParamExists('getRecipeRanking', 'accessToken', accessToken)
+            // verify required parameter 'client' is not null or undefined
+            assertParamExists('getRecipeRanking', 'client', client)
+            // verify required parameter 'limit' is not null or undefined
+            assertParamExists('getRecipeRanking', 'limit', limit)
+            // verify required parameter 'offset' is not null or undefined
+            assertParamExists('getRecipeRanking', 'offset', offset)
+            // verify required parameter 'from' is not null or undefined
+            assertParamExists('getRecipeRanking', 'from', from)
+            // verify required parameter 'to' is not null or undefined
+            assertParamExists('getRecipeRanking', 'to', to)
+            const localVarPath = `/recipe_ranking`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+            if (from !== undefined) {
+                localVarQueryParameter['from'] = from;
+            }
+
+            if (to !== undefined) {
+                localVarQueryParameter['to'] = to;
+            }
+
+            if (uid !== undefined && uid !== null) {
+                localVarHeaderParameter['uid'] = String(uid);
+            }
+
+            if (accessToken !== undefined && accessToken !== null) {
+                localVarHeaderParameter['access-token'] = String(accessToken);
+            }
+
+            if (client !== undefined && client !== null) {
+                localVarHeaderParameter['client'] = String(client);
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * レシピ情報を一覧取得する
          * @summary レシピ情報を一覧取得する
          * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
@@ -2623,6 +2702,23 @@ export const RecipesApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * 指定した期間で最も多くお気に入りに登録されたレシピ情報の一覧を取得する
+         * @summary 指定した期間で最も多くお気に入りに登録されたレシピ情報の一覧を取得する
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
+         * @param {number} limit 取得するレシピ情報の件数
+         * @param {number} offset 取得をスキップするレシピ情報の件数
+         * @param {string} from 取得するレシピがお気に入りに登録された期間の始期
+         * @param {string} to 取得するレシピがお気に入りに登録された期間の終期
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getRecipeRanking(uid: string, accessToken: string, client: string, limit: number, offset: number, from: string, to: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetRecipesResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getRecipeRanking(uid, accessToken, client, limit, offset, from, to, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * レシピ情報を一覧取得する
          * @summary レシピ情報を一覧取得する
          * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
@@ -2721,6 +2817,22 @@ export const RecipesApiFactory = function (configuration?: Configuration, basePa
          */
         getRecipe(uid: string, accessToken: string, client: string, recipeId: number, options?: any): AxiosPromise<GetRecipeResponse> {
             return localVarFp.getRecipe(uid, accessToken, client, recipeId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 指定した期間で最も多くお気に入りに登録されたレシピ情報の一覧を取得する
+         * @summary 指定した期間で最も多くお気に入りに登録されたレシピ情報の一覧を取得する
+         * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+         * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+         * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
+         * @param {number} limit 取得するレシピ情報の件数
+         * @param {number} offset 取得をスキップするレシピ情報の件数
+         * @param {string} from 取得するレシピがお気に入りに登録された期間の始期
+         * @param {string} to 取得するレシピがお気に入りに登録された期間の終期
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRecipeRanking(uid: string, accessToken: string, client: string, limit: number, offset: number, from: string, to: string, options?: any): AxiosPromise<GetRecipesResponse> {
+            return localVarFp.getRecipeRanking(uid, accessToken, client, limit, offset, from, to, options).then((request) => request(axios, basePath));
         },
         /**
          * レシピ情報を一覧取得する
@@ -2826,6 +2938,24 @@ export class RecipesApi extends BaseAPI {
      */
     public getRecipe(uid: string, accessToken: string, client: string, recipeId: number, options?: AxiosRequestConfig) {
         return RecipesApiFp(this.configuration).getRecipe(uid, accessToken, client, recipeId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 指定した期間で最も多くお気に入りに登録されたレシピ情報の一覧を取得する
+     * @summary 指定した期間で最も多くお気に入りに登録されたレシピ情報の一覧を取得する
+     * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
+     * @param {string} accessToken devise-token-auth用のaccess-token(未ログインの場合は空文字を指定)
+     * @param {string} client devise-token-auth用のclient(未ログインの場合は空文字を指定)
+     * @param {number} limit 取得するレシピ情報の件数
+     * @param {number} offset 取得をスキップするレシピ情報の件数
+     * @param {string} from 取得するレシピがお気に入りに登録された期間の始期
+     * @param {string} to 取得するレシピがお気に入りに登録された期間の終期
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RecipesApi
+     */
+    public getRecipeRanking(uid: string, accessToken: string, client: string, limit: number, offset: number, from: string, to: string, options?: AxiosRequestConfig) {
+        return RecipesApiFp(this.configuration).getRecipeRanking(uid, accessToken, client, limit, offset, from, to, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

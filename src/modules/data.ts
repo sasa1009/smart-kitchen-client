@@ -209,3 +209,22 @@ export const followingRecipeDataList = reactive<Array<GetRecipesResponseRecipes>
     }
   },
 ]);
+
+// 直近1週間で最も多くお気に入りに登録されたレシピ情報の配列
+export const recipeRankingList = reactive<Array<GetRecipesResponseRecipes>>([
+  {
+    id: 0,
+    title: '',
+    calorie: 0,
+    main_ingredient: '',
+    category: '',
+    image_url: '',
+    is_favorited: false,
+    favorited_count: 0,
+    user: {
+      id: 0,
+      name: '',
+      image_url: ''
+    }
+  },
+]);

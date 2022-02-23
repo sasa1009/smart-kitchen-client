@@ -61,6 +61,25 @@ async function updateFavorite() {
     }
   }
 }
+
+function goToFoodLogPage() {
+  if (isLogin.value) {
+    router.push({
+      name: 'FoodLog',
+      params: {
+        name: props.recipeCardData.title,
+        calorie: props.recipeCardData.calorie,
+        recipe_id: props.recipeCardData.id,
+      }
+    });
+  } else {
+    ElMessage({
+      showClose: true,
+      message: '食事記録をつけるにはログインしてください。',
+    });
+    router.push({ name: 'Login' });
+  }
+}
 </script>
 
 <template>
@@ -151,14 +170,7 @@ async function updateFavorite() {
         <el-button
           type="text"
           style="padding: 0;"
-          @click="$router.push({
-            name: 'FoodLog',
-            params: {
-              name: props.recipeCardData.title,
-              calorie: props.recipeCardData.calorie,
-              recipe_id: props.recipeCardData.id,
-            }
-          })"
+          @click="goToFoodLogPage"
         >
           <font-awesome-icon
             :icon="['fas', 'pencil-alt']"

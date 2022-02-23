@@ -8,8 +8,9 @@ import { useMq } from 'vue3-mq';
 import { Carousel, Navigation, Slide } from 'vue3-carousel';
 import 'vue3-carousel/dist/carousel.css';
 import { Configuration, RecipesApi } from '@/api'
-import { ingredients, categories, recipeDataList, followingRecipeDataList } from '@/modules/data';
+import { ingredients, categories, recipeDataList, followingRecipeDataList, recipeRankingList } from '@/modules/data';
 import { isLogin, authData } from '@/modules/auth';
+import dayjs from 'dayjs';
 
 const mq = useMq();
 
@@ -63,9 +64,29 @@ async function getFollowingRecipeData() {
   }
 }
 
+/**
+ * 直近1週間で最も多くお気に入りに登録されたレシピ情報の一覧を取得する
+ */
+async function getRecipeRankingData() {
+  try {
+    let response;
+    if (isLogin.value) {
+      response = await new RecipesApi(configuration).getRecipeRanking(authData.value.uid, authData.value.accessToken, authData.value.client, 10, 0, dayjs().subtract(7, 'd').toISOString(), dayjs().toISOString());
+    } else {
+      response = await new RecipesApi(configuration).getRecipeRanking('', '', '', 10, 0, dayjs().subtract(7, 'd').toISOString(), dayjs().toISOString());
+    }
+    if (response.status !== 200) throw new Error('レシピランキング情報の取得に失敗しました。');
+    recipeRankingList.splice(0);
+    Object.assign(recipeRankingList, response.data.recipes);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 // レシピ情報の一覧を取得する
 (function init() {
   getRecipeData();
+  getRecipeRankingData();
   if (isLogin.value) {
     getFollowingRecipeData();
   }
@@ -137,7 +158,64 @@ async function getFollowingRecipeData() {
     </el-tab-pane>
   </el-tabs>
   <div :class="'carousel-wrapper-' + mq.current">
-    <h3 style="margin: 10px 0 10px 0;">今週の人気レシピランキング</h3>
+    <h3 style="margin: 10px 0 10px 0;">一週間の人気レシピランキング</h3>
+    <Carousel
+      :settings="carouselSetting"
+      :breakpoints="breakpointSettings"
+    >
+      <Slide
+        v-for="(recipeCardData, index) in recipeRankingList"
+        :key="index"
+      >
+        <div>
+          <span style="font-size: 18px; font-weight: bold;">
+            {{ index + 1 }}
+          </span>
+          <RecipeCard
+            :mq-current="mq.current"
+            v-model:recipe-card-data="recipeRankingList[index]"
+            :is-login="true"
+          />
+        </div>
+      </Slide>
+
+      <template #addons>
+        <Navigation />
+      </template>
+    </Carousel>
+  </div>
+  <div
+    v-if="isLogin && followingRecipeDataList.length >= 1"
+    :class="'carousel-wrapper-' + mq.current"
+  >
+    <h3 style="margin: 10px 0 10px 0;">フォロー中のユーザーの新着レシピ</h3>
+    <Carousel
+      :settings="carouselSetting"
+      :breakpoints="breakpointSettings"
+    >
+      <Slide
+        v-for="(recipeCardData, index) in followingRecipeDataList"
+        :key="index"
+      >
+        <div>
+          <RecipeCard
+            :mq-current="mq.current"
+            v-model:recipe-card-data="followingRecipeDataList[index]"
+            :is-login="true"
+          />
+        </div>
+      </Slide>
+
+      <template #addons>
+        <Navigation />
+      </template>
+    </Carousel>
+  </div>
+  <div
+    v-else
+    :class="'carousel-wrapper-' + mq.current"
+  >
+    <h3 style="margin: 10px 0 10px 0;">新着レシピ</h3>
     <Carousel
       :settings="carouselSetting"
       :breakpoints="breakpointSettings"
@@ -153,30 +231,6 @@ async function getFollowingRecipeData() {
           <RecipeCard
             :mq-current="mq.current"
             v-model:recipe-card-data="recipeDataList[index]"
-            :is-login="true"
-          />
-        </div>
-      </Slide>
-
-      <template #addons>
-        <Navigation />
-      </template>
-    </Carousel>
-  </div>
-  <div :class="'carousel-wrapper-' + mq.current">
-    <h3 style="margin: 10px 0 10px 0;">フォロー中のユーザーの新着レシピ</h3>
-    <Carousel
-      :settings="carouselSetting"
-      :breakpoints="breakpointSettings"
-    >
-      <Slide
-        v-for="(recipeCardData, index) in followingRecipeDataList"
-        :key="index"
-      >
-        <div>
-          <RecipeCard
-            :mq-current="mq.current"
-            v-model:recipe-card-data="followingRecipeDataList[index]"
             :is-login="true"
           />
         </div>
