@@ -29,6 +29,8 @@ const isDrawerOpen = ref(false);
       <el-button
         class="search-button"
         round
+        @click="$router.push({ name: 'Recipes', params: { searchKeyword: input } });
+                input = '';"
       >
         検索
       </el-button>
@@ -134,6 +136,8 @@ const isDrawerOpen = ref(false);
           <el-button
             class="search-button"
             round
+            @click="$router.push({ name: 'Recipes', params: { searchKeyword: input } });
+                    input = '';"
           >
             検索
           </el-button>
