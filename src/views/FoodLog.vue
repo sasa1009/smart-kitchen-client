@@ -280,7 +280,6 @@ if (route.params.name) {
                 v-model="foodData.name"
                 :maxlength="30"
                 :show-word-limit="true"
-                :disabled="!!foodData.recipe_id"
               />
               <span
                 v-if="foodData.is_show_error_message"
@@ -299,7 +298,6 @@ if (route.params.name) {
                     v-model="foodData.calorie"
                     :min="0"
                     :max="100000"
-                    :disabled="!!foodData.recipe_id"
                   />
                 </el-form-item>
               </el-col>
