@@ -27,38 +27,48 @@ const emits = defineEmits(['update:recipeCardData']);
 const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
 
 async function updateFavorite() {
-  const recipeCardData = props.recipeCardData;
-  if (recipeCardData.is_favorited) {
-    const response = await new FavoritesApi(configuration).deleteFavorite(authData.value.uid, authData.value.accessToken, authData.value.client, props.recipeCardData.id);
-    if (response.status === 204) {
-      ElMessage({
-        showClose: true,
-        message: 'お気に入りを解除しました。',
-      });
-      recipeCardData.is_favorited = !recipeCardData.is_favorited;
-      recipeCardData.favorited_count--;
-      emits('update:recipeCardData', recipeCardData);
-    }
-  } else {
-    if (isLogin.value) {
-      const response = await new FavoritesApi(configuration).createFavorite(authData.value.uid, authData.value.accessToken, authData.value.client, props.recipeCardData.id);
-      if (response.status === 201) {
+  try {
+    const recipeCardData = props.recipeCardData;
+    if (recipeCardData.is_favorited) {
+      const response = await new FavoritesApi(configuration).deleteFavorite(authData.value.uid, authData.value.accessToken, authData.value.client, props.recipeCardData.id);
+      if (response.status === 204) {
         ElMessage({
           showClose: true,
-          message: 'お気に入りに登録しました。',
-          type: 'success'
+          message: 'お気に入りを解除しました。',
         });
         recipeCardData.is_favorited = !recipeCardData.is_favorited;
-        recipeCardData.favorited_count++;
+        recipeCardData.favorited_count--;
         emits('update:recipeCardData', recipeCardData);
       }
     } else {
-      ElMessage({
-        showClose: true,
-        message: 'レシピをお気に入りに登録するにはログインしてください。',
-      });
-      router.push({name: 'Login'})
+      if (isLogin.value) {
+        const response = await new FavoritesApi(configuration).createFavorite(authData.value.uid, authData.value.accessToken, authData.value.client, props.recipeCardData.id);
+        if (response.status === 201) {
+          ElMessage({
+            showClose: true,
+            message: 'お気に入りに登録しました。',
+            type: 'success'
+          });
+          recipeCardData.is_favorited = !recipeCardData.is_favorited;
+          recipeCardData.favorited_count++;
+          emits('update:recipeCardData', recipeCardData);
+        }
+      } else {
+        ElMessage({
+          showClose: true,
+          message: 'レシピをお気に入りに登録するにはログインしてください。',
+        });
+        router.push({name: 'Login'})
+      }
     }
+  } catch (error) {
+    console.error(error);
+    const message = props.recipeCardData.is_favorited ? 'お気に入りの解除に失敗しました。' : 'お気に入りの登録に失敗しました。';
+    ElMessage({
+      showClose: true,
+      message: message,
+      type: 'success'
+    });
   }
 }
 
