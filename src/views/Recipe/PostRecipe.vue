@@ -190,6 +190,26 @@ function addIngredient() {
 }
 
 /**
+ * 食材の順番を入れ替える
+ */
+function replaceIngredients(index: number) {
+  const tmpIngredient = ingredientData[index];
+  ingredientData.splice(index, 1);
+  ingredientData.splice(index + 1, 0, tmpIngredient);
+}
+
+/**
+ * 食材入力欄のエラーメッセージが表示中で入力が完了した時点でエラーメッセージを非表示にする
+ */
+function validateIngredient(index: number) {
+  if (ingredientData[index].showErrorMessage) {
+    if (!!ingredientData[index].name && !!ingredientData[index].amount) {
+      ingredientData[index].showErrorMessage = false;
+    }
+  }
+}
+
+/**
  * 手順を削除する
  */
 function deleteProcedure(index: number) {
@@ -210,6 +230,24 @@ function addProcedure() {
     image_url: null,
     image_key: null
   });
+}
+
+/**
+ * 手順の順番を入れ替える
+ */
+function replaceProcedures(index: number) {
+  const tmpProcedure = procedureData[index];
+  procedureData.splice(index, 1);
+  procedureData.splice(index + 1, 0, tmpProcedure);
+}
+
+/**
+ * 手順入力欄のエラーメッセージが表示中で入力が完了した時点でエラーメッセージを非表示にする
+ */
+function validateProcedure(index: number) {
+  if (procedureData[index].showErrorMessage && !!procedureData[index].description) {
+      procedureData[index].showErrorMessage = false;
+  }
 }
 
 const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
@@ -636,6 +674,7 @@ if (route.params.id) {
                 v-model="ingredientData[index].name"
                 :maxlength="20"
                 :show-word-limit="true"
+                @blur="validateIngredient(index)"
               />
             </el-col>
             <el-col :span="8">
@@ -643,6 +682,7 @@ if (route.params.id) {
                 v-model="ingredientData[index].amount"
                 :maxlength="20"
                 :show-word-limit="true"
+                @blur="validateIngredient(index)"
               />
             </el-col>
             <el-col
@@ -664,6 +704,15 @@ if (route.params.id) {
               class="ingredient-error-message"
             >
               食材名と分量を入力してください。
+            </span>
+            <span
+              v-if="ingredientData.length >= 2 && ingredientData.length !== (index + 1)"
+              :class="'swap-button ingredient-swap-button-' + (mq.current === 'sm' ? 'sm' : 'mdlg')"
+              @click="replaceIngredients(index)"
+            >
+              <font-awesome-icon
+                :icon="['fas', 'sync-alt']"
+              />
             </span>
           </el-row>
           <el-button
@@ -707,13 +756,23 @@ if (route.params.id) {
                 type="textarea"
                 :maxlength="100"
                 :show-word-limit="true"
+                @blur="validateProcedure(index)"
               />
               <span
                 v-if="procedureData[index].showErrorMessage"
                 class="procedure-error-message"
               >
-              手順を入力してください。
-            </span>
+                手順を入力してください。
+              </span>
+              <span
+                v-if="procedureData.length >= 2 && procedureData.length !== (index + 1)"
+                :class="'swap-button procedure-swap-button-' + (mq.current === 'sm' ? 'sm' : 'mdlg')"
+                @click="replaceProcedures(index)"
+              >
+                <font-awesome-icon
+                  :icon="['fas', 'sync-alt']"
+                />
+              </span>
             </el-col>
             <el-col
               :span="2"
@@ -923,7 +982,7 @@ if (route.params.id) {
 }
 .ingredient {
   color: #606266;
-  margin-bottom: 12px;
+  margin-bottom: 20px;
   position: relative;
 }
 .ingredient-has-error {
@@ -949,6 +1008,23 @@ if (route.params.id) {
   position: absolute;
   top: 30px;
 }
+.ingredient-swap-button-mdlg {
+  top: 35px;
+  right: 9px;
+}
+.ingredient-swap-button-sm {
+  top: 35px;
+  right: 3px;
+}
+.swap-button {
+  font-size: 23px;
+  color: #67C23A;
+  position: absolute;
+  cursor: pointer;
+}
+.swap-button:hover {
+  opacity: 0.8;
+}
 .ingredient-delete-button:hover {
   opacity: 0.8;
 }
@@ -969,6 +1045,14 @@ if (route.params.id) {
   position: absolute;
   bottom: -29px;
   left: 0px;
+}
+.procedure-swap-button-mdlg {
+  top: 50px;
+  right: -33px;
+}
+.procedure-swap-button-sm {
+  top: 40px;
+  right: -27px;
 }
 .procedure-upload-wrapper {
   margin-top: 17px;
