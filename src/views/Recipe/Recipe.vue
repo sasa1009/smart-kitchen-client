@@ -76,8 +76,28 @@ async function updateFavorite() {
         showClose: true,
         message: 'レシピをお気に入りに登録するにはログインしてください。',
       });
-      router.push({name: 'Login'})
+      router.push({name: 'Login'});
     }
+  }
+}
+
+async function deleteRecipe() {
+  try {
+    if (isLogin.value) {
+      await new RecipesApi(configuration).deleteRecipe(authData.value.uid, authData.value.accessToken, authData.value.client, Number(route.params.id));
+      ElMessage({
+        showClose: true,
+        message: 'レシピを削除しました。',
+        type: 'success',
+      });
+      router.push({name: 'CurrentUser' });
+    }
+  } catch (error) {
+    ElMessage({
+      showClose: true,
+      message: 'レシピの削除に失敗しました。',
+      type: 'error',
+    });
   }
 }
 
@@ -205,6 +225,22 @@ async function updateFavorite() {
             >
               レシピを編集する
             </el-button>
+            <el-popconfirm
+              title="削除してもよろしいですか？"
+              @confirm="deleteRecipe"
+            >
+              <template #reference>
+                <el-button
+                  round
+                  size="small"
+                  type="danger"
+                  plain
+                  class="food-log-button"
+                >
+                  レシピを削除する
+                </el-button>
+              </template>
+            </el-popconfirm>
           </div>
         </div>
       </div>
@@ -405,6 +441,9 @@ async function updateFavorite() {
 .button-wrapper {
   margin-top: 10px;
   height: 35px;
+}
+.button-wrapper:nth-child(2) {
+  margin-top: 20px;
 }
 .favorite-button {
   height: 30px;

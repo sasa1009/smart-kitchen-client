@@ -2186,6 +2186,61 @@ export const RecipesApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * レシピ情報を削除する
+         * @summary レシピ情報を削除する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} id レシピのID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteRecipe: async (uid: string, accessToken: string, client: string, id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uid' is not null or undefined
+            assertParamExists('deleteRecipe', 'uid', uid)
+            // verify required parameter 'accessToken' is not null or undefined
+            assertParamExists('deleteRecipe', 'accessToken', accessToken)
+            // verify required parameter 'client' is not null or undefined
+            assertParamExists('deleteRecipe', 'client', client)
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('deleteRecipe', 'id', id)
+            const localVarPath = `/recipes/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (uid !== undefined && uid !== null) {
+                localVarHeaderParameter['uid'] = String(uid);
+            }
+
+            if (accessToken !== undefined && accessToken !== null) {
+                localVarHeaderParameter['access-token'] = String(accessToken);
+            }
+
+            if (client !== undefined && client !== null) {
+                localVarHeaderParameter['client'] = String(client);
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * ユーザーがお気に入りに登録したレシピ情報の一覧を取得する
          * @summary ユーザーがお気に入りに登録したレシピ情報の一覧を取得する
          * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
@@ -2698,6 +2753,20 @@ export const RecipesApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * レシピ情報を削除する
+         * @summary レシピ情報を削除する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} id レシピのID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteRecipe(uid: string, accessToken: string, client: string, id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteRecipe(uid, accessToken, client, id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * ユーザーがお気に入りに登録したレシピ情報の一覧を取得する
          * @summary ユーザーがお気に入りに登録したレシピ情報の一覧を取得する
          * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
@@ -2833,6 +2902,19 @@ export const RecipesApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.createRecipe(uid, accessToken, client, createRecipeRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * レシピ情報を削除する
+         * @summary レシピ情報を削除する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} id レシピのID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteRecipe(uid: string, accessToken: string, client: string, id: number, options?: any): AxiosPromise<void> {
+            return localVarFp.deleteRecipe(uid, accessToken, client, id, options).then((request) => request(axios, basePath));
+        },
+        /**
          * ユーザーがお気に入りに登録したレシピ情報の一覧を取得する
          * @summary ユーザーがお気に入りに登録したレシピ情報の一覧を取得する
          * @param {string} uid devise-token-auth用のuid(未ログインの場合は空文字を指定)
@@ -2960,6 +3042,21 @@ export class RecipesApi extends BaseAPI {
      */
     public createRecipe(uid: string, accessToken: string, client: string, createRecipeRequest: CreateRecipeRequest, options?: AxiosRequestConfig) {
         return RecipesApiFp(this.configuration).createRecipe(uid, accessToken, client, createRecipeRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * レシピ情報を削除する
+     * @summary レシピ情報を削除する
+     * @param {string} uid devise-token-auth用のuid
+     * @param {string} accessToken devise-token-auth用のaccess-token
+     * @param {string} client devise-token-auth用のclient
+     * @param {number} id レシピのID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RecipesApi
+     */
+    public deleteRecipe(uid: string, accessToken: string, client: string, id: number, options?: AxiosRequestConfig) {
+        return RecipesApiFp(this.configuration).deleteRecipe(uid, accessToken, client, id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
