@@ -76,6 +76,12 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true },
   },
   {
+    path: '/recipe/edit/:id',
+    name: 'EditRecipe',
+    component: PostRecipe,
+    meta: { requiresAuth: true },
+  },
+  {
     path: '/food-log',
     name: 'FoodLog',
     component: FoodLog,

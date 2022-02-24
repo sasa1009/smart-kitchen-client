@@ -115,7 +115,7 @@ function logout() {
             class="menu-icon"
           >
             <font-awesome-icon
-              :icon="['far', 'user']"
+              :icon="['far', 'user-circle']"
             />
           </el-button>
         </template>

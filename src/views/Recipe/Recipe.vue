@@ -23,6 +23,7 @@ const recipeData = reactive<GetRecipeResponseRecipe>({
   category: '',
   tips: '',
   image_url: null,
+  image_key: null,
   is_favorited: false,
   user: {
     id: 0,
@@ -42,6 +43,7 @@ const recipeData = reactive<GetRecipeResponseRecipe>({
           index: 0,
           description: '',
           image_url: null,
+          image_key: null,
       }
   ]
 });
@@ -49,33 +51,63 @@ const recipeData = reactive<GetRecipeResponseRecipe>({
 const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
 
 async function updateFavorite() {
-  if (recipeData.is_favorited) {
-    const response = await new FavoritesApi(configuration).deleteFavorite(authData.value.uid, authData.value.accessToken, authData.value.client, recipeData.id);
-    if (response.status === 204) {
-      ElMessage({
-        showClose: true,
-        message: 'お気に入りを解除しました。',
-      });
-      recipeData.is_favorited = !recipeData.is_favorited;
-    }
-  } else {
-    if (isLogin.value) {
-      const response = await new FavoritesApi(configuration).createFavorite(authData.value.uid, authData.value.accessToken, authData.value.client, recipeData.id);
-      if (response.status === 201) {
+  try {
+    if (recipeData.is_favorited) {
+      const response = await new FavoritesApi(configuration).deleteFavorite(authData.value.uid, authData.value.accessToken, authData.value.client, recipeData.id);
+      if (response.status === 204) {
         ElMessage({
           showClose: true,
-          message: 'お気に入りに登録しました。',
-          type: 'success'
+          message: 'お気に入りを解除しました。',
         });
         recipeData.is_favorited = !recipeData.is_favorited;
       }
     } else {
+      if (isLogin.value) {
+        const response = await new FavoritesApi(configuration).createFavorite(authData.value.uid, authData.value.accessToken, authData.value.client, recipeData.id);
+        if (response.status === 201) {
+          ElMessage({
+            showClose: true,
+            message: 'お気に入りに登録しました。',
+            type: 'success'
+          });
+          recipeData.is_favorited = !recipeData.is_favorited;
+        }
+      } else {
+        ElMessage({
+          showClose: true,
+          message: 'レシピをお気に入りに登録するにはログインしてください。',
+        });
+        router.push({name: 'Login'});
+      }
+    }
+  } catch (error) {
+    console.error(error);
+    const message = recipeData.is_favorited ? 'お気に入りの解除に失敗しました。' : 'お気に入りの登録に失敗しました。';
+    ElMessage({
+      showClose: true,
+      message: message,
+      type: 'success'
+    });
+  }
+}
+
+async function deleteRecipe() {
+  try {
+    if (isLogin.value) {
+      await new RecipesApi(configuration).deleteRecipe(authData.value.uid, authData.value.accessToken, authData.value.client, Number(route.params.id));
       ElMessage({
         showClose: true,
-        message: 'レシピをお気に入りに登録するにはログインしてください。',
+        message: 'レシピを削除しました。',
+        type: 'success',
       });
-      router.push({name: 'Login'})
+      router.push({name: 'CurrentUser' });
     }
+  } catch (error) {
+    ElMessage({
+      showClose: true,
+      message: 'レシピの削除に失敗しました。',
+      type: 'error',
+    });
   }
 }
 
@@ -199,9 +231,26 @@ async function updateFavorite() {
               type="warning"
               plain
               class="food-log-button"
+              @click="$router.push({ name: 'EditRecipe', params: { id: recipeData.id } })"
             >
               レシピを編集する
             </el-button>
+            <el-popconfirm
+              title="削除してもよろしいですか？"
+              @confirm="deleteRecipe"
+            >
+              <template #reference>
+                <el-button
+                  round
+                  size="small"
+                  type="danger"
+                  plain
+                  class="food-log-button"
+                >
+                  レシピを削除する
+                </el-button>
+              </template>
+            </el-popconfirm>
           </div>
         </div>
       </div>
@@ -402,6 +451,9 @@ async function updateFavorite() {
 .button-wrapper {
   margin-top: 10px;
   height: 35px;
+}
+.button-wrapper:nth-child(2) {
+  margin-top: 20px;
 }
 .favorite-button {
   height: 30px;

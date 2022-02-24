@@ -157,7 +157,10 @@ async function getRecipeRankingData() {
       </el-row>
     </el-tab-pane>
   </el-tabs>
-  <div :class="'carousel-wrapper-' + mq.current">
+  <div
+    v-if="recipeRankingList.length >= 1"
+    :class="'carousel-wrapper-' + mq.current"
+  >
     <h3 style="margin: 10px 0 10px 0;">一週間の人気レシピランキング</h3>
     <Carousel
       :settings="carouselSetting"
