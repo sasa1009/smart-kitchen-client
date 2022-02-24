@@ -3,41 +3,17 @@ import { ref, reactive } from 'vue';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { useMq } from 'vue3-mq';
-import dayjs from 'dayjs';
 import axios from 'axios';
-import { authData } from '@/modules/auth';
+import { authData, isLogin } from '@/modules/auth';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
+import { NotificationsApi, Configuration, GetNotificationsResponseNotifications } from '@/api';
 
 const router = useRouter();
 const input = ref('');
 const mq = useMq();
 const isDrawerOpen = ref(false);
-const notifications = reactive([
-  {
-    imageUrl: '',
-    message: 'お知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせ',
-    date: dayjs().format('YYYY/MM/DD')
-  },
-  {
-    imageUrl: '',
-    message: 'お知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせ',
-    date: dayjs().format('YYYY/MM/DD')
-  },
-  {
-    imageUrl: '',
-    message: 'お知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせ',
-    date: dayjs().format('YYYY/MM/DD')
-  },
-  {
-    imageUrl: '',
-    message: 'お知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせお知らせ',
-    date: dayjs().format('YYYY/MM/DD')
-  },
-])
-function addNotification() {
-  notifications.push(...notifications);
-}
+const notificationList = reactive<Array<GetNotificationsResponseNotifications>>([])
 function logout() {
   axios({
     method: 'delete',
@@ -71,6 +47,32 @@ function logout() {
     });
 }
 
+// 通知情報のページングに使用するパラメーター
+const pageData = reactive({
+  limit: 5,
+  offset: 0,
+  total: 0
+});
+
+async function getNotificasions() {
+  if (!isLogin.value) return;
+  try {
+    const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
+    const response = await new NotificationsApi(configuration).getNotifications(authData.value.uid, authData.value.accessToken, authData.value.client, pageData.limit, pageData.offset);
+    for (const notification of response.data.notifications) {
+      // if (!!notification.recipe_id && !notification.recipe_title) continue;
+      if (notification.sender_name) {
+        notificationList.push(notification);
+      }
+    }
+    pageData.offset += response.data.notifications.length;
+    pageData.total = response.data.meta.total;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+getNotificasions();
 </script>
 
 <template>
@@ -156,9 +158,12 @@ function logout() {
           </el-button>
         </template>
         <div class="notification">
-          <ul style="padding: 0;">
+          <ul
+            style="padding: 0;
+                   margin: 0;"
+          >
             <li
-              v-for="(notification, index) in notifications"
+              v-for="(notification, index) in notificationList"
               :key="index"
               style="list-style-type: none;
                      overflow: hidden;
@@ -169,28 +174,70 @@ function logout() {
               <div style="width: 50px;
                           float: left;"
               >
+                <div
+                  v-if="notification.sender_image_url"
+                  class="sender-image-wrapper"
+                  @click="router.push({ name: 'User', params: { id: notification.sender_id } })"
+                >
+                  <el-image
+                    :src="notification.sender_image_url"
+                    class="sender-image"
+                    fit="cover"
+                  />
+                </div>
                 <font-awesome-icon
-                  :icon="['far', 'user']"
+                  v-else
+                  :icon="['far', 'user-circle']"
                   size="2x"
                 />
               </div>
-              <div style="width: 250px;
-                          float: left;"
+              <div
+                v-if="notification.recipe_id"
+                style="width: 250px;
+                       float: left;"
               >
                 <p style="margin: 0;">
-                  {{ notification.message }}
+                  <span
+                    class="sender-name"
+                    @click="router.push({ name: 'User', params: { id: notification.sender_id } })"
+                  >
+                    {{ notification.sender_name }}
+                  </span>
+                  が
+                  <span
+                    class="sender-name"
+                    @click="router.push({ name: 'Recipe', params: { id: notification.recipe_id } })"
+                  >
+                    {{ notification.recipe_title }}
+                  </span>
+                  をお気に入りに登録しました。
                 </p>
-                <span>
-                  {{ notification.date }}
-                </span>
+              </div>
+              <div
+                v-else
+                style="width: 250px;
+                       float: left;"
+              >
+                <p style="margin: 0;">
+                  <span
+                    class="sender-name"
+                    @click="router.push({ name: 'User', params: { id: notification.sender_id } })"
+                  >
+                    {{ notification.sender_name }}
+                  </span>
+                  にフォローされました。
+                </p>
               </div>
             </li>
           </ul>
-          <div style="text-align: center;">
+          <div
+            style="text-align: center;"
+          >
             <el-button
+              v-if="pageData.total > pageData.offset"
               type="text"
               class="next-button"
-              @click="addNotification"
+              @click="getNotificasions"
             >
               続きを読み込む
             </el-button>
@@ -287,9 +334,12 @@ function logout() {
           </el-button>
         </template>
         <div class="notification">
-          <ul style="padding: 0;">
+          <ul
+            style="padding: 0;
+                   margin: 0;"
+          >
             <li
-              v-for="(notification, index) in notifications"
+              v-for="(notification, index) in notificationList"
               :key="index"
               style="list-style-type: none;
                      overflow: hidden;
@@ -300,28 +350,70 @@ function logout() {
               <div style="width: 50px;
                           float: left;"
               >
+                <div
+                  v-if="notification.sender_image_url"
+                  class="sender-image-wrapper"
+                  @click="router.push({ name: 'User', params: { id: notification.sender_id } })"
+                >
+                  <el-image
+                    :src="notification.sender_image_url"
+                    class="sender-image"
+                    fit="cover"
+                  />
+                </div>
                 <font-awesome-icon
-                  :icon="['far', 'user']"
+                  v-else
+                  :icon="['far', 'user-circle']"
                   size="2x"
                 />
               </div>
-              <div style="width: 250px;
-                          float: left;"
+              <div
+                v-if="notification.recipe_id"
+                style="width: 250px;
+                       float: left;"
               >
                 <p style="margin: 0;">
-                  {{ notification.message }}
+                  <span
+                    class="sender-name"
+                    @click="router.push({ name: 'User', params: { id: notification.sender_id } })"
+                  >
+                    {{ notification.sender_name }}
+                  </span>
+                  が
+                  <span
+                    class="sender-name"
+                    @click="router.push({ name: 'Recipe', params: { id: notification.recipe_id } })"
+                  >
+                    {{ notification.recipe_title }}
+                  </span>
+                  をお気に入りに登録しました。
                 </p>
-                <span>
-                  {{ notification.date }}
-                </span>
+              </div>
+              <div
+                v-else
+                style="width: 250px;
+                       float: left;"
+              >
+                <p style="margin: 0;">
+                  <span
+                    class="sender-name"
+                    @click="router.push({ name: 'User', params: { id: notification.sender_id } })"
+                  >
+                    {{ notification.sender_name }}
+                  </span>
+                  にフォローされました。
+                </p>
               </div>
             </li>
           </ul>
-          <div style="text-align: center;">
+          <div
+            style="text-align: center;"
+          >
             <el-button
+              v-if="pageData.total > pageData.offset"
               type="text"
               class="next-button"
-              @click="addNotification"
+              @click="getNotificasions"
             >
               続きを読み込む
             </el-button>
@@ -444,5 +536,29 @@ function logout() {
 }
 .el-menu {
   border-right: none;
+}
+/* お知らせ */
+.sender-image-wrapper {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+}
+.user-image-wrapper:hover {
+  opacity: 0.8;
+}
+.sender-image {
+  width: 28px;
+  height: 28px;
+}
+.sender-name {
+  margin: 0 3px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.sender-name:hover {
+  opacity: 0.8;
+  text-decoration: underline;
 }
 </style>

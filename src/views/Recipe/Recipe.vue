@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { RecipesApi, Configuration, GetRecipeResponseRecipe, FavoritesApi } from '@/api';
@@ -114,7 +114,7 @@ async function deleteRecipe() {
 /**
  * 単一のレシピ情報を取得
  */
-(async function init() {
+async function getRecipeData() {
   try {
     let response;
     if (isLogin.value) {
@@ -134,7 +134,17 @@ async function deleteRecipe() {
   } catch (error) {
     console.error(error);
   }
-})()
+}
+
+/**
+ * パスパラメータのIDが変わった時にレシピ情報を再度読み込む
+ */
+watch(() => route.path, async () => {
+  await getRecipeData();
+});
+
+// コンポーネント作成時にレシピ情報を読み込む
+getRecipeData();
 </script>
 
 <template>

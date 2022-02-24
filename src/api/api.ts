@@ -437,6 +437,75 @@ export interface GetFoodLogsResponseFoodLogs {
     'meal_date_time': string;
 }
 /**
+ * 通知情報
+ * @export
+ * @interface GetNotificationsResponse
+ */
+export interface GetNotificationsResponse {
+    /**
+     * 通知情報の配列
+     * @type {Array<GetNotificationsResponseNotifications>}
+     * @memberof GetNotificationsResponse
+     */
+    'notifications': Array<GetNotificationsResponseNotifications>;
+    /**
+     * 
+     * @type {GetNotificationsResponseMeta}
+     * @memberof GetNotificationsResponse
+     */
+    'meta': GetNotificationsResponseMeta;
+}
+/**
+ * 追加情報
+ * @export
+ * @interface GetNotificationsResponseMeta
+ */
+export interface GetNotificationsResponseMeta {
+    /**
+     * 通知情報の総数
+     * @type {number}
+     * @memberof GetNotificationsResponseMeta
+     */
+    'total': number;
+}
+/**
+ * 
+ * @export
+ * @interface GetNotificationsResponseNotifications
+ */
+export interface GetNotificationsResponseNotifications {
+    /**
+     * 通知を送信したユーザーのID
+     * @type {number}
+     * @memberof GetNotificationsResponseNotifications
+     */
+    'sender_id': number;
+    /**
+     * 通知を送信したユーザーの名前
+     * @type {string}
+     * @memberof GetNotificationsResponseNotifications
+     */
+    'sender_name': string | null;
+    /**
+     * 通知を送信したユーザーの画像のURL
+     * @type {string}
+     * @memberof GetNotificationsResponseNotifications
+     */
+    'sender_image_url': string | null;
+    /**
+     * レシピのID
+     * @type {number}
+     * @memberof GetNotificationsResponseNotifications
+     */
+    'recipe_id': number | null;
+    /**
+     * レシピのタイトル
+     * @type {string}
+     * @memberof GetNotificationsResponseNotifications
+     */
+    'recipe_title': string | null;
+}
+/**
  * 署名付きURL情報
  * @export
  * @interface GetPresignedUrlResponse
@@ -1970,6 +2039,154 @@ export class FoodLogsApi extends BaseAPI {
      */
     public getFoodLogs(uid: string, accessToken: string, client: string, from: string, to: string, options?: AxiosRequestConfig) {
         return FoodLogsApiFp(this.configuration).getFoodLogs(uid, accessToken, client, from, to, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * NotificationsApi - axios parameter creator
+ * @export
+ */
+export const NotificationsApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 通知情報を一覧取得する
+         * @summary 通知情報を一覧取得する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} limit 取得する通知情報の件数
+         * @param {number} offset 取得をスキップする通知情報の件数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getNotifications: async (uid: string, accessToken: string, client: string, limit: number, offset: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uid' is not null or undefined
+            assertParamExists('getNotifications', 'uid', uid)
+            // verify required parameter 'accessToken' is not null or undefined
+            assertParamExists('getNotifications', 'accessToken', accessToken)
+            // verify required parameter 'client' is not null or undefined
+            assertParamExists('getNotifications', 'client', client)
+            // verify required parameter 'limit' is not null or undefined
+            assertParamExists('getNotifications', 'limit', limit)
+            // verify required parameter 'offset' is not null or undefined
+            assertParamExists('getNotifications', 'offset', offset)
+            const localVarPath = `/notifications`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+            if (uid !== undefined && uid !== null) {
+                localVarHeaderParameter['uid'] = String(uid);
+            }
+
+            if (accessToken !== undefined && accessToken !== null) {
+                localVarHeaderParameter['access-token'] = String(accessToken);
+            }
+
+            if (client !== undefined && client !== null) {
+                localVarHeaderParameter['client'] = String(client);
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * NotificationsApi - functional programming interface
+ * @export
+ */
+export const NotificationsApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = NotificationsApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 通知情報を一覧取得する
+         * @summary 通知情報を一覧取得する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} limit 取得する通知情報の件数
+         * @param {number} offset 取得をスキップする通知情報の件数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getNotifications(uid: string, accessToken: string, client: string, limit: number, offset: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetNotificationsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getNotifications(uid, accessToken, client, limit, offset, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * NotificationsApi - factory interface
+ * @export
+ */
+export const NotificationsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = NotificationsApiFp(configuration)
+    return {
+        /**
+         * 通知情報を一覧取得する
+         * @summary 通知情報を一覧取得する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {number} limit 取得する通知情報の件数
+         * @param {number} offset 取得をスキップする通知情報の件数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getNotifications(uid: string, accessToken: string, client: string, limit: number, offset: number, options?: any): AxiosPromise<GetNotificationsResponse> {
+            return localVarFp.getNotifications(uid, accessToken, client, limit, offset, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * NotificationsApi - object-oriented interface
+ * @export
+ * @class NotificationsApi
+ * @extends {BaseAPI}
+ */
+export class NotificationsApi extends BaseAPI {
+    /**
+     * 通知情報を一覧取得する
+     * @summary 通知情報を一覧取得する
+     * @param {string} uid devise-token-auth用のuid
+     * @param {string} accessToken devise-token-auth用のaccess-token
+     * @param {string} client devise-token-auth用のclient
+     * @param {number} limit 取得する通知情報の件数
+     * @param {number} offset 取得をスキップする通知情報の件数
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof NotificationsApi
+     */
+    public getNotifications(uid: string, accessToken: string, client: string, limit: number, offset: number, options?: AxiosRequestConfig) {
+        return NotificationsApiFp(this.configuration).getNotifications(uid, accessToken, client, limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
