@@ -989,6 +989,57 @@ export interface UpdateCurrentUserRequest {
 export const CurrentUserApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
+         * ログイン中のユーザー情報を削除する
+         * @summary ログイン中のユーザー情報を削除する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteCurrentUser: async (uid: string, accessToken: string, client: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uid' is not null or undefined
+            assertParamExists('deleteCurrentUser', 'uid', uid)
+            // verify required parameter 'accessToken' is not null or undefined
+            assertParamExists('deleteCurrentUser', 'accessToken', accessToken)
+            // verify required parameter 'client' is not null or undefined
+            assertParamExists('deleteCurrentUser', 'client', client)
+            const localVarPath = `/auth`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (uid !== undefined && uid !== null) {
+                localVarHeaderParameter['uid'] = String(uid);
+            }
+
+            if (accessToken !== undefined && accessToken !== null) {
+                localVarHeaderParameter['access-token'] = String(accessToken);
+            }
+
+            if (client !== undefined && client !== null) {
+                localVarHeaderParameter['client'] = String(client);
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * ログイン中のユーザー情報を取得する
          * @summary ログイン中のユーザー情報を取得する
          * @param {string} uid devise-token-auth用のuid
@@ -1111,6 +1162,19 @@ export const CurrentUserApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = CurrentUserApiAxiosParamCreator(configuration)
     return {
         /**
+         * ログイン中のユーザー情報を削除する
+         * @summary ログイン中のユーザー情報を削除する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteCurrentUser(uid: string, accessToken: string, client: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteCurrentUser(uid, accessToken, client, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * ログイン中のユーザー情報を取得する
          * @summary ログイン中のユーザー情報を取得する
          * @param {string} uid devise-token-auth用のuid
@@ -1149,6 +1213,18 @@ export const CurrentUserApiFactory = function (configuration?: Configuration, ba
     const localVarFp = CurrentUserApiFp(configuration)
     return {
         /**
+         * ログイン中のユーザー情報を削除する
+         * @summary ログイン中のユーザー情報を削除する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteCurrentUser(uid: string, accessToken: string, client: string, options?: any): AxiosPromise<void> {
+            return localVarFp.deleteCurrentUser(uid, accessToken, client, options).then((request) => request(axios, basePath));
+        },
+        /**
          * ログイン中のユーザー情報を取得する
          * @summary ログイン中のユーザー情報を取得する
          * @param {string} uid devise-token-auth用のuid
@@ -1184,6 +1260,20 @@ export const CurrentUserApiFactory = function (configuration?: Configuration, ba
  * @extends {BaseAPI}
  */
 export class CurrentUserApi extends BaseAPI {
+    /**
+     * ログイン中のユーザー情報を削除する
+     * @summary ログイン中のユーザー情報を削除する
+     * @param {string} uid devise-token-auth用のuid
+     * @param {string} accessToken devise-token-auth用のaccess-token
+     * @param {string} client devise-token-auth用のclient
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CurrentUserApi
+     */
+    public deleteCurrentUser(uid: string, accessToken: string, client: string, options?: AxiosRequestConfig) {
+        return CurrentUserApiFp(this.configuration).deleteCurrentUser(uid, accessToken, client, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * ログイン中のユーザー情報を取得する
      * @summary ログイン中のユーザー情報を取得する
