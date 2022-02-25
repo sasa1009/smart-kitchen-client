@@ -14,7 +14,7 @@ const input = ref('');
 const mq = useMq();
 const isDrawerOpen = ref(false);
 
-function login() {
+function guestLogin() {
   axios({
     method: 'post',
     headers: {
@@ -92,7 +92,7 @@ function login() {
       <el-button
         type="text"
         class="menu-item"
-        @click="login"
+        @click="guestLogin"
       >
         ゲストログイン
       </el-button>
@@ -143,7 +143,10 @@ function login() {
           >
             <span>ユーザー登録</span>
           </el-menu-item>
-          <el-menu-item index="3">
+          <el-menu-item
+            index="3"
+            @click="guestLogin"
+          >
             <span>ゲストログイン</span>
           </el-menu-item>
           <el-menu-item
