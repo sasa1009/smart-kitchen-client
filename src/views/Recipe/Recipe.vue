@@ -53,13 +53,21 @@ const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE
 async function updateFavorite() {
   try {
     if (recipeData.is_favorited) {
-      const response = await new FavoritesApi(configuration).deleteFavorite(authData.value.uid, authData.value.accessToken, authData.value.client, recipeData.id);
-      if (response.status === 204) {
+      if (isLogin.value) {
+        const response = await new FavoritesApi(configuration).deleteFavorite(authData.value.uid, authData.value.accessToken, authData.value.client, recipeData.id);
+        if (response.status === 204) {
+          ElMessage({
+            showClose: true,
+            message: 'お気に入りを解除しました。',
+          });
+          recipeData.is_favorited = !recipeData.is_favorited;
+        }
+      } else {
         ElMessage({
           showClose: true,
-          message: 'お気に入りを解除しました。',
+          message: 'お気に入りを解除するにはログインしてください。',
         });
-        recipeData.is_favorited = !recipeData.is_favorited;
+        router.push({name: 'Login'});
       }
     } else {
       if (isLogin.value) {

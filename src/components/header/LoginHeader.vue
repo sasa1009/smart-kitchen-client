@@ -13,7 +13,6 @@ const router = useRouter();
 const input = ref('');
 const mq = useMq();
 const isDrawerOpen = ref(false);
-const notificationList = reactive<Array<GetNotificationsResponseNotifications>>([])
 function logout() {
   axios({
     method: 'delete',
@@ -47,6 +46,9 @@ function logout() {
     });
 }
 
+// 通知情報を格納する
+const notificationDataList = reactive<Array<GetNotificationsResponseNotifications>>([]);
+
 // 通知情報のページングに使用するパラメーター
 const pageData = reactive({
   limit: 5,
@@ -54,15 +56,18 @@ const pageData = reactive({
   total: 0
 });
 
+/**
+ * 通知情報を一覧取得する
+ */
 async function getNotificasions() {
   if (!isLogin.value) return;
   try {
     const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
     const response = await new NotificationsApi(configuration).getNotifications(authData.value.uid, authData.value.accessToken, authData.value.client, pageData.limit, pageData.offset);
     for (const notification of response.data.notifications) {
-      // if (!!notification.recipe_id && !notification.recipe_title) continue;
+      if (!!notification.recipe_id && !notification.recipe_title) continue;
       if (notification.sender_name) {
-        notificationList.push(notification);
+        notificationDataList.push(notification);
       }
     }
     pageData.offset += response.data.notifications.length;
@@ -163,7 +168,7 @@ getNotificasions();
                    margin: 0;"
           >
             <li
-              v-for="(notification, index) in notificationList"
+              v-for="(notification, index) in notificationDataList"
               :key="index"
               style="list-style-type: none;
                      overflow: hidden;
@@ -339,7 +344,7 @@ getNotificasions();
                    margin: 0;"
           >
             <li
-              v-for="(notification, index) in notificationList"
+              v-for="(notification, index) in notificationDataList"
               :key="index"
               style="list-style-type: none;
                      overflow: hidden;
