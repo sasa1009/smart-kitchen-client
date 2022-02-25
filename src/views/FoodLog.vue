@@ -91,7 +91,7 @@ function addFoodData(food_data: GetFoodLogTemplatesResponseFoodLogTemplates | un
     formData.food_data_list.push({
       name: '',
       calorie: 0,
-      amount: 0,
+      amount: 1,
       recipe_id: null,
       is_create_template: false,
       is_show_error_message: false

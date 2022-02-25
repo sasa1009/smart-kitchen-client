@@ -474,7 +474,7 @@ watch(() => route.path, (path: string) => {
     ]);
   
   // レシピ作成ページからレシピ編集ページに遷移した場合は再度レシピデータを取得
-  } else {
+  } else if (route.name === 'EditRecipe') {
     getRecipeData();
   }
 });
@@ -795,7 +795,7 @@ if (route.params.id) {
                   <input
                     type="file"
                     @change="(event) => { handleFile(event, index) }"
-                    />
+                  />
                 </label>
                 <div
                   class="procedure-image-name-wrapper"

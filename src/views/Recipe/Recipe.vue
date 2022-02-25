@@ -140,7 +140,9 @@ async function getRecipeData() {
  * パスパラメータのIDが変わった時にレシピ情報を再度読み込む
  */
 watch(() => route.path, async () => {
-  await getRecipeData();
+  if (route.name === 'Recipe') {
+    await getRecipeData();
+  }
 });
 
 // コンポーネント作成時にレシピ情報を読み込む

@@ -86,7 +86,7 @@ async function getUserData() {
   try {
     const response = await new CurrentUserApi(configuration).getCurrentUser(authData.value.uid, authData.value.accessToken, authData.value.client);
     if (response.status !== 200) throw new Error('ユーザー情報の取得に失敗しました。');
-    Object.assign(userData, response.data.user)
+    Object.assign(userData, response.data.user);
   } catch (error) {
     console.error(error);
   }
@@ -175,7 +175,7 @@ const followingRecipePageData = reactive({
 watch(
   () => followingRecipePageData.current,
   async () => {
-    await getFavoritedRecipeData();
+    await getFollowingRecipeData();
   }
 );
 
@@ -184,7 +184,7 @@ watch(
  */
 async function getFollowingRecipeData() {
   try {
-    const response = await new RecipesApi(configuration).getFollowingRecipes(authData.value.uid, authData.value.accessToken, authData.value.client, Number(authData.value.userId), favoritedRecipePageData.limit, favoritedRecipePageData.limit * (favoritedRecipePageData.current - 1));
+    const response = await new RecipesApi(configuration).getFollowingRecipes(authData.value.uid, authData.value.accessToken, authData.value.client, Number(authData.value.userId), followingRecipePageData.limit, followingRecipePageData.limit * (followingRecipePageData.current - 1));
     if (response.status !== 200) throw new Error('レシピ情報の取得に失敗しました。');
     followingRecipeDataList.splice(0);
     Object.assign(followingRecipeDataList, response.data.recipes);
@@ -215,10 +215,8 @@ watch(
   }
 );
 
-(async function init() {
-  await getUserData();
-  await getUsersRecipeData();
-})();
+getUserData();
+getUsersRecipeData();
 </script>
 
 <template>

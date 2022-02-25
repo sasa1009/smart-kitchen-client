@@ -207,9 +207,11 @@ watch(
  * パスパラメータのIDが変わった時にユーザー情報を再度読み込む
  */
 watch(() => route.path, async () => {
-  currentTab.value = '0';
-  await getUserData();
-  await getUsersRecipeData();
+  if (route.name === 'User') {
+    currentTab.value = '0';
+    await getUserData();
+    await getUsersRecipeData();
+  }
 });
 
 // コンポーネント作成時にユーザー情報を読み込む

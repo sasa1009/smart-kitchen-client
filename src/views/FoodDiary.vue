@@ -32,7 +32,7 @@ const dateNumber = computed(() => (date: string) => {
  * ISOStringを時間にフォーマットする
  */
 const formatDate = computed(() => (date: string) => {
-  return dayjs(date).format('HH:mm');
+  return dayjs(date).format('H:m');
 });
 
 /**
