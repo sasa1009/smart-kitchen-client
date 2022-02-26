@@ -526,17 +526,19 @@ getUsersRecipeData();
 <style scoped>
 /* ユーザーデータラッパー大 */
 .user-data-wrapper-mdlg {
-  width: 750px;
+  width: 752px;
   min-height: 450px;
   background-color: white;
+  border: 1px solid #dcdfe6;
   margin: 10px auto 0 auto;
   padding-bottom: 10px;
   box-sizing: border-box;
 }
 /* ユーザーデータラッパー小 */
 .user-data-wrapper-sm {
-  width: 375px;
+  width: 377px;
   background-color: white;
+  border: 1px solid #dcdfe6;
   margin: 10px auto 0 auto;
   padding-bottom: 15px;
   box-sizing: border-box;
@@ -548,13 +550,13 @@ getUsersRecipeData();
 }
 /* ユーザーデータ大 */
 .user-data-mdlg {
-  width: 375px;
+  width: 374px;
   height: 400px;
   float: left;
 }
 /* ユーザーデータ小 */
 .user-data-sm {
-  width: 375px;
+  width: 374px;
   height: 400px;
   padding: 10px;
   box-sizing: border-box;
@@ -620,7 +622,7 @@ getUsersRecipeData();
 }
 /* コメント大 */
 .comment-mdlg {
-  width: 375px;
+  width: 374px;
   float: left;
   font-size: 14px;
   padding: 0 10px;
@@ -628,7 +630,7 @@ getUsersRecipeData();
 }
 /* コメント小 */
 .comment-sm {
-  width: 375px;
+  width: 374px;
   font-size: 14px;
   padding: 10px;
   box-sizing: border-box;

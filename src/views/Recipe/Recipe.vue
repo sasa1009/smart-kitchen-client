@@ -351,6 +351,7 @@ getRecipeData();
 .recipe-data-wrapper-mdlg {
   width: 750px;
   background-color: white;
+  border: 1px solid #dcdfe6;
   margin: 10px auto 0 auto;
   padding-bottom: 10px;
   box-sizing: border-box;
@@ -359,6 +360,7 @@ getRecipeData();
 .recipe-data-wrapper-sm {
   width: 375px;
   background-color: white;
+  border: 1px solid #dcdfe6;
   margin: 10px auto 0 auto;
   padding-bottom: 10px;
   box-sizing: border-box;

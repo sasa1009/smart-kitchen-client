@@ -65,10 +65,7 @@ async function getNotificasions() {
     const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
     const response = await new NotificationsApi(configuration).getNotifications(authData.value.uid, authData.value.accessToken, authData.value.client, pageData.limit, pageData.offset);
     for (const notification of response.data.notifications) {
-      if (!!notification.recipe_id && !notification.recipe_title) continue;
-      if (notification.sender_name) {
-        notificationDataList.push(notification);
-      }
+      notificationDataList.push(notification);
     }
     pageData.offset += response.data.notifications.length;
     pageData.total = response.data.meta.total;
@@ -208,7 +205,7 @@ getNotificasions();
                   >
                     {{ notification.sender_name }}
                   </span>
-                  が
+                  さんが
                   <span
                     class="sender-name"
                     @click="router.push({ name: 'Recipe', params: { id: notification.recipe_id } })"
@@ -230,7 +227,7 @@ getNotificasions();
                   >
                     {{ notification.sender_name }}
                   </span>
-                  にフォローされました。
+                  さんにフォローされました。
                 </p>
               </div>
             </li>
@@ -384,7 +381,7 @@ getNotificasions();
                   >
                     {{ notification.sender_name }}
                   </span>
-                  が
+                  さんが
                   <span
                     class="sender-name"
                     @click="router.push({ name: 'Recipe', params: { id: notification.recipe_id } })"
@@ -406,7 +403,7 @@ getNotificasions();
                   >
                     {{ notification.sender_name }}
                   </span>
-                  にフォローされました。
+                  さんにフォローされました。
                 </p>
               </div>
             </li>
