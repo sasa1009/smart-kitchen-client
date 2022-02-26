@@ -1,11 +1,54 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus';
+import axios from 'axios';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { useMq } from "vue3-mq";
+import { useMq } from 'vue3-mq';
+import dayjs from 'dayjs';
+import { authData } from '@/modules/auth';
+
+const router = useRouter();
 const input = ref('');
 const mq = useMq();
 const isDrawerOpen = ref(false);
+
+function guestLogin() {
+  axios({
+    method: 'post',
+    headers: {
+      'content-type': 'application/json'
+    },
+    url:'http://localhost:3000/api/v1/auth/sign_in',
+    data: {
+      email: 'akinorisasakura1009@gmail.com',
+      password: 'password'
+    },
+  })
+    .then(function (response) {
+      console.log(response);
+      authData.value.userId = response.data.data.id;
+      authData.value.uid = response.headers.uid;
+      authData.value.accessToken = response.headers['access-token'];
+      authData.value.client = response.headers.client;
+      authData.value.expiry = dayjs.unix(Number(response.headers.expiry)).format();
+      ElMessage({
+        showClose: true,
+        message: 'ゲストユーザーとしてログインしました。',
+        type: 'success'
+      })
+      router.push({ name: 'Home' });
+    })
+    .catch(function (error) {
+      console.error(error);
+      ElMessage({
+        showClose: true,
+        message: 'ログインに失敗しました。',
+        type: 'error'
+      })
+    });
+}
 </script>
 
 <template>
@@ -49,6 +92,7 @@ const isDrawerOpen = ref(false);
       <el-button
         type="text"
         class="menu-item"
+        @click="guestLogin"
       >
         ゲストログイン
       </el-button>
@@ -99,7 +143,10 @@ const isDrawerOpen = ref(false);
           >
             <span>ユーザー登録</span>
           </el-menu-item>
-          <el-menu-item index="3">
+          <el-menu-item
+            index="3"
+            @click="guestLogin"
+          >
             <span>ゲストログイン</span>
           </el-menu-item>
           <el-menu-item

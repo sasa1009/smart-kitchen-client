@@ -91,7 +91,7 @@ function addFoodData(food_data: GetFoodLogTemplatesResponseFoodLogTemplates | un
     formData.food_data_list.push({
       name: '',
       calorie: 0,
-      amount: 0,
+      amount: 1,
       recipe_id: null,
       is_create_template: false,
       is_show_error_message: false
@@ -441,6 +441,7 @@ if (route.params.name) {
 .form-wrapper-mdlg {
   width: 750px;
   background-color: white;
+  border: 1px solid #dcdfe6;
   margin: 10px auto 0 auto;
   padding-bottom: 10px;
   box-sizing: border-box;
@@ -449,6 +450,7 @@ if (route.params.name) {
 .form-wrapper-sm {
   width: 375px;
   background-color: white;
+  border: 1px solid #dcdfe6;
   margin: 10px auto 0 auto;
   padding-bottom: 10px;
   box-sizing: border-box;

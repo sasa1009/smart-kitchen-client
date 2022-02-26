@@ -32,7 +32,7 @@ const dateNumber = computed(() => (date: string) => {
  * ISOStringを時間にフォーマットする
  */
 const formatDate = computed(() => (date: string) => {
-  return dayjs(date).format('HH:mm');
+  return dayjs(date).format('H:m');
 });
 
 /**
@@ -533,6 +533,7 @@ async function updateChart(status: 'previous' | 'next') {
 .content-mdlg {
   width: 750px;
   background-color: white;
+  border: 1px solid #dcdfe6;
   margin: 10px auto 0 auto;
   padding: 10px;
   box-sizing: border-box;
@@ -541,6 +542,7 @@ async function updateChart(status: 'previous' | 'next') {
 .content-sm {
   width: 375px;
   background-color: white;
+  border: 1px solid #dcdfe6;
   margin: 10px auto 0 auto;
   padding-top: 10px;
   box-sizing: border-box;

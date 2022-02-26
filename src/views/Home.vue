@@ -84,13 +84,11 @@ async function getRecipeRankingData() {
 }
 
 // レシピ情報の一覧を取得する
-(function init() {
-  getRecipeData();
-  getRecipeRankingData();
-  if (isLogin.value) {
-    getFollowingRecipeData();
-  }
-})();
+getRecipeData();
+getRecipeRankingData();
+if (isLogin.value) {
+  getFollowingRecipeData();
+}
 </script>
 
 <template>

@@ -474,7 +474,7 @@ watch(() => route.path, (path: string) => {
     ]);
   
   // レシピ作成ページからレシピ編集ページに遷移した場合は再度レシピデータを取得
-  } else {
+  } else if (route.name === 'EditRecipe') {
     getRecipeData();
   }
 });
@@ -795,7 +795,7 @@ if (route.params.id) {
                   <input
                     type="file"
                     @change="(event) => { handleFile(event, index) }"
-                    />
+                  />
                 </label>
                 <div
                   class="procedure-image-name-wrapper"
@@ -859,6 +859,7 @@ if (route.params.id) {
 .recipe-data-wrapper-mdlg {
   width: 750px;
   background-color: white;
+  border: 1px solid #dcdfe6;
   margin: 10px auto 0 auto;
   padding-bottom: 10px;
   box-sizing: border-box;
@@ -867,6 +868,7 @@ if (route.params.id) {
 .recipe-data-wrapper-sm {
   width: 375px;
   background-color: white;
+  border: 1px solid #dcdfe6;
   margin: 10px auto 0 auto;
   padding-bottom: 10px;
   box-sizing: border-box;

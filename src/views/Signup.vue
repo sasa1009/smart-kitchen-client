@@ -11,7 +11,7 @@ const router = useRouter();
 
 const formRef = ref<InstanceType<typeof ElForm>>()
 const rules = reactive({
-  userName: [
+  name: [
     {
       required: true,
       message: 'ユーザー名を入力してください。',
@@ -51,9 +51,10 @@ const rules = reactive({
   ]
 });
 const formData = reactive({
-  userName: '',
+  name: '',
   email: '',
-  password: ''
+  password: '',
+  comment: ''
 });
 function signUp(formEl: InstanceType<typeof ElForm> | undefined) {
   if (!formEl) return;
@@ -111,9 +112,9 @@ function signUp(formEl: InstanceType<typeof ElForm> | undefined) {
       <h3>ユーザー登録</h3>
       <el-form-item
         label="ユーザー名"
-        prop="userName"
+        prop="name"
       >
-        <el-input v-model="formData.userName"></el-input>
+        <el-input v-model="formData.name"></el-input>
       </el-form-item>
       <el-form-item
         label="メールアドレス"

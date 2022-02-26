@@ -30,15 +30,23 @@ async function updateFavorite() {
   try {
     const recipeCardData = props.recipeCardData;
     if (recipeCardData.is_favorited) {
-      const response = await new FavoritesApi(configuration).deleteFavorite(authData.value.uid, authData.value.accessToken, authData.value.client, props.recipeCardData.id);
-      if (response.status === 204) {
+      if (isLogin.value) {
+        const response = await new FavoritesApi(configuration).deleteFavorite(authData.value.uid, authData.value.accessToken, authData.value.client, props.recipeCardData.id);
+        if (response.status === 204) {
+          ElMessage({
+            showClose: true,
+            message: 'お気に入りを解除しました。',
+          });
+          recipeCardData.is_favorited = !recipeCardData.is_favorited;
+          recipeCardData.favorited_count--;
+          emits('update:recipeCardData', recipeCardData);
+        }
+      } else {
         ElMessage({
           showClose: true,
-          message: 'お気に入りを解除しました。',
+          message: 'お気に入りを解除するにはログインしてください。',
         });
-        recipeCardData.is_favorited = !recipeCardData.is_favorited;
-        recipeCardData.favorited_count--;
-        emits('update:recipeCardData', recipeCardData);
+        router.push({name: 'Login'})
       }
     } else {
       if (isLogin.value) {

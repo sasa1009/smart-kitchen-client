@@ -3,7 +3,7 @@ import { ref, reactive, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import type { ElForm } from 'element-plus';
-import { authData } from '@/modules/auth';
+import { authData, isLogin } from '@/modules/auth';
 import { getPresignedUrl } from '@/modules/presignedUrl';
 import { CurrentUserApi, Configuration, UpdateCurrentUserRequest } from '@/api';
 import axios from 'axios';
@@ -190,6 +190,8 @@ async function uploadImageFileToS3(file: File) {
   }
 }
 
+const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
+
 /**
  * ユーザー情報を更新する
  */
@@ -207,14 +209,13 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
         }
 
         // ユーザー情報を更新
-        const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
         const response = await new CurrentUserApi(configuration).updateCurrentUser(authData.value.uid, authData.value.accessToken, authData.value.client, authData.value.userId, formData)
         if (response.status === 200) {
           ElMessage({
             showClose: true,
             message: 'ユーザー情報を更新しました。',
             type: 'success',
-          })
+          });
           router.push({ name: 'CurrentUser' })
         } else {
           throw new Error('ユーザー情報更新失敗。');
@@ -225,7 +226,7 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
           showClose: true,
           message: 'ユーザー情報の更新に失敗しました。',
           type: 'error',
-        })
+        });
       }
     } else {
       console.log('error submit!');
@@ -238,7 +239,6 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
  * ログイン中のユーザー情報を取得する
  */
 (async function init() {
-  const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
   try {
     const response = await new CurrentUserApi(configuration).getCurrentUser(authData.value.uid, authData.value.accessToken, authData.value.client);
     if (response.status !== 200) throw new Error('ユーザー情報の取得に失敗しました。');
@@ -255,6 +255,34 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
     console.error(error);
   }
 })();
+
+/**
+ * ユーザー情報を削除する
+ */
+async function deleteUser() {
+  try {
+    if (!isLogin.value) return;
+    await new CurrentUserApi(configuration).deleteCurrentUser(authData.value.uid, authData.value.accessToken, authData.value.client);
+    authData.value.userId = null;
+    authData.value.uid = '';
+    authData.value.accessToken = '';
+    authData.value.client = '';
+    authData.value.expiry = '';
+    ElMessage({
+      showClose: true,
+      message: '退会が完了しました。ご利用いただきありがとうございました。',
+      type: 'success',
+    });
+    router.push({ name: 'Home' });
+  } catch (error) {
+    console.error(error);
+    ElMessage({
+      showClose: true,
+      message: '退会処理に失敗しました。',
+      type: 'error',
+    });
+  }
+}
 </script>
 
 <template>
@@ -266,7 +294,6 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
       :model="formData"
       :rules="rules"
       :hide-required-asterisk="true"
-      class="login-form"
     >
       <div :class="'user-data-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
         <div
@@ -292,9 +319,10 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
           <label class="upload">
             画像を変更
             <input
+              ref="inputRef"
               type="file"
               @change="handleFile"
-              />
+            />
           </label>
           <span class="upload-tips">5MB以下で、JPEGまたはPNG形式の画像を指定してください。</span>
           <div
@@ -485,6 +513,20 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
         </el-form-item>
       </div>
     </el-form>
+    <div :class="'withdrawal-' + (mq.current === 'sm' ? 'sm' : 'mdlg')">
+      <el-popconfirm
+        title="本当に退会してもよろしいですか？"
+        @confirm="deleteUser"
+      >
+        <template #reference>
+          <el-button
+            type="danger"
+          >
+            退会する
+          </el-button>
+        </template>
+      </el-popconfirm>
+    </div>
   </div>
 </template>
 
@@ -493,12 +535,14 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
 .user-data-wrapper-mdlg {
   width: 750px;
   background-color: white;
+  border: 1px solid #dcdfe6;
   margin: 10px auto 0 auto;
 }
 /* ユーザーデータラッパー小 */
 .user-data-wrapper-sm {
   width: 375px;
   background-color: white;
+  border: 1px solid #dcdfe6;
   margin: 10px auto 0 auto;
 }
 .user-image-wrapper {
@@ -646,5 +690,19 @@ function updateUser(formEl: InstanceType<typeof ElForm> | undefined) {
   font-size: 12px;
   margin: 0;
   line-height: 25px;
+}
+/* 退会 */
+.withdrawal-mdlg {
+  text-align: right;
+  width: 500px;
+  margin: 30px auto 0;
+  padding-bottom: 10px;
+}
+.withdrawal-sm {
+  text-align: right;
+  width: 375px;
+  margin: 30px auto 0;
+  padding: 0 10px 10px;
+  box-sizing: border-box;
 }
 </style>

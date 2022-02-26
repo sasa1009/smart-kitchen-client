@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { RecipesApi, Configuration, GetRecipeResponseRecipe, FavoritesApi } from '@/api';
@@ -53,13 +53,21 @@ const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE
 async function updateFavorite() {
   try {
     if (recipeData.is_favorited) {
-      const response = await new FavoritesApi(configuration).deleteFavorite(authData.value.uid, authData.value.accessToken, authData.value.client, recipeData.id);
-      if (response.status === 204) {
+      if (isLogin.value) {
+        const response = await new FavoritesApi(configuration).deleteFavorite(authData.value.uid, authData.value.accessToken, authData.value.client, recipeData.id);
+        if (response.status === 204) {
+          ElMessage({
+            showClose: true,
+            message: 'お気に入りを解除しました。',
+          });
+          recipeData.is_favorited = !recipeData.is_favorited;
+        }
+      } else {
         ElMessage({
           showClose: true,
-          message: 'お気に入りを解除しました。',
+          message: 'お気に入りを解除するにはログインしてください。',
         });
-        recipeData.is_favorited = !recipeData.is_favorited;
+        router.push({name: 'Login'});
       }
     } else {
       if (isLogin.value) {
@@ -114,7 +122,7 @@ async function deleteRecipe() {
 /**
  * 単一のレシピ情報を取得
  */
-(async function init() {
+async function getRecipeData() {
   try {
     let response;
     if (isLogin.value) {
@@ -134,7 +142,19 @@ async function deleteRecipe() {
   } catch (error) {
     console.error(error);
   }
-})()
+}
+
+/**
+ * パスパラメータのIDが変わった時にレシピ情報を再度読み込む
+ */
+watch(() => route.path, async () => {
+  if (route.name === 'Recipe') {
+    await getRecipeData();
+  }
+});
+
+// コンポーネント作成時にレシピ情報を読み込む
+getRecipeData();
 </script>
 
 <template>
@@ -331,6 +351,7 @@ async function deleteRecipe() {
 .recipe-data-wrapper-mdlg {
   width: 750px;
   background-color: white;
+  border: 1px solid #dcdfe6;
   margin: 10px auto 0 auto;
   padding-bottom: 10px;
   box-sizing: border-box;
@@ -339,6 +360,7 @@ async function deleteRecipe() {
 .recipe-data-wrapper-sm {
   width: 375px;
   background-color: white;
+  border: 1px solid #dcdfe6;
   margin: 10px auto 0 auto;
   padding-bottom: 10px;
   box-sizing: border-box;

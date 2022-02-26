@@ -203,10 +203,20 @@ watch(
   }
 );
 
-(async function init() {
-  await getUserData();
-  await getUsersRecipeData();
-})();
+/**
+ * パスパラメータのIDが変わった時にユーザー情報を再度読み込む
+ */
+watch(() => route.path, async () => {
+  if (route.name === 'User') {
+    currentTab.value = '0';
+    await getUserData();
+    await getUsersRecipeData();
+  }
+});
+
+// コンポーネント作成時にユーザー情報を読み込む
+getUserData();
+getUsersRecipeData();
 </script>
 
 <template>
@@ -380,23 +390,25 @@ watch(
   width: 750px;
   height: 400px;
   background-color: white;
+  border: 1px solid #dcdfe6;
   margin: 10px auto 0 auto;
 }
 /* ユーザーデータラッパー小 */
 .user-data-wrapper-sm {
   width: 375px;
   background-color: white;
+  border: 1px solid #dcdfe6;
   margin: 10px auto 0 auto;
 }
 /* ユーザーデータ大 */
 .user-data-mdlg {
-  width: 375px;
+  width: 374px;
   height: 400px;
   float: left;
 }
 /* ユーザーデータ小 */
 .user-data-sm {
-  width: 375px;
+  width: 374px;
   height: 380px;
   padding: 10px;
   box-sizing: border-box;
@@ -478,14 +490,14 @@ watch(
 }
 /* コメント大 */
 .comment-mdlg {
-  width: 375px;
+  width: 374px;
   height: 400px;
   float: left;
   font-size: 14px;
 }
 /* コメント小 */
 .comment-sm {
-  width: 375px;
+  width: 374px;
   height: 200px;
   font-size: 14px;
   padding: 10px;
