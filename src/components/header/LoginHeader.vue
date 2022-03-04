@@ -21,7 +21,7 @@ function logout() {
       'access-token': authData.value.accessToken,
       client: authData.value.client
     },
-    url:'http://localhost:3000/api/v1/auth/sign_out',
+    url: process.env.VUE_APP_API_BASE_URL + '/auth/sign_out',
   })
     .then(function (response) {
       console.log(response);
@@ -38,11 +38,11 @@ function logout() {
     })
     .catch(function (error) {
       console.log(error);
-      ElMessage({
-        showClose: true,
-        message: 'ログアウトに失敗しました。',
-        type: 'error'
-      })
+      authData.value.userId = null;
+      authData.value.uid = '';
+      authData.value.accessToken = '';
+      authData.value.client = '';
+      authData.value.expiry = '';
     });
 }
 
@@ -444,7 +444,7 @@ getNotificasions();
       <el-drawer
         v-model="isDrawerOpen"
         direction="ttb"
-        size="20%"
+        size="40%"
       >
         <div
           class="search"

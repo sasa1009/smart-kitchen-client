@@ -51,7 +51,7 @@ function login(formEl: InstanceType<typeof ElForm> | undefined) {
         headers: {
           'content-type': 'application/json'
         },
-        url:'http://localhost:3000/api/v1/auth/sign_in',
+        url: process.env.VUE_APP_API_BASE_URL + '/auth/sign_in',
         data: formData,
       })
         .then(function (response) {

@@ -213,7 +213,7 @@ if (isLogin.value) {
     </Carousel>
   </div>
   <div
-    v-else
+    v-else-if="recipeDataList.length >= 1"
     :class="'carousel-wrapper-' + mq.current"
   >
     <h3 style="margin: 10px 0 10px 0;">新着レシピ</h3>

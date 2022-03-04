@@ -14,15 +14,18 @@ const input = ref('');
 const mq = useMq();
 const isDrawerOpen = ref(false);
 
+/**
+ * ゲストユーザーとしてログインする
+ */
 function guestLogin() {
   axios({
     method: 'post',
     headers: {
       'content-type': 'application/json'
     },
-    url:'http://localhost:3000/api/v1/auth/sign_in',
+    url: process.env.VUE_APP_API_BASE_URL + '/auth/sign_in',
     data: {
-      email: 'akinorisasakura1009@gmail.com',
+      email: process.env.VUE_APP_GUEST_USER_EMAIL,
       password: 'password'
     },
   })
@@ -170,7 +173,7 @@ function guestLogin() {
       <el-drawer
         v-model="isDrawerOpen"
         direction="ttb"
-        size="20%"
+        size="40%"
       >
         <div
           class="search"

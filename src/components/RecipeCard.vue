@@ -93,7 +93,7 @@ function goToFoodLogPage() {
   } else {
     ElMessage({
       showClose: true,
-      message: '食事記録をつけるにはログインしてください。',
+      message: '食事記録を登録するにはログインしてください。',
     });
     router.push({ name: 'Login' });
   }
