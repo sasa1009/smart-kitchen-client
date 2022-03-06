@@ -226,9 +226,6 @@ if (isLogin.value) {
         :key="index"
       >
         <div>
-          <span style="font-size: 18px; font-weight: bold;">
-            {{ index + 1 }}
-          </span>
           <RecipeCard
             :mq-current="mq.current"
             v-model:recipe-card-data="recipeDataList[index]"
