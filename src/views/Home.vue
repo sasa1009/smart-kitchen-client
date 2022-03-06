@@ -213,7 +213,7 @@ if (isLogin.value) {
     </Carousel>
   </div>
   <div
-    v-else
+    v-else-if="recipeDataList.length >= 1"
     :class="'carousel-wrapper-' + mq.current"
   >
     <h3 style="margin: 10px 0 10px 0;">新着レシピ</h3>
@@ -226,9 +226,6 @@ if (isLogin.value) {
         :key="index"
       >
         <div>
-          <span style="font-size: 18px; font-weight: bold;">
-            {{ index + 1 }}
-          </span>
           <RecipeCard
             :mq-current="mq.current"
             v-model:recipe-card-data="recipeDataList[index]"

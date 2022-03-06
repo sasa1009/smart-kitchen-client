@@ -50,6 +50,9 @@ const recipeData = reactive<GetRecipeResponseRecipe>({
 
 const configuration = new Configuration({ basePath: process.env.VUE_APP_API_BASE_URL });
 
+/**
+ * お気に入り未登録の場合は登録、登録済みの場合は登録解除する
+ */
 async function updateFavorite() {
   try {
     if (recipeData.is_favorited) {
@@ -99,6 +102,31 @@ async function updateFavorite() {
   }
 }
 
+/**
+ * ログイン中の場合食事記録ページに遷移し、未ログインの場合はログインページに遷移する
+ */
+function goToFoodLog() {
+  if (isLogin.value) {
+    router.push({
+      name: 'FoodLog',
+      params: {
+        name: recipeData.title,
+        calorie: recipeData.calorie,
+        recipe_id: recipeData.id,
+      }
+    });
+  } else {
+    ElMessage({
+      showClose: true,
+      message: '食事記録を登録するにはログインしてください。',
+    });
+    router.push({ name: 'Login' });
+  }
+}
+
+/**
+ * レシピのお気に入りを解除する
+ */
 async function deleteRecipe() {
   try {
     if (isLogin.value) {
@@ -225,14 +253,7 @@ getRecipeData();
               round
               size="small"
               class="food-log-button"
-              @click="$router.push({
-                name: 'FoodLog',
-                params: {
-                  name: recipeData.title,
-                  calorie: recipeData.calorie,
-                  recipe_id: recipeData.id,
-                }
-              })"
+              @click="goToFoodLog"
             >
               <font-awesome-icon
                 :icon="['fas', 'pencil-alt']"

@@ -93,7 +93,7 @@ function goToFoodLogPage() {
   } else {
     ElMessage({
       showClose: true,
-      message: '食事記録をつけるにはログインしてください。',
+      message: '食事記録を登録するにはログインしてください。',
     });
     router.push({ name: 'Login' });
   }
@@ -154,7 +154,7 @@ function goToFoodLogPage() {
       :class="'recipe-info-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
     >
       <el-col :span="5">
-        <div>
+        <div class="recipe-card-button-wrapper">
           <el-button
             type="text"
             v-if="props.recipeCardData.is_favorited"
@@ -179,9 +179,9 @@ function goToFoodLogPage() {
               :class="'icon-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')"
             />
           </el-button>
-        </div>
-        <div :class="'liked-number-' + (props.mqCurrent === 'sm' ? 'sm' : 'mdlg')">
-          {{ props.recipeCardData.favorited_count }}
+          <div>
+            {{ props.recipeCardData.favorited_count }}
+          </div>
         </div>
       </el-col>
       <el-col :span="5">
@@ -319,7 +319,7 @@ function goToFoodLogPage() {
 }
 /* ユーザー情報大 */
 .user-mdlg {
-  width: 200px;
+  width: 198px;
   padding-left: 5px;
 }
 .user-name-mdlg {
@@ -328,7 +328,7 @@ function goToFoodLogPage() {
 }
 /* ユーザー情報小 */
 .user-sm {
-  width: 160px;
+  width: 158px;
   padding-left: 5px;
 }
 .user-name-sm {
@@ -383,14 +383,11 @@ function goToFoodLogPage() {
 }
 /* レシピ情報大 */
 .recipe-info-mdlg {
-  width: 200px;
+  width: 198px;
   padding-left: 5px;
 }
 .liked {
   color: gold;
-}
-.liked-number-mdlg {
-  padding-left: 11px;
 }
 .category:hover {
   opacity: 0.8;
@@ -402,13 +399,15 @@ function goToFoodLogPage() {
 }
 /* レシピ情報小 */
 .recipe-info-sm {
-  width: 160px;
+  width: 158px;
   padding-left: 3px;
-}
-.liked-number-sm {
-  padding-left: 9px;
 }
 .category-sm {
   font-size: 11px;
+}
+/* お気に入りボタンと食事記録ボタンのラッパー */
+.recipe-card-button-wrapper {
+  width: 30.13px;
+  text-align: center;
 }
 </style>

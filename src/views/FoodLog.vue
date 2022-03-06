@@ -518,7 +518,7 @@ h1 {
   color: #F56C6C;
   position: absolute;
   bottom: -30px;
-  right: 162px;
+  right: 160px;
 }
 /* フォームの右側大 */
 .form-col-right-mdlg {
