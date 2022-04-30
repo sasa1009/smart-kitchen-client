@@ -32,7 +32,7 @@ const dateNumber = computed(() => (date: string) => {
  * ISOStringを時間にフォーマットする
  */
 const formatDate = computed(() => (date: string) => {
-  return dayjs(date).format('H:m');
+  return dayjs(date).format('H:mm');
 });
 
 /**
@@ -445,7 +445,7 @@ async function updateChart(status: 'previous' | 'next') {
   </div>
   <el-dialog
     v-model="dialogVisible"
-    :title="'食事記録 (' + date.getMonth() + '月' + date.getDate() + '日)'"
+    :title="'食事記録 (' + (date.getMonth() + 1) + '月' + date.getDate() + '日)'"
     :width="(mq.current === 'sm' ? '350px' : '500px')"
   >
     <el-row class="row">

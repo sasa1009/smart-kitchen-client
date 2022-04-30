@@ -318,6 +318,87 @@ export interface CurrentUserResponseUser {
     'weight_loss_target': number | null;
 }
 /**
+ * 食事記録情報
+ * @export
+ * @interface ExportFoodLogsResponse
+ */
+export interface ExportFoodLogsResponse {
+    /**
+     * 食事記録情報の配列
+     * @type {Array<ExportFoodLogsResponseFoodLogs>}
+     * @memberof ExportFoodLogsResponse
+     */
+    'food_logs': Array<ExportFoodLogsResponseFoodLogs>;
+    /**
+     * 
+     * @type {ExportFoodLogsResponseMeta}
+     * @memberof ExportFoodLogsResponse
+     */
+    'meta': ExportFoodLogsResponseMeta;
+}
+/**
+ * 
+ * @export
+ * @interface ExportFoodLogsResponseFoodLogs
+ */
+export interface ExportFoodLogsResponseFoodLogs {
+    /**
+     * 食事記録情報のID
+     * @type {number}
+     * @memberof ExportFoodLogsResponseFoodLogs
+     */
+    'id': number;
+    /**
+     * 食品名
+     * @type {string}
+     * @memberof ExportFoodLogsResponseFoodLogs
+     */
+    'name': string;
+    /**
+     * カロリー(kcal)
+     * @type {number}
+     * @memberof ExportFoodLogsResponseFoodLogs
+     */
+    'calorie': number;
+    /**
+     * 数量
+     * @type {number}
+     * @memberof ExportFoodLogsResponseFoodLogs
+     */
+    'amount': number;
+    /**
+     * レシピのID
+     * @type {number}
+     * @memberof ExportFoodLogsResponseFoodLogs
+     */
+    'recipe_id': number | null;
+    /**
+     * 食事した日時
+     * @type {string}
+     * @memberof ExportFoodLogsResponseFoodLogs
+     */
+    'meal_date_time': string;
+    /**
+     * ユーザーID
+     * @type {number}
+     * @memberof ExportFoodLogsResponseFoodLogs
+     */
+    'user_id': number;
+}
+/**
+ * 追加情報
+ * @export
+ * @interface ExportFoodLogsResponseMeta
+ */
+export interface ExportFoodLogsResponseMeta {
+    /**
+     * 食事記録情報の総数
+     * @type {number}
+     * @memberof ExportFoodLogsResponseMeta
+     */
+    'total': number;
+}
+/**
  * 食事記録のテンプレート情報
  * @export
  * @interface GetFoodLogTemplatesResponse
@@ -1908,6 +1989,71 @@ export const FoodLogsApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * 指定された期間の食事記録を一覧取得する
+         * @summary 指定された期間の食事記録を一覧取得する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {string} from 取得する食事記録の始期
+         * @param {string} to 取得する食事記録の終期
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        exportFoodLogs: async (uid: string, accessToken: string, client: string, from: string, to: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uid' is not null or undefined
+            assertParamExists('exportFoodLogs', 'uid', uid)
+            // verify required parameter 'accessToken' is not null or undefined
+            assertParamExists('exportFoodLogs', 'accessToken', accessToken)
+            // verify required parameter 'client' is not null or undefined
+            assertParamExists('exportFoodLogs', 'client', client)
+            // verify required parameter 'from' is not null or undefined
+            assertParamExists('exportFoodLogs', 'from', from)
+            // verify required parameter 'to' is not null or undefined
+            assertParamExists('exportFoodLogs', 'to', to)
+            const localVarPath = `/food_logs/export`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (from !== undefined) {
+                localVarQueryParameter['from'] = from;
+            }
+
+            if (to !== undefined) {
+                localVarQueryParameter['to'] = to;
+            }
+
+            if (uid !== undefined && uid !== null) {
+                localVarHeaderParameter['uid'] = String(uid);
+            }
+
+            if (accessToken !== undefined && accessToken !== null) {
+                localVarHeaderParameter['access-token'] = String(accessToken);
+            }
+
+            if (client !== undefined && client !== null) {
+                localVarHeaderParameter['client'] = String(client);
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 食事記録情報を一覧取得する
          * @summary 食事記録情報を一覧取得する
          * @param {string} uid devise-token-auth用のuid
@@ -2011,6 +2157,21 @@ export const FoodLogsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * 指定された期間の食事記録を一覧取得する
+         * @summary 指定された期間の食事記録を一覧取得する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {string} from 取得する食事記録の始期
+         * @param {string} to 取得する食事記録の終期
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async exportFoodLogs(uid: string, accessToken: string, client: string, from: string, to: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ExportFoodLogsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.exportFoodLogs(uid, accessToken, client, from, to, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * 食事記録情報を一覧取得する
          * @summary 食事記録情報を一覧取得する
          * @param {string} uid devise-token-auth用のuid
@@ -2060,6 +2221,20 @@ export const FoodLogsApiFactory = function (configuration?: Configuration, baseP
          */
         deleteFoodLog(uid: string, accessToken: string, client: string, id: string, options?: any): AxiosPromise<void> {
             return localVarFp.deleteFoodLog(uid, accessToken, client, id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 指定された期間の食事記録を一覧取得する
+         * @summary 指定された期間の食事記録を一覧取得する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {string} from 取得する食事記録の始期
+         * @param {string} to 取得する食事記録の終期
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        exportFoodLogs(uid: string, accessToken: string, client: string, from: string, to: string, options?: any): AxiosPromise<ExportFoodLogsResponse> {
+            return localVarFp.exportFoodLogs(uid, accessToken, client, from, to, options).then((request) => request(axios, basePath));
         },
         /**
          * 食事記録情報を一覧取得する
@@ -2113,6 +2288,22 @@ export class FoodLogsApi extends BaseAPI {
      */
     public deleteFoodLog(uid: string, accessToken: string, client: string, id: string, options?: AxiosRequestConfig) {
         return FoodLogsApiFp(this.configuration).deleteFoodLog(uid, accessToken, client, id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 指定された期間の食事記録を一覧取得する
+     * @summary 指定された期間の食事記録を一覧取得する
+     * @param {string} uid devise-token-auth用のuid
+     * @param {string} accessToken devise-token-auth用のaccess-token
+     * @param {string} client devise-token-auth用のclient
+     * @param {string} from 取得する食事記録の始期
+     * @param {string} to 取得する食事記録の終期
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof FoodLogsApi
+     */
+    public exportFoodLogs(uid: string, accessToken: string, client: string, from: string, to: string, options?: AxiosRequestConfig) {
+        return FoodLogsApiFp(this.configuration).exportFoodLogs(uid, accessToken, client, from, to, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
