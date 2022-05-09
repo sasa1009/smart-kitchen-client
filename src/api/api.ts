@@ -990,6 +990,62 @@ export interface GetUsersResponseUsers {
     'is_following': boolean;
 }
 /**
+ * 一括登録する食事記録情報
+ * @export
+ * @interface ImportFoodLogsRequest
+ */
+export interface ImportFoodLogsRequest {
+    /**
+     * 食事記録情報の配列
+     * @type {Array<ImportFoodLogsRequestFoodLogs>}
+     * @memberof ImportFoodLogsRequest
+     */
+    'food_logs': Array<ImportFoodLogsRequestFoodLogs>;
+}
+/**
+ * 
+ * @export
+ * @interface ImportFoodLogsRequestFoodLogs
+ */
+export interface ImportFoodLogsRequestFoodLogs {
+    /**
+     * 食品名
+     * @type {string}
+     * @memberof ImportFoodLogsRequestFoodLogs
+     */
+    'name': string;
+    /**
+     * カロリー(kcal)
+     * @type {number}
+     * @memberof ImportFoodLogsRequestFoodLogs
+     */
+    'calorie': number;
+    /**
+     * 数量
+     * @type {number}
+     * @memberof ImportFoodLogsRequestFoodLogs
+     */
+    'amount': number;
+    /**
+     * レシピのID
+     * @type {number}
+     * @memberof ImportFoodLogsRequestFoodLogs
+     */
+    'recipe_id': number | null;
+    /**
+     * 食事した日時
+     * @type {string}
+     * @memberof ImportFoodLogsRequestFoodLogs
+     */
+    'meal_date_time': string;
+    /**
+     * ユーザーID
+     * @type {number}
+     * @memberof ImportFoodLogsRequestFoodLogs
+     */
+    'user_id': number;
+}
+/**
  * 更新するユーザー情報
  * @export
  * @interface UpdateCurrentUserRequest
@@ -2118,6 +2174,63 @@ export const FoodLogsApiAxiosParamCreator = function (configuration?: Configurat
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 食事記録情報を一括登録する
+         * @summary 食事記録情報を一括登録する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {ImportFoodLogsRequest} importFoodLogsRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        importFoodLogs: async (uid: string, accessToken: string, client: string, importFoodLogsRequest: ImportFoodLogsRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uid' is not null or undefined
+            assertParamExists('importFoodLogs', 'uid', uid)
+            // verify required parameter 'accessToken' is not null or undefined
+            assertParamExists('importFoodLogs', 'accessToken', accessToken)
+            // verify required parameter 'client' is not null or undefined
+            assertParamExists('importFoodLogs', 'client', client)
+            // verify required parameter 'importFoodLogsRequest' is not null or undefined
+            assertParamExists('importFoodLogs', 'importFoodLogsRequest', importFoodLogsRequest)
+            const localVarPath = `/food_logs/import`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (uid !== undefined && uid !== null) {
+                localVarHeaderParameter['uid'] = String(uid);
+            }
+
+            if (accessToken !== undefined && accessToken !== null) {
+                localVarHeaderParameter['access-token'] = String(accessToken);
+            }
+
+            if (client !== undefined && client !== null) {
+                localVarHeaderParameter['client'] = String(client);
+            }
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(importFoodLogsRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -2186,6 +2299,20 @@ export const FoodLogsApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getFoodLogs(uid, accessToken, client, from, to, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+        /**
+         * 食事記録情報を一括登録する
+         * @summary 食事記録情報を一括登録する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {ImportFoodLogsRequest} importFoodLogsRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async importFoodLogs(uid: string, accessToken: string, client: string, importFoodLogsRequest: ImportFoodLogsRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.importFoodLogs(uid, accessToken, client, importFoodLogsRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
     }
 };
 
@@ -2249,6 +2376,19 @@ export const FoodLogsApiFactory = function (configuration?: Configuration, baseP
          */
         getFoodLogs(uid: string, accessToken: string, client: string, from: string, to: string, options?: any): AxiosPromise<GetFoodLogsResponse> {
             return localVarFp.getFoodLogs(uid, accessToken, client, from, to, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 食事記録情報を一括登録する
+         * @summary 食事記録情報を一括登録する
+         * @param {string} uid devise-token-auth用のuid
+         * @param {string} accessToken devise-token-auth用のaccess-token
+         * @param {string} client devise-token-auth用のclient
+         * @param {ImportFoodLogsRequest} importFoodLogsRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        importFoodLogs(uid: string, accessToken: string, client: string, importFoodLogsRequest: ImportFoodLogsRequest, options?: any): AxiosPromise<void> {
+            return localVarFp.importFoodLogs(uid, accessToken, client, importFoodLogsRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -2320,6 +2460,21 @@ export class FoodLogsApi extends BaseAPI {
      */
     public getFoodLogs(uid: string, accessToken: string, client: string, from: string, to: string, options?: AxiosRequestConfig) {
         return FoodLogsApiFp(this.configuration).getFoodLogs(uid, accessToken, client, from, to, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 食事記録情報を一括登録する
+     * @summary 食事記録情報を一括登録する
+     * @param {string} uid devise-token-auth用のuid
+     * @param {string} accessToken devise-token-auth用のaccess-token
+     * @param {string} client devise-token-auth用のclient
+     * @param {ImportFoodLogsRequest} importFoodLogsRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof FoodLogsApi
+     */
+    public importFoodLogs(uid: string, accessToken: string, client: string, importFoodLogsRequest: ImportFoodLogsRequest, options?: AxiosRequestConfig) {
+        return FoodLogsApiFp(this.configuration).importFoodLogs(uid, accessToken, client, importFoodLogsRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
